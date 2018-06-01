@@ -47,10 +47,13 @@ setup_file_link "${CODE_HOME}/gitignore_global"
 setup_dir_link "${CODE_HOME}/emacs.d" "${HOME}/.emacs.d"
 setup_dir_link "${CODE_HOME}/bin" "${HOME}/bin"
 
+if [ "$(uname)" == "Darwin" ]; then
+    . "${CODE_HOME}/install/brew.sh"
+    . "${CODE_HOME}/install/npm.sh"
+    . "${CODE_HOME}/install/bash.sh"
+    . "${CODE_HOME}/install/brew-cask.sh"
+fi
 
-
-
-echo "Read the bashrc file you are setting up on Mac to get Emacs running"
 
 # to remove everything, run the following.  Not going to automate this, because it is too destructive
 # rm "${HOME}/.bashrc" "${HOME}/.bash_profile" "${HOME}/.gitconfig" "${HOME}/.screenrc" "${HOME}/.vim" "${HOME}/.emacs.d" "${HOME}/bin" "${HOME}/.bash_completion.d" "${HOME}/.vimrc" "${HOME}/.tmux.conf"

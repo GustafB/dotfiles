@@ -122,7 +122,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+BEGIN_SRC emacs-lisp
   (when window-system
     (global-hl-line-mode))
-  (set-face-background 'hl-line "#778184")
+;;  (set-face-background 'hl-line "#778184")
 
 #+END_SRC
 *** Load icons package
@@ -131,11 +131,22 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 *** Load theme
 #+BEGIN_SRC emacs-lisp
-      (use-package zerodark-theme
-        :ensure t
-        :init
-        (add-hook 'after-init-hook 'zerodark t))
-       (zerodark-setup-modeline-format)
+(defun my/load-theme (frame)
+  (select-frame frame)
+  (load-theme 'zerodark t))
+(if (daemonp)
+    (add-hook 'after-make-frame-functions #'my/load-theme)
+  (load-theme 'zerodark t))
+;;        (use-package zerodark-theme
+  ;;        :ensure t
+    ;;      :config
+      ;;    (load-theme 'zerodark 'no-confirm))
+;;          :hook 'zerodark-setup-modeline-format)
+ (use-package zerodark-theme
+    :ensure t
+    :config
+    :hook ('my/load-theme))
+
 #+END_SRC
 *** Load rainbow-mode
 #+BEGIN_SRC emacs-lisp
@@ -641,24 +652,12 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 ** =projectile=
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-    :defer 5
+;;    :defer 5
     :diminish
     :bind* ("C-c TAB" . projectile-find-other-file)
     :bind-keymap ("C-c p" . projectile-command-map)
     :config
-    (projectile-global-mode)
-
-    (defun my-projectile-invalidate-cache (&rest _args)
-      ;; We ignore the args to `magit-checkout'.
-      (projectile-invalidate-cache nil))
-
-    (eval-after-load 'magit-branch
-      '(progn
-         (advice-add 'magit-checkout
-                     :after #'my-projectile-invalidate-cache)
-         (advice-add 'magit-branch-and-checkout
-                     :after #'my-projectile-invalidate-cache))))
-
+    (projectile-global-mode))
 #+END_SRC
 ** =helm=
 #+BEGIN_SRC emacs-lisp
@@ -671,9 +670,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
                 ("A-v"   . helm-previous-page))
     :config
     (helm-autoresize-mode 1))
-
   (global-set-key (kbd "C-x b") 'helm-buffers-list)
-
 #+END_SRC
 * =web-mode=
 - Enable rainbow mode
