@@ -1,0 +1,28 @@
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+[user]
+  name = GustafN
+  email = gustaf.brostedt@gmail.com
+[core]
+  autocrlf = false
+  safecrlf = false
+	editor = sublime -n -w
+	excludesfile = /Users/gustafbrostedt/.gitignore_global
+[alias]
+  co = checkout
+  ci = commit
+  st = status
+  br = branch
+  hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+  type = cat-file -t
+  dump = cat-file -p
+  pom = push origin master
+  pod = push origin dev
+  gpr = pull --rebase
+  gprud = pull --rebase upstream dev
+  ac = add . && commit
+  u = upstream
+  dbr = branch -d 
