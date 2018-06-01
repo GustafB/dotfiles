@@ -39,12 +39,16 @@ if [ ! -d "${HOME}/.backup" ]; then
 fi
 
 # setup links
-setup_file_link "${CODE_HOME}/.zsrhc" "${HOME}/.zsrhc"
+setup_file_link "${CODE_HOME}/zsrch" "${HOME}/.zsrch"
+setup_file_link "${CODE_HOME}/inputrc" "${HOME}/.inputrc"
+setup_file_link "${CODE_HOME}/bash_profile" "${HOME}/.bash_profile"
 setup_file_link "${CODE_HOME}/gitconfig" "${HOME}/.gitconfig"
-setup_file_link "${CODE_HOME}/screenrc" "${HOME}/.screenrc"
-setup_dir_link "${CODE_HOME}/dotemacs.d" "${HOME}/.emacs.d"
-#setup_dir_link "${CODE_HOME}/bash_completion.d" "${HOME}/.bash_completion.d"
+setup_file_link "${CODE_HOME}/gitignore_global"
+setup_dir_link "${CODE_HOME}/emacs.d" "${HOME}/.emacs.d"
 setup_dir_link "${CODE_HOME}/bin" "${HOME}/bin"
+
+
+
 
 echo "Read the bashrc file you are setting up on Mac to get Emacs running"
 
