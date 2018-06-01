@@ -17,13 +17,9 @@ Add MELPA to package-list
 #+END_SRC
 Make sure use-package is installed
 #+BEGIN_SRC emacs-lisp
-  (unless (package-installed-p 'use-package)
-    (package-install 'use-package))
-
-  (setq use-package-verbose t)
-;;  (setq use-package-always-ensure t)
-
-  (require 'use-package)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 #+END_SRC
 
 Compile packages and ensure latest version in available
@@ -102,9 +98,9 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 *** Evil-Mode
 #+BEGIN_SRC emacs-lisp
-(setq evil-want-abbrev-expand-on-insert-exit nil)
-(evil-mode 0)
-(add-to-list'evil-emacs-state-modes 'eshell)
+;;(setq evil-want-abbrev-expand-on-insert-exit nil)
+;;(evil-mode 0)
+;;(add-to-list'evil-emacs-state-modes 'eshell)
 #+END_SRC
 *** Inhibit startup message
     #+BEGIN_SRC emacs-lisp
@@ -127,7 +123,8 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 *** Load icons package
 #+BEGIN_SRC emacs-lisp
-  (use-package all-the-icons)
+  (use-package all-the-icons
+   :ensure t)
 #+END_SRC
 *** Load theme
 #+BEGIN_SRC emacs-lisp
@@ -151,6 +148,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 *** Load rainbow-mode
 #+BEGIN_SRC emacs-lisp
   (use-package rainbow-mode
+    :ensure t
     :commands rainbow-mode)
 #+END_SRC
 *** Fonts and resizing
@@ -216,6 +214,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 *** Expand regions
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
+    :ensure t
     :commands (er/expand-region er/contract-region)
     :bind (
            ("M-=" . er/expand-region)
@@ -258,8 +257,8 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 ** =ivy=
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
+    :ensure t
     :diminish
-
     :bind (("C-x b" . ivy-switch-buffer)
            ("C-x B" . ivy-switch-buffer-other-window)
            ("M-H"   . ivy-resume))
@@ -507,6 +506,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 ** =company=
 #+BEGIN_SRC emacs-lisp
   (use-package company
+    :ensure t
     :init (progn
             (add-hook 'prog-mode-hook 'company-mode))
     :config (progn
@@ -525,6 +525,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 ** =google-this=
 #+BEGIN_SRC emacs-lisp
   (use-package google-this
+    :ensure t
     :bind-keymap ("C-c /" . google-this-mode-submap)
     :bind* ("M-SPC" . google-this-search)
     :bind (:map google-this-mode-map
@@ -541,7 +542,8 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 ** =drag-stuff=
 #+BEGIN_SRC emacs-lisp
-  (use-package drag-stuff)
+  (use-package drag-stuff
+   :ensure t)
   (drag-stuff-global-mode 1)
   (drag-stuff-define-keys)
 #+END_SRC
@@ -557,6 +559,12 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 ** =ido-mode=
 #+BEGIN_SRC emacs-lisp
+  (use-package ido
+    :ensure t)
+  (use-package flx-ido
+    :ensure t)
+  (use-package ido-vertical-mode
+    :ensure t)
   (setq ido-enable-flex-matching t)
   (setq ido-everywhere t)
   (ido-mode 1)
@@ -569,6 +577,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 ** =Magit=
 #+BEGIN_SRC emacs-lisp
   (use-package magit
+    :ensure t
     :bind (("C-x g" . magit-status)
            ("C-x G" . magit-status-with-prefix))
     :bind (:map magit-mode-map
@@ -676,6 +685,8 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 - Enable rainbow mode
 - Set indentation to 2 spaces
 #+BEGIN_SRC emacs-lisp
+  (use-package web-mode
+    :ensure t)
   (add-hook 'web-mode-hook
             (lambda ()
               (rainbow-mode)
@@ -704,8 +715,10 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 * =js2-refactor=
 #+BEGIN_SRC emacs-lisp
-(require 'js2-refactor)
-(require 'xref-js2)
+(use-package js2-refactor
+  :ensure t)
+(use-package xref-js2
+  :ensure t)
 (setq js2-highlight-level 3)
 (add-hook 'js2-mode-hook #'js2-refactor-mode)
 (js2r-add-keybindings-with-prefix "C-c C-r")
@@ -724,6 +737,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 * =markdown-mode=
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
+    :ensure t
     :mode (("\\`README\\.md\\'" . gfm-mode)
            ("\\.md\\'"          . markdown-mode)
            ("\\.markdown\\'"    . markdown-mode))
@@ -741,17 +755,20 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 Load company-enabled restclient
 #+BEGIN_SRC emacs-lisp
   (use-package company-restclient
+    :ensure t
     :after (company restclient))
 #+END_SRC
 Load regular rest client
 #+BEGIN_SRC emacs-lisp
   (use-package restclient
+    :ensure t
     :mode ("\\.rest\\'" . restclient-mode))
 #+END_SRC
 * CSS and SCSS
 Set indentation for =css-mode=
 #+BEGIN_SRC emacs-lisp
     (use-package css-mode
+      :ensure t
       :config
       :hook rainbow-mode
       :config
@@ -760,6 +777,7 @@ Set indentation for =css-mode=
 Disable auto-compile for =scss-mode=
 #+BEGIN_SRC emacs-lisp
   (use-package scss-mode
+    :ensure t
     :config
     (setq scss-compile-at-save nil))
 #+END_SRC

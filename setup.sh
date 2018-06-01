@@ -39,20 +39,19 @@ if [ ! -d "${HOME}/.backup" ]; then
 fi
 
 # setup links
-setup_file_link "${CODE_HOME}/zsrch" "${HOME}/.zsrch"
+setup_file_link "${CODE_HOME}/zshrc" "${HOME}/.zshrc"
 setup_file_link "${CODE_HOME}/inputrc" "${HOME}/.inputrc"
-setup_file_link "${CODE_HOME}/bash_profile" "${HOME}/.bash_profile"
 setup_file_link "${CODE_HOME}/gitconfig" "${HOME}/.gitconfig"
-setup_file_link "${CODE_HOME}/gitignore_global"
-setup_dir_link "${CODE_HOME}/emacs.d" "${HOME}/.emacs.d"
+setup_file_link "${CODE_HOME}/gitignore_global" "${HOME}/.gitignore_global"
+setup_dir_link "${CODE_HOME}/dotemacs.d" "${HOME}/.emacs.d"
 setup_dir_link "${CODE_HOME}/bin" "${HOME}/bin"
 
-if [ "$(uname)" == "Darwin" ]; then
-    . "${CODE_HOME}/install/brew.sh"
-    . "${CODE_HOME}/install/npm.sh"
-    . "${CODE_HOME}/install/bash.sh"
-    . "${CODE_HOME}/install/brew-cask.sh"
-fi
+# if [ "$(uname)" == "Darwin" ]; then
+#     . "${CODE_HOME}/install/brew.sh"
+#     . "${CODE_HOME}/install/npm.sh"
+#     . "${CODE_HOME}/install/bash.sh"
+#     . "${CODE_HOME}/install/brew-cask.sh"
+# fi
 
 
 # to remove everything, run the following.  Not going to automate this, because it is too destructive
