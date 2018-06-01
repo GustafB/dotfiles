@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # simple script to shutdown the running Emacs daemon
