@@ -28,11 +28,24 @@ Compile packages and ensure latest version in available
     :config (auto-compile-on-load-mode))
   (setq load-prefer-newer t)
 #+END_SRC
+Use quelpa
+#+BEGIN_SRC emacs-lisp
+  (use-package quelpa
+    :ensure t)
 
+  (use-package quelpa-use-package
+    :ensure t)
+
+#+END_SRC
 * Tweaking UX
 ** Utility Functions
 Some handy functionality, mostly drawn from other configs ([[https://github.com/hrs/][HRS]], [[https://github.com/NicolasPetton][Nicolas Petton]], [[https://github.com/jwiegley][JWiegley]])
 #+BEGIN_SRC emacs-lisp
+  (defvar saved-window-configuration nil)
+  (defun push-window-configuration ()
+    (interactive)
+    (push (current-window-configuration) saved-window-configuration))
+
   (defun generate-scratch-buffer ()
     "Create and switch to a temporary scratch buffer with a random
        name."
@@ -93,8 +106,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+BEGIN_SRC emacs-lisp
   (tool-bar-mode 0)
   (menu-bar-mode 0)
-  (when window-system
-    (scroll-bar-mode -1))
+  (scroll-bar-mode -1)
 #+END_SRC
 *** Evil-Mode
 #+BEGIN_SRC emacs-lisp
@@ -128,21 +140,23 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 *** Load theme
 #+BEGIN_SRC emacs-lisp
-(defun my/load-theme (frame)
-  (select-frame frame)
-  (load-theme 'zerodark t))
-(if (daemonp)
-    (add-hook 'after-make-frame-functions #'my/load-theme)
-  (load-theme 'zerodark t))
-;;        (use-package zerodark-theme
-  ;;        :ensure t
-    ;;      :config
-      ;;    (load-theme 'zerodark 'no-confirm))
-;;          :hook 'zerodark-setup-modeline-format)
- (use-package zerodark-theme
-    :ensure t
-    :config
-    :hook ('my/load-theme))
+      (defun my/load-theme (frame)
+        (select-frame frame)
+        (load-theme 'zerodark t))
+      (if (daemonp)
+          (add-hook 'after-make-frame-functions #'my/load-theme)
+        (load-theme 'zerodark t))
+      ;;        (use-package zerodark-theme
+        ;;        :ensure t
+          ;;      :config
+            ;;    (load-theme 'zerodark 'no-confirm))
+      ;;          :hook 'zerodark-setup-modeline-format)
+       (use-package zerodark-theme
+          :ensure t
+          :config
+          :hook (my/load-theme)
+          :init
+          (add-hook 'after-init-hook 'zerodark-setup-modeline-format))
 
 #+END_SRC
 *** Load rainbow-mode
@@ -357,140 +371,25 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 
 #+END_SRC
 ** =dired=
+Kill files/buffers that are deleted in dired
 #+BEGIN_SRC emacs-lisp
-  (use-package dired
-    :ensure nil
-    :bind ("C-c j" . dired-two-pane)
-    :bind (:map dired-mode-map
-                ("j"     . dired)
-                ("z"     . pop-window-configuration)
-                ("e"     . ora-ediff-files)
-                ("l"     . dired-up-directory)
-                ("q"     . dired-up-directory)
-                ("Y"     . ora-dired-rsync)
-                ("M-!"   . async-shell-command)
-                ("<tab>" . dired-next-window)
-                ("M-G")
-                ("M-s f"))
-    :diminish dired-omit-mode
-    :hook (dired-mode . dired-hide-details-mode)
-    :preface
-    (defun dired-two-pane ()
-      (interactive)
-      (push-window-configuration)
-      (let ((here default-directory))
-        (delete-other-windows)
-        (dired "~/dl")
-        (split-window-horizontally)
-        (dired here)))
-
-    (defun dired-next-window ()
-      (interactive)
-      (let ((next (car (cl-remove-if-not #'(lambda (wind)
-                                             (with-current-buffer (window-buffer wind)
-                                               (eq major-mode 'dired-mode)))
-                                         (cdr (window-list))))))
-        (when next
-          (select-window next))))
-
-    (defvar mark-files-cache (make-hash-table :test #'equal))
-
-    (defun mark-similar-versions (name)
-      (let ((pat name))
-        (if (string-match "^\\(.+?\\)-[0-9._-]+$" pat)
-            (setq pat (match-string 1 pat)))
-        (or (gethash pat mark-files-cache)
-            (ignore (puthash pat t mark-files-cache)))))
-
-    (defun dired-mark-similar-version ()
-      (interactive)
-      (setq mark-files-cache (make-hash-table :test #'equal))
-      (dired-mark-sexp '(mark-similar-versions name)))
-
-    (defun ora-dired-rsync (dest)
-      (interactive
-       (list
-        (expand-file-name
-         (read-file-name "Rsync to: " (dired-dwim-target-directory)))))
-      (let ((files (dired-get-marked-files
-                    nil current-prefix-arg))
-            (tmtxt/rsync-command "rsync -aP "))
-        (dolist (file files)
-          (setq tmtxt/rsync-command
-                (concat tmtxt/rsync-command
-                        (shell-quote-argument file)
-                        " ")))
-        (setq tmtxt/rsync-command
-              (concat tmtxt/rsync-command
-                      (shell-quote-argument dest)))
-        (async-shell-command tmtxt/rsync-command "*rsync*")
-        (other-window 1)))
-
-    (defun ora-ediff-files ()
-      (interactive)
-      (let ((files (dired-get-marked-files))
-            (wnd (current-window-configuration)))
-        (if (<= (length files) 2)
-            (let ((file1 (car files))
-                  (file2 (if (cdr files)
-                             (cadr files)
-                           (read-file-name
-                            "file: "
-                            (dired-dwim-target-directory)))))
-              (if (file-newer-than-file-p file1 file2)
-                  (ediff-files file2 file1)
-                (ediff-files file1 file2))
-              (add-hook 'ediff-after-quit-hook-internal
-                        `(lambda ()
-                           (setq ediff-after-quit-hook-internal nil)
-                           (set-window-configuration ,wnd))))
-          (error "no more than 2 files should be marked"))))
-
-    :config
-    (defvar dired-omit-regexp-orig (symbol-function 'dired-omit-regexp))
-
-    ;; Omit files that Git would ignore
-    (defun dired-omit-regexp ()
-      (let ((file (expand-file-name ".git"))
-            parent-dir)
-        (while (and (not (file-exists-p file))
-                    (progn
-                      (setq parent-dir
-                            (file-name-directory
-                             (directory-file-name
-                              (file-name-directory file))))
-                      ;; Give up if we are already at the root dir.
-                      (not (string= (file-name-directory file)
-                                    parent-dir))))
-          ;; Move up to the parent dir and try again.
-          (setq file (expand-file-name ".git" parent-dir)))
-        ;; If we found a change log in a parent, use that.
-        (if (file-exists-p file)
-            (let ((regexp (funcall dired-omit-regexp-orig))
-                  (omitted-files
-                   (shell-command-to-string "git clean -d -x -n")))
-              (if (= 0 (length omitted-files))
-                  regexp
-                (concat
-                 regexp
-                 (if (> (length regexp) 0)
-                     "\\|" "")
-                 "\\("
-                 (mapconcat
-                  #'(lambda (str)
-                      (concat
-                       "^"
-                       (regexp-quote
-                        (substring str 13
-                                   (if (= ?/ (aref str (1- (length str))))
-                                       (1- (length str))
-                                     nil)))
-                       "$"))
-                  (split-string omitted-files "\n" t)
-                  "\\|")
-                 "\\)")))
-          (funcall dired-omit-regexp-orig)))))
-
+(setq dired-clean-up-buffers-too t)
+#+END_SRC
+Copy directories recursively without confirmation
+#+BEGIN_SRC emacs-lisp
+(setq dired-recursive-copies 'always)
+#+END_SRC
+Ask before recursively deleting a directory
+#+BEGIN_SRC emacs-lisp
+(setq dired-recursive-deletes 'top)
+#+END_SRC
+Enable dired+
+#+BEGIN_SRC emacs-lisp
+  (use-package dired+
+    :quelpa (dired+ :fetcher github :repo "emacsmirror/dired-plus"))
+#+END_SRC
+Enable dired-toggle
+#+BEGIN_SRC emacs-lisp
   (use-package dired-toggle
     :ensure nil
     :bind ("C-c ~" . dired-toggle)
@@ -572,6 +471,105 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
   (setq ido-create-new-buffer 'always) ; don't confirm to create new buffers
   (ido-vertical-mode 1)
   (setq ido-vertical-define-keys 'C-n-and-C-p-only)
+#+END_SRC
+** =ibuffer=
+#+BEGIN_SRC emacs-lisp
+  (use-package ibuffer
+    :ensure nil)
+  (use-package ibuffer-vc
+    :ensure t)
+
+  ;;; IBuffer:
+  ;; Use human readable Size column instead of original one
+  (define-ibuffer-column size-h
+    (:name "Size" :inline t)
+    (let ((bs (buffer-size)))
+      (cond ((> bs 1e6) (format "%7.1fmB" (/ bs 1e6)))
+            ((> bs 1e3) (format "%7.1fkB" (/ bs 1e3)))
+            (t          (format "%7d  " bs)))))
+
+  (setf ibuffer-formats
+        '((mark modified read-only vc-status-mini " "
+                (name 18 18 :left :elide)
+                " "
+                (size-h 9 -1 :right)
+                " "
+                (mode 16 16 :left :elide)
+                " "
+                (vc-status 16 16 :left)
+                " "
+                filename-and-process))
+        ibuffer-show-empty-filter-groups nil)
+
+  (define-ibuffer-filter name-not
+      "Negated buffer name match."
+    (:description "buffer name not"
+     :reader (read-from-minibuffer "Exclude buffers (regexp): "))
+    (not (string-match qualifier (buffer-name buf))))
+
+  (defvar gk-ibuffer-filters
+    '(("Emacs"
+       (name . "^\\*\\(scratch\\|Messages\\)\\*$"))
+      ("VC"
+       (name . "^\\*\\(vc\\|log\\)-?"))
+      ("Documentation"
+       (name . "^\\*\\(Help\\|info\\|Man [0-9]?\\)"))
+      ("Special buffers"
+       (name-not . "compilation")
+       (name . "^\\*.*\\*$"))
+      ("EWW Reading"
+       (mode . eww-mode)))
+    "Fixed filter definitions for ibuffer.")
+
+  (cl-defun gk-ibuffer-generate-filter-groups-by-dir ()
+    "Create a set of ibuffer filter groups based on the dirs of buffers."
+    (let* ((func (lambda (buf)
+                   (when-let ((bufnam (buffer-file-name buf)))
+                     (if-let ((linknam (file-symlink-p bufnam)))
+                         (file-name-directory (expand-file-name linknam))
+                       (file-name-directory (expand-file-name bufnam))))))
+           (dirs (ibuffer-remove-duplicates (delq nil (mapcar func (buffer-list))))))
+      (mapcar (lambda (dir) (cons (concat "Directory: " dir) `((dir . ,dir)))) dirs)))
+
+  (define-ibuffer-filter dir
+      "Toggle current view to buffers with dir QUALIFIER."
+    (:description "directory" :reader (read-from-minibuffer "Filter by dir (regexp): "))
+    (ibuffer-awhen (buffer-file-name buf)
+      (string= qualifier (file-name-directory it))))
+
+  (define-advice ibuffer-update (:before (&rest args) autogroups)
+    "Group related buffers together using ‘ibuffer-vc’ and ‘dir’,
+  and special ones sepatarely."
+    (ignore args)
+    (setf ibuffer-filter-groups
+          (append
+           gk-ibuffer-filters
+           (ibuffer-vc-generate-filter-groups-by-vc-root)
+           (gk-ibuffer-generate-filter-groups-by-dir))))
+
+  ;; Hide these buffers by default.
+  (defvar gk-ibuffer-collapsed-groups (list "Special buffers" "Emacs" "Documentation"
+                                            "VC"))
+
+  (define-advice ibuffer (:after (&rest args) gk-hidden-groups)
+    "Hide groups in ‘gk-ibuffer-collapsed-groups’."
+    (ignore args)
+    (save-excursion
+      (dolist (group gk-ibuffer-collapsed-groups)
+        (ignore-errors
+          (ibuffer-jump-to-filter-group group)
+          (ibuffer-toggle-filter-group)))))
+
+  (cl-defun gk-ibuffer-hook ()
+    (unless (eq ibuffer-sorting-mode 'alphabetic)
+      (ibuffer-do-sort-by-filename/process))
+    (ibuffer-update nil t))
+
+  (add-hook 'ibuffer-hook 'gk-ibuffer-hook)
+
+  (provide 'gk-ibuffer)
+
+
 #+END_SRC
 * Version Control & Project Management
 ** =Magit=
@@ -661,7 +659,8 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 ** =projectile=
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
-;;    :defer 5
+    :ensure t
+    :defer 5
     :diminish
     :bind* ("C-c TAB" . projectile-find-other-file)
     :bind-keymap ("C-c p" . projectile-command-map)
@@ -671,6 +670,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 ** =helm=
 #+BEGIN_SRC emacs-lisp
   (use-package helm
+    :ensure t
     :defer t
     :bind (:map helm-map
                 ("<tab>" . helm-execute-persistent-action)
@@ -848,6 +848,8 @@ Disable auto-compile for =scss-mode=
   (global-set-key (kbd "C-x 3") 'split-window-right-and-switch)
   (global-set-key (kbd "C-x C-t") 'iterm-goto-filedir-or-home)
   (global-set-key (kbd "C-x k") 'kill-current-buffer)
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
+#+END_SRC
 #+END_SRC
 * Other defaults
 Always indent with spaces

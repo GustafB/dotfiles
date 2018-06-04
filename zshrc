@@ -20,6 +20,12 @@ export FZF_DEFAULT_OPTS='--height 40% --reverse --border --inline-info --color=d
 export ENHANCD_FILTER="fzf:peco:percol"
 export ENHANCD_COMMAND='c'
 
+if [ -n "$INSIDE_EMACS" ]; then
+  chpwd() { print -P "\033AnSiTc %d" }
+  print -P "\033AnSiTu %n"
+  print -P "\033AnSiTc %d"
+fi
+
 # =============================================================================
 #                                   Plugins
 # =============================================================================

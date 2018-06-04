@@ -25,4 +25,4 @@
   gprud = pull --rebase upstream dev
   ac = add . && commit
   u = upstream
-  dbr = branch -d 
+  dbr = branch -d
