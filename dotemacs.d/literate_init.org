@@ -11,9 +11,11 @@ This is a straight clone of [[https://github.com/hrs/sensible-defaults.el][HRS]]
 * Configure =use-package=
 Add MELPA to package-list
 #+BEGIN_SRC emacs-lisp
-(require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
+  (require 'package)
+  (add-to-list 'package-archives
+               '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives
+               '("org" . "https://orgmode.org/elpa") t)
 #+END_SRC
 Make sure use-package is installed
 #+BEGIN_SRC emacs-lisp
@@ -48,7 +50,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 
   (defun generate-scratch-buffer ()
     "Create and switch to a temporary scratch buffer with a random
-       name."
+         name."
     (interactive)
     (switch-to-buffer (make-temp-name "scratch-")))
 
@@ -100,6 +102,35 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
     (balance-windows)
     (other-window 1))
 
+  (defun package-upgrade-all ()
+    "Upgrade all packages automatically without showing *Packages* buffer."
+    (interactive)
+    (package-refresh-contents)
+    (let (upgrades)
+      (cl-flet ((get-version (name where)
+                             (let ((pkg (cadr (assq name where))))
+                               (when pkg
+                                 (package-desc-version pkg)))))
+        (dolist (package (mapcar #'car package-alist))
+          (let ((in-archive (get-version package package-archive-contents)))
+            (when (and in-archive
+                       (version-list-< (get-version package package-alist)
+                                       in-archive))
+              (push (cadr (assq package package-archive-contents))
+                    upgrades)))))
+      (if upgrades
+          (when (yes-or-no-p
+                 (message "Upgrade %d package%s (%s)? "
+                          (length upgrades)
+                          (if (= (length upgrades) 1) "" "s")
+                          (mapconcat #'package-desc-full-name upgrades ", ")))
+            (save-window-excursion
+              (dolist (package-desc upgrades)
+                (let ((old-package (cadr (assq (package-desc-name package-desc)
+                                               package-alist))))
+                  (package-install package-desc)
+                  (package-delete  old-package)))))
+        (message "All packages are up to date"))))
 #+END_SRC
 ** UI/UX things
 *** Remove scroll bars
@@ -800,6 +831,35 @@ Disable auto-compile for =scss-mode=
 
   (use-package org-journal
     :ensure t)
+#+END_SRC
+** =pdf-tools=
+#+BEGIN_SRC emacs-lisp
+  (use-package pdf-tools
+    :ensure t)
+#+END_SRC
+** =org-ref=
+I like to be able to store notes when I read papers / studies
+#+BEGIN_SRC emacs-lisp
+  (use-package org-ref
+    :ensure t
+    :config
+    (setq org-ref-notes-directory "~/Dropbox/org/reading"
+          org-ref-bibliography-notes "~/Dropbox/org/reading/index.org"
+          org-ref-default-bibliography '("~/Dropbox/org/reading/index.bib")
+          org-ref-pdf-directory "~/Dropbox/org/reading/lib/")) ;; where documents are stored
+
+#+END_SRC
+** =helm-bibtex=
+Library for creating and storing references and citations
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-bibtex
+    :ensure t
+    :config
+    (setq helm-bibtex-bibliography "~/Dropbox/org/reading/index.bib" ;; where your references are stored
+        helm-bibtex-library-path "~/Dropbox/org/reading/lib/" ;; where your pdfs etc are stored
+        helm-bibtex-notes-path "~/Dropbox/org/reading/index.org" ;; where your notes are stored
+        bibtex-completion-bibliography "~/Dropbox/org/reading/index.bib" ;; writing completion
+        bibtex-completion-notes-path "~/Dropbox/org/reading/index.org"))
 #+END_SRC
 ** Cosmetics
 #+BEGIN_SRC emacs-lisp

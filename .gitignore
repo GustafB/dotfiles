@@ -17,8 +17,9 @@ ede-projects.el
 ido.last
 .mc-lists.el
 recentf
-literate_init.el
-quelpa
+/dotemacs.d/literate_init.el
+/dotemacs.d/elpa
+/dotemacs.d/quelpa
 mc-lists.el
 projectile-bookmarks.eld
 recentf
