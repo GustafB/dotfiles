@@ -1,4 +1,4 @@
-#+TITLE:Emacs Config
+G#+TITLE:Emacs Config
 
 * Load better default settings
 This is a straight clone of [[https://github.com/hrs/sensible-defaults.el][HRS]] defaults setup
@@ -24,11 +24,11 @@ Make sure use-package is installed
   (package-install 'use-package))
 #+END_SRC
 
-Compile packages and ensure latest version in available
+Compile packages and ensure latest version in available - not required anymore
 #+BEGIN_SRC emacs-lisp
-  (use-package auto-compile
-    :config (auto-compile-on-load-mode))
-  (setq load-prefer-newer t)
+  ;; (use-package auto-compile
+  ;;   :config (auto-compile-on-load-mode))
+  ;; (setq load-prefer-newer t)
 #+END_SRC
 Use quelpa
 #+BEGIN_SRC emacs-lisp
@@ -298,6 +298,12 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
   (provide 'setup-flycheck)
   (add-hook 'c-mode-common-hook #'flycheck-mode)
 #+END_SRC
+*** Load up which-key
+Sometimes my brain takes a fart and then its useful to know which key to press
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :ensure t)
+#+END_SRC
 * Navigation & Interface
 ** =ivy=
 #+BEGIN_SRC emacs-lisp
@@ -486,6 +492,8 @@ Enable dired-toggle
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
   (global-set-key (kbd "C-M-g") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C-.") 'mc/skip-to-next-like-this)
+  (global-set-key (kbd "C-,") 'mc/skip-to-previous-like-this)
 #+END_SRC
 ** =ido-mode=
 #+BEGIN_SRC emacs-lisp
@@ -716,20 +724,21 @@ Enable dired-toggle
 - Enable rainbow mode
 - Set indentation to 2 spaces
 #+BEGIN_SRC emacs-lisp
-  (use-package web-mode
-    :ensure t)
-  (add-hook 'web-mode-hook
-            (lambda ()
-              (rainbow-mode)
-              (setq web-mode-markup-indent-offset 2)))
-  (add-auto-mode
-   'web-mode
-   "\\.blade$"
-   "\\.phtml$"
-   "\\.erb$"
-   "\\.html$"
-   "\\.php$"
-   "\\.rhtml$")
+    (use-package web-mode
+      :ensure t
+      :config
+      (add-hook 'web-mode-hook
+                (lambda ()
+                  (rainbow-mode)
+                  (setq web-mode-markup-indent-offset 2)))
+      (add-auto-mode
+       'web-mode
+       "\\.blade$"
+       "\\.phtml$"
+       "\\.erb$"
+       "\\.html$"
+       "\\.php$"
+       "\\.rhtml$"))
 #+END_SRC
 * =js2-mode=
 #+BEGIN_SRC emacs-lisp
@@ -765,7 +774,8 @@ Enable dired-toggle
 (add-hook 'js2-mode-hook (lambda ()
   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 #+END_SRC
-* =markdown-mode=
+* =markdown
+-mode=
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :ensure t
@@ -780,6 +790,7 @@ Enable dired-toggle
     (setq markdown-preview-stylesheets
           (list (concat "https://github.com/dmarcotte/github-markdown-preview/"
                         "blob/master/data/css/github.css"))))
+  (custom-set-variables '(markdown-command "/usr/local/bin/markdown"))
 
 #+END_SRC
 * =rest-client=
@@ -798,12 +809,15 @@ Load regular rest client
 * CSS and SCSS
 Set indentation for =css-mode=
 #+BEGIN_SRC emacs-lisp
-    (use-package css-mode
-      :ensure t
-      :config
-      :hook rainbow-mode
-      :config
-      (setq css-indent-offset 2))
+  (use-package css-mode
+    :commands css-mode
+    :init
+    (setq css-indent-offset 2)
+    :config
+    (use-package rainbow-mode
+      :init
+      (dolist (hook '(css-mode-hook sass-mode-hook))
+	(add-hook hook 'rainbow-mode))))
 #+END_SRC
 Disable auto-compile for =scss-mode=
 #+BEGIN_SRC emacs-lisp
@@ -916,6 +930,10 @@ Always indent with spaces
 #+BEGIN_SRC emacs-lisp
   (setq-default indent-tabs-mode nil)
 #+END_SRC
+Follow symlinks
+#+BEGIN_SRC emacs-lisp
+  (setq vc-follow-symlinks t)
+#+END_SRC
 Set default tab width
 #+BEGIN_SRC emacs-lisp
   (setq-default tab-width 2)
@@ -959,4 +977,92 @@ prompt to 'name>'."
 I like to see my todo list on startup
 #+BEGIN_SRC emacs-lisp
 (find-file "~/Dropbox/org/index.org")
+#+END_SRC
+* Email
+Add mu and mu4e to load path
+#+BEGIN_SRC emacs-lisp
+  (let ((default-directory "/usr/local/share/emacs/site-lisp/"))
+    (normal-top-level-add-subdirs-to-load-path))
+#+END_SRC
+Enabel mu4e and link to email account
+#+BEGIN_SRC emacs-lisp
+  (use-package mu4e
+    :config
+    (setq mu4e-contexts
+          `( ,(make-mu4e-context
+               :name "Gmail"
+               :match-func (lambda (msg) (when msg
+                                           (string-prefix-p "/gmail-personal" (mu4e-message-field msg :maildir))))
+               :vars '(
+                       (mu4e-trash-folder . "/gmail-personal/[Gmail].Trash")
+                       (mu4e-refile-folder . "/gmail-personal/[Gmail].Archive")
+                       (mu4e-drafts-folder . "/gmail-personal/[Gmail].Utkast")
+                       (mu4e-sent-folder . "/gmail-personal/[Gmail].Skickat")
+                       ))
+             )))
+#+END_SRC
+Enable desktop alerts
+#+BEGIN_SRC emacs-lisp
+  (use-package mu4e-alert
+    :ensure t
+    :after mu4e
+    :init
+    (setq mu4e-alert-interesting-mail-query
+          "flag:unread maildir:/Gmail/INBOX"
+          )
+    (mu4e-alert-enable-mode-line-display)
+    (defun refresh-mu4e-alert-mode-line ()
+      (interactive)
+      (mu4e~proc-kill)
+      (mu4e-alert-enable-mode-line-display)
+      )
+    (run-with-timer 0 60 'refresh-mu4e-alert-mode-line)
+    )
+#+END_SRC
+Since offline-imap can't send emails by default so enable this groundbreaking feature
+#+BEGIN_SRC emacs-lisp
+  ;; I have my "default" parameters from Gmail
+  (setq mu4e-sent-folder "/Users/gustafbrostedt/Maildir/sent"
+	;; mu4e-sent-messages-behavior 'delete ;; Unsure how this should be configured
+	mu4e-drafts-folder "/Users/gustafbrostedt/Maildir/drafts"
+	user-mail-address "gustaf.brostedt@gmail.com"
+	smtpmail-default-smtp-server "smtp.gmail.com"
+	smtpmail-smtp-server "smtp.gmail.com"
+	smtpmail-smtp-service 587)
+
+  ;; Now I set a list of
+  (defvar my-mu4e-account-alist
+    '(("Gmail"
+       (mu4e-sent-folder "/Gmail/sent")
+       (user-mail-address "gustaf.brostedt@gmail.com")
+       (smtpmail-smtp-user "gustaf.brostedt")
+       (smtpmail-local-domain "gmail.com")
+       (smtpmail-default-smtp-server "smtp.gmail.com")
+       (smtpmail-smtp-server "smtp.gmail.com")
+       (smtpmail-smtp-service 587)
+       )
+      ;; Include any other accounts here ...
+      ))
+
+  (defun my-mu4e-set-account ()
+    "Set the account for composing a message.
+     This function is taken from:
+       https://www.djcbsoftware.nl/code/mu/mu4e/Multiple-accounts.html"
+    (let* ((account
+	    (if mu4e-compose-parent-message
+		(let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+		  (string-match "/\\(.*?\\)/" maildir)
+		  (match-string 1 maildir))
+	      (completing-read (format "Compose with account: (%s) "
+				       (mapconcat #'(lambda (var) (car var))
+						  my-mu4e-account-alist "/"))
+			       (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+			       nil t nil nil (caar my-mu4e-account-alist))))
+	   (account-vars (cdr (assoc account my-mu4e-account-alist))))
+      (if account-vars
+	  (mapc #'(lambda (var)
+		    (set (car var) (cadr var)))
+		account-vars)
+	(error "No email account found"))))
+  (add-hook 'mu4e-compose-pre-hook 'my-mu4e-set-account)
 #+END_SRC

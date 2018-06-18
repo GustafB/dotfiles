@@ -1,4 +1,4 @@
-[
+# =============================================================================
 #                                   Functions
 # =============================================================================
 powerlevel9k_random_color(){
@@ -288,8 +288,7 @@ bindkey "^[[1;5D" backward-word
 # =============================================================================
 #                                 Completions
 # =============================================================================
-shopt -s cdspell # Correct mispellings in cd command
-zstyle ':completion:*' rehash true
+#zstyle ':completion:*' rehash true
 #zstyle ':completion:*' verbose yes
 #zstyle ':completion:*:descriptions' format '%B%d%b'
 #zstyle ':completion:*:messages' format '%d'
