@@ -1,4 +1,4 @@
-G#+TITLE:Emacs Config
+#+TITLE:Emacs Config
 
 * Load better default settings
 This is a straight clone of [[https://github.com/hrs/sensible-defaults.el][HRS]] defaults setup
@@ -302,6 +302,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 Sometimes my brain takes a fart and then its useful to know which key to press
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
+    :defer 5
     :ensure t)
 #+END_SRC
 * Navigation & Interface
@@ -834,18 +835,6 @@ Disable auto-compile for =scss-mode=
   :config
   (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
 #+END_SRC
-** =org-journal=
-#+BEGIN_SRC emacs-lisp
-  ;; Set default path
-  (setq org-journal-dir (concat "~/Dropbox/org/journal/" (format-time-string "%Y/%m/")))
-  ;; Define naming convention
-  (setq org-journal-file-format "%Y-%m-%d.org")
-  ;; Carry-over incomplete todos
-  (setq org-journal-carryover-items "TODO=\"TODO\"|TODO=\"STARTED\"")
-
-  (use-package org-journal
-    :ensure t)
-#+END_SRC
 ** =pdf-tools=
 #+BEGIN_SRC emacs-lisp
   (use-package pdf-tools
@@ -882,40 +871,7 @@ Library for creating and storing references and citations
 (setq org-src-tab-acts-natively t)
 (setq org-src-window-setup 'current-window)
 #+END_SRC
-** Org directory
-#+BEGIN_SRC emacs-lisp
-  (setq org-directory "~/Dropbox/org")
 
-  (defun org-file-path (filename)
-    "Return the absolute address of an org file, given its relative name."
-    (concat (file-name-as-directory org-directory) filename))
-
-  ;;(setq org-inbox-file "~/Dropbox/inbox.org")
-  (setq org-index-file (org-file-path "index.org"))
-  (setq org-archive-location
-        (concat (org-file-path "archive.org") "::* From %s"))
-
-  (setq org-agenda-files (list org-index-file))
-
-  (defun open-index-file ()
-    "Open the master org TODO list."
-    (interactive)
-    (find-file org-index-file)
-    (flycheck-mode -1)
-    (end-of-buffer))
-
-  (global-set-key (kbd "C-c i") 'open-index-file)
-
-  (defun mark-done-and-archive ()
-    "Mark the state of an org-mode item as DONE and archive it."
-    (interactive)
-    (org-todo 'done)
-    (org-archive-subtree))
-
-  (define-key org-mode-map (kbd "C-c C-x C-s") 'mark-done-and-archive)
-
-  (setq org-log-done 'time)
-#+END_SRC
 * Keybindings
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x 2") 'split-window-below-and-switch)
@@ -974,10 +930,6 @@ prompt to 'name>'."
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (setq ansi-color-names-vector ["white" "orange red" "green" "yellow" "pale blue" "magenta" "cyan" "tan"])
 #+END_SRC
-I like to see my todo list on startup
-#+BEGIN_SRC emacs-lisp
-(find-file "~/Dropbox/org/index.org")
-#+END_SRC
 * Email
 Add mu and mu4e to load path
 #+BEGIN_SRC emacs-lisp
@@ -1016,8 +968,7 @@ Enable desktop alerts
       (mu4e~proc-kill)
       (mu4e-alert-enable-mode-line-display)
       )
-    (run-with-timer 0 60 'refresh-mu4e-alert-mode-line)
-    )
+    (run-with-timer 0 60 'refresh-mu4e-alert-mode-line))
 #+END_SRC
 Since offline-imap can't send emails by default so enable this groundbreaking feature
 #+BEGIN_SRC emacs-lisp
@@ -1065,4 +1016,103 @@ Since offline-imap can't send emails by default so enable this groundbreaking fe
 		account-vars)
 	(error "No email account found"))))
   (add-hook 'mu4e-compose-pre-hook 'my-mu4e-set-account)
+#+END_SRC
+* Life Management
+Any setup related to managing my agenda and life in general
+** Todo list and archive
+#+BEGIN_SRC emacs-lisp
+  (setq org-directory "~/Dropbox/org/agenda")
+
+  (defun org-file-path (filename)
+    "Return the absolute address of an org file, given its relative name."
+    (concat (file-name-as-directory org-directory) filename))
+
+  ;;(setq org-inbox-file "~/Dropbox/inbox.org")
+  (setq org-index-file (org-file-path "index.org"))
+  (setq org-archive-location
+        (concat (org-file-path "archive.org") "::* From %s"))
+
+  (setq org-agenda-files (list org-index-file))
+
+  (defun open-index-file ()
+    "Open the master org TODO list."
+    (interactive)
+    (find-file org-index-file)
+    (flycheck-mode -1)
+    (end-of-buffer))
+
+  (global-set-key (kbd "C-c i") 'open-index-file)
+
+  (defun mark-done-and-archive ()
+    "Mark the state of an org-mode item as DONE and archive it."
+    (interactive)
+    (org-todo 'done)
+    (org-archive-subtree))
+
+  (define-key org-mode-map (kbd "C-c C-x C-s") 'mark-done-and-archive)
+
+  (setq org-log-done 'time)
+#+END_SRC
+** =org-journal=
+#+BEGIN_SRC emacs-lisp
+  ;; Set default path
+  (setq org-journal-dir (concat "~/Dropbox/org/agenda/journal/" (format-time-string "%Y/%m/")))
+  ;; Define naming convention
+  (setq org-journal-file-format "%Y-%m-%d.org")
+  ;; Carry-over incomplete todos
+  (setq org-journal-carryover-items "TODO=\"TODO\"|TODO=\"STARTED\"")
+
+  (use-package org-journal
+    :ensure t)
+#+END_SRC
+** =org-agenda=
+Most of the below is taken from [[http://doc.norang.ca/org-mode.html][My Life In Plain Text]] by Bernt Hanson.
+
+Tell the agenda where to search for files
+#+BEGIN_SRC emacs-lisp
+  (setq org-agenda-files (quote( "~/Dropbox/org/agenda")))
+#+END_SRC
+Add some additional todo keywords and edit highlighting
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-keywords
+        (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+
+  (setq org-todo-keyword-faces
+        (quote (("TODO" :foreground "red" :weight bold)
+                ("NEXT" :foreground "blue" :weight bold)
+                ("DONE" :foreground "forest green" :weight bold)
+                ("WAITING" :foreground "orange" :weight bold)
+                ("HOLD" :foreground "magenta" :weight bold)
+                ("CANCELLED" :foreground "forest green" :weight bold)
+                ("MEETING" :foreground "forest green" :weight bold)
+                ("PHONE" :foreground "forest green" :weight bold))))
+#+END_SRC
+Allow to key toggling between todo states
+/hotkey for changing state:/ =C-c C-t KEY=
+#+BEGIN_SRC emacs-lisp
+  (setq org-use-fast-todo-selection t)
+#+END_SRC
+Allow cycling through todo states with arrow keys, =S-left= &  =S-right=
+#+BEGIN_SRC emacs-lisp
+  (setq org-treat-S-cursor-todo-selection-as-state-change nil)
+#+END_SRC
+The below triggers will update the tags on todos as they change state
+They follow the below structure
+- Moving a task to =CANCELLED= adds a =CANCELLED= tag
+- Moving a task to =WAITING= adds a =WAITING= tag
+- Moving a task to =HOLD= adds =WAITING= and =HOLD= tags
+- Moving a task to a done state removes =WAITING= and =HOLD= tags
+- Moving a task to =TODO= removes =WAITING=, =CANCELLED=, and =HOLD= tags
+- Moving a task to =NEXT= removes =WAITING=, =CANCELLED=, and =HOLD= tags
+- Moving a task to =DONE= removes =WAITING=, =CANCELLED=, and =HOLD= tags
+#+BEGIN_SRC emacs-lisp
+  (setq org-todo-state-tags-triggers
+        (quote (("CANCELLED" ("CANCELLED" . t))
+                ("WAITING" ("WAITING" . t))
+                ("HOLD" ("WAITING") ("HOLD" . t))
+                (done ("WAITING") ("HOLD"))
+                ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+                ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+                ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
 #+END_SRC
