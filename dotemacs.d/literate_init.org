@@ -1116,3 +1116,30 @@ They follow the below structure
                 ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
                 ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
 #+END_SRC
+** =org-capture=
+#+BEGIN_SRC emacs-lisp
+  (use-package org-capture
+    :commands org-capture
+    :bind ("C-c c" . org-capture)
+    :ensure nil
+    :config
+    (setq org-directory "~/Dropbox/org/agenda")
+    (setq org-default-notes-file "~/Dropbox/org/agenda/refile.org")
+    (setq org-capture-templates
+        (quote (("t" "todo" entry (file "~/Dropbox/org/agenda/refile.org")
+                 "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
+                ("r" "respond" entry (file "~/Dropbox/org/agenda/refile.org")
+                 "* NEXT Respond to %:from on %:subject\nSCHEDULED: %t\n%U\n%a\n" :clock-in t :clock-resume t :immediate-finish t)
+                ("n" "note" entry (file "~/Dropbox/org/agenda/refile.org")
+                 "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
+                ;; ("j" "Journal" entry (file+datetree "~/git/org/diary.org")
+                ;;  "* %?\n%U\n" :clock-in t :clock-resume t)
+                ("w" "org-protocol" entry (file "~/Dropbox/org/agenda/refile.org")
+                 "* TODO Review %c\n%U\n" :immediate-finish t)
+                ("m" "Meeting" entry (file "~/Dropbox/org/agenda/refile.org")
+                 "* MEETING with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+                ("p" "Phone call" entry (file "~/Dropbox/org/agenda/refile.org")
+                 "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
+                ("h" "Habit" entry (file "~/Dropbox/org/agenda/refile.org")
+                 "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")))))
+#+END_SRC
