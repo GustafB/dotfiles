@@ -139,12 +139,6 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
   (menu-bar-mode 0)
   (scroll-bar-mode -1)
 #+END_SRC
-*** Evil-Mode
-#+BEGIN_SRC emacs-lisp
-;;(setq evil-want-abbrev-expand-on-insert-exit nil)
-;;(evil-mode 0)
-;;(add-to-list'evil-emacs-state-modes 'eshell)
-#+END_SRC
 *** Inhibit startup message
     #+BEGIN_SRC emacs-lisp
     (setq inhibit-startup-message t)
@@ -496,121 +490,6 @@ Enable dired-toggle
   (global-set-key (kbd "C-.") 'mc/skip-to-next-like-this)
   (global-set-key (kbd "C-,") 'mc/skip-to-previous-like-this)
 #+END_SRC
-** =ido-mode=
-#+BEGIN_SRC emacs-lisp
-  (use-package ido
-    :ensure t)
-  (use-package flx-ido
-    :ensure t)
-  (use-package ido-vertical-mode
-    :ensure t)
-  (setq ido-enable-flex-matching t)
-  (setq ido-everywhere t)
-  (ido-mode 1)
-  (flx-ido-mode 1) ; better/faster matching
-  (setq ido-create-new-buffer 'always) ; don't confirm to create new buffers
-  (ido-vertical-mode 1)
-  (setq ido-vertical-define-keys 'C-n-and-C-p-only)
-#+END_SRC
-** =ibuffer=
-#+BEGIN_SRC emacs-lisp
-  (use-package ibuffer
-    :ensure nil)
-  (use-package ibuffer-vc
-    :ensure t)
-
-  ;;; IBuffer:
-  ;; Use human readable Size column instead of original one
-  (define-ibuffer-column size-h
-    (:name "Size" :inline t)
-    (let ((bs (buffer-size)))
-      (cond ((> bs 1e6) (format "%7.1fmB" (/ bs 1e6)))
-            ((> bs 1e3) (format "%7.1fkB" (/ bs 1e3)))
-            (t          (format "%7d  " bs)))))
-
-  (setf ibuffer-formats
-        '((mark modified read-only vc-status-mini " "
-                (name 18 18 :left :elide)
-                " "
-                (size-h 9 -1 :right)
-                " "
-                (mode 16 16 :left :elide)
-                " "
-                (vc-status 16 16 :left)
-                " "
-                filename-and-process))
-        ibuffer-show-empty-filter-groups nil)
-
-  (define-ibuffer-filter name-not
-      "Negated buffer name match."
-    (:description "buffer name not"
-     :reader (read-from-minibuffer "Exclude buffers (regexp): "))
-    (not (string-match qualifier (buffer-name buf))))
-
-  (defvar gk-ibuffer-filters
-    '(("Emacs"
-       (name . "^\\*\\(scratch\\|Messages\\)\\*$"))
-      ("VC"
-       (name . "^\\*\\(vc\\|log\\)-?"))
-      ("Documentation"
-       (name . "^\\*\\(Help\\|info\\|Man [0-9]?\\)"))
-      ("Special buffers"
-       (name-not . "compilation")
-       (name . "^\\*.*\\*$"))
-      ("EWW Reading"
-       (mode . eww-mode)))
-    "Fixed filter definitions for ibuffer.")
-
-  (cl-defun gk-ibuffer-generate-filter-groups-by-dir ()
-    "Create a set of ibuffer filter groups based on the dirs of buffers."
-    (let* ((func (lambda (buf)
-                   (when-let ((bufnam (buffer-file-name buf)))
-                     (if-let ((linknam (file-symlink-p bufnam)))
-                         (file-name-directory (expand-file-name linknam))
-                       (file-name-directory (expand-file-name bufnam))))))
-           (dirs (ibuffer-remove-duplicates (delq nil (mapcar func (buffer-list))))))
-      (mapcar (lambda (dir) (cons (concat "Directory: " dir) `((dir . ,dir)))) dirs)))
-
-  (define-ibuffer-filter dir
-      "Toggle current view to buffers with dir QUALIFIER."
-    (:description "directory" :reader (read-from-minibuffer "Filter by dir (regexp): "))
-    (ibuffer-awhen (buffer-file-name buf)
-      (string= qualifier (file-name-directory it))))
-
-  (define-advice ibuffer-update (:before (&rest args) autogroups)
-    "Group related buffers together using ‘ibuffer-vc’ and ‘dir’,
-  and special ones sepatarely."
-    (ignore args)
-    (setf ibuffer-filter-groups
-          (append
-           gk-ibuffer-filters
-           (ibuffer-vc-generate-filter-groups-by-vc-root)
-           (gk-ibuffer-generate-filter-groups-by-dir))))
-
-  ;; Hide these buffers by default.
-  (defvar gk-ibuffer-collapsed-groups (list "Special buffers" "Emacs" "Documentation"
-                                            "VC"))
-
-  (define-advice ibuffer (:after (&rest args) gk-hidden-groups)
-    "Hide groups in ‘gk-ibuffer-collapsed-groups’."
-    (ignore args)
-    (save-excursion
-      (dolist (group gk-ibuffer-collapsed-groups)
-        (ignore-errors
-          (ibuffer-jump-to-filter-group group)
-          (ibuffer-toggle-filter-group)))))
-
-  (cl-defun gk-ibuffer-hook ()
-    (unless (eq ibuffer-sorting-mode 'alphabetic)
-      (ibuffer-do-sort-by-filename/process))
-    (ibuffer-update nil t))
-
-  (add-hook 'ibuffer-hook 'gk-ibuffer-hook)
-
-  (provide 'gk-ibuffer)
-
-
-#+END_SRC
 * Version Control & Project Management
 ** =Magit=
 #+BEGIN_SRC emacs-lisp
@@ -721,7 +600,8 @@ Enable dired-toggle
     (helm-autoresize-mode 1))
   (global-set-key (kbd "C-x b") 'helm-buffers-list)
 #+END_SRC
-* =web-mode=
+* Major Modes
+** =web-mode=
 - Enable rainbow mode
 - Set indentation to 2 spaces
 #+BEGIN_SRC emacs-lisp
@@ -741,7 +621,7 @@ Enable dired-toggle
        "\\.php$"
        "\\.rhtml$"))
 #+END_SRC
-* =js2-mode=
+** =js2-mode=
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
     :ensure t
@@ -749,12 +629,12 @@ Enable dired-toggle
     (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
 (add-hook 'j2-mode-hook (lambda () (setq js2-basic-offset 2)))
 #+END_SRC
-* =json-mode=
+** =json-mode=
 #+BEGIN_SRC emacs-lisp
   (use-package json-mode
     :ensure t)
 #+END_SRC
-* =js2-refactor=
+** =js2-refactor=
 #+BEGIN_SRC emacs-lisp
 (use-package js2-refactor
   :ensure t)
@@ -775,7 +655,7 @@ Enable dired-toggle
 (add-hook 'js2-mode-hook (lambda ()
   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 #+END_SRC
-* =markdown
+** =markdown
 -mode=
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -794,7 +674,7 @@ Enable dired-toggle
   (custom-set-variables '(markdown-command "/usr/local/bin/markdown"))
 
 #+END_SRC
-* =rest-client=
+** =rest-client=
 Load company-enabled restclient
 #+BEGIN_SRC emacs-lisp
   (use-package company-restclient
@@ -807,8 +687,7 @@ Load regular rest client
     :ensure t
     :mode ("\\.rest\\'" . restclient-mode))
 #+END_SRC
-* CSS and SCSS
-Set indentation for =css-mode=
+** =css-mode=
 #+BEGIN_SRC emacs-lisp
   (use-package css-mode
     :commands css-mode
@@ -820,7 +699,7 @@ Set indentation for =css-mode=
       (dolist (hook '(css-mode-hook sass-mode-hook))
 	(add-hook hook 'rainbow-mode))))
 #+END_SRC
-Disable auto-compile for =scss-mode=
+** =scss-mode=
 #+BEGIN_SRC emacs-lisp
   (use-package scss-mode
     :ensure t
