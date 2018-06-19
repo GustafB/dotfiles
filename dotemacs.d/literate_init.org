@@ -1030,7 +1030,7 @@ Any setup related to managing my agenda and life in general
   ;;(setq org-inbox-file "~/Dropbox/inbox.org")
   (setq org-index-file (org-file-path "index.org"))
   (setq org-archive-location
-        (concat (org-file-path "archive.org") "::* From %s"))
+        (concat (org-file-path "../archive.org") "::* From %s"))
 
   (setq org-agenda-files (list org-index-file))
 
@@ -1117,7 +1117,9 @@ They follow the below structure
                 ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
 #+END_SRC
 ** =org-capture=
+Configure org-capture and load templates
 #+BEGIN_SRC emacs-lisp
+
   (use-package org-capture
     :commands org-capture
     :bind ("C-c c" . org-capture)
@@ -1142,4 +1144,38 @@ They follow the below structure
                  "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t)
                 ("h" "Habit" entry (file "~/Dropbox/org/agenda/refile.org")
                  "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")))))
+#+END_SRC
+Configure =org-refile=
+#+BEGIN_SRC emacs-lisp
+  ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
+  (setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                   (org-agenda-files :maxlevel . 9))))
+
+  ; Use full outline paths for refile targets - we file directly with IDO
+  (setq org-refile-use-outline-path t)
+
+  ; Targets complete directly with IDO
+  (setq org-outline-path-complete-in-steps nil)
+
+  ; Allow refile to create parent tasks with confirmation
+  (setq org-refile-allow-creating-parent-nodes (quote confirm))
+
+  ; Use IDO for both buffer and file completion and ido-everywhere to t
+  (setq org-completion-use-ido t)
+  (setq ido-everywhere t)
+  (setq ido-max-directory-size 100000)
+  (ido-mode (quote both))
+  ; Use the current window when visiting files and buffers with ido
+  (setq ido-default-file-method 'selected-window)
+  (setq ido-default-buffer-method 'selected-window)
+  ; Use the current window for indirect buffer display
+  (setq org-indirect-buffer-display 'current-window)
+
+  ;;;; Refile settings
+  ; Exclude DONE state tasks from refile targets
+  (defun verify-refile-target ()
+    "Exclude todo keywords with a done state from refile targets"
+    (not (member (nth 2 (org-heading-components)) org-done-keywords)))
+
+  (setq org-refile-target-verify-function 'verify-refile-target)
 #+END_SRC
