@@ -19,5 +19,5 @@ type = Gmail
 maxconnections = 2
 remoteuser = gustaf.brostedt@gmail.com
 remotepasseval = mailpasswd("gmail")
-folderfilter = lambda foldername: foldername not in ['[Gmail]/All Mail', '[Gmail]/Important', '[Gmail]/Alla mail', '[Gmail]/Viktigt']
+folderfilter = lambda foldername: foldername not in ['[Gmail]/Spam', '[Gmail]/All Mail', '[Gmail]/Starred', '[Gmail]/Important']
 sslcacertfile = /usr/local/etc/openssl/cert.pem
