@@ -819,51 +819,69 @@ Enabel mu4e and link to email account
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e
     :config
+    ;; Don't prompt for context on startup
+    (setq mu4e-context-policy 'pick-first)
+    ;; Don't ask to quit...
+    (setq mu4e-confirm-quit nil)
+    (setq mu4e-maildir-shortcuts
+          '(("/gmail-personal/INBOX"             . ?i)
+            ("/gmail-personal/[Gmail].Sent Mail" . ?s)
+            ("/gmail-personal/[Gmail].Drafts" . ?d)
+            ("/gmail-personal/[Gmail].Trash"     . ?t)))
     (setq mu4e-contexts
           `( ,(make-mu4e-context
                :name "Gmail"
-               :match-func (lambda (msg) (when msg
-                                           (string-prefix-p "/gmail-personal" (mu4e-message-field msg :maildir))))
+               :match-func (lambda (msg)
+                             (when msg
+                               (mu4e-message-contact-field-matches msg
+                                                                   :to "gustaf.brostedt@gmail.com")))
                :vars '(
+                       (user-mail-address . "gustaf.brostedt@gmail.com")
+                       (user-full-name . "Gustaf Brostedt")
                        (mu4e-trash-folder . "/gmail-personal/[Gmail].Trash")
-                       (mu4e-refile-folder . "/gmail-personal/[Gmail].Archive")
-                       (mu4e-drafts-folder . "/gmail-personal/[Gmail].Utkast")
-                       (mu4e-sent-folder . "/gmail-personal/[Gmail].Skickat")
+                       (mu4e-drafts-folder . "/gmail-personal/[Gmail].Drafts")
+                       (mu4e-sent-folder . "/gmail-personal/[Gmail].Sent Mail")
                        ))
              )))
 #+END_SRC
 Enable desktop alerts
 #+BEGIN_SRC emacs-lisp
+  ;; (use-package mu4e-alert
+  ;;   :ensure t
+  ;;   :after mu4e
+  ;;   :init
+  ;;   (setq mu4e-alert-interesting-mail-query
+  ;;         "flag:unread maildir:/Gmail/INBOX"
+  ;;         )
+  ;;   (mu4e-alert-enable-mode-line-display)
+  ;;   (defun refresh-mu4e-alert-mode-line ()
+  ;;     (interactive)
+  ;;     (mu4e~proc-kill)
+  ;;     (mu4e-alert-enable-mode-line-display)
+  ;;     )
+  ;;   (run-with-timer 0 60 'refresh-mu4e-alert-mode-line))
   (use-package mu4e-alert
-    :ensure t
     :after mu4e
     :init
-    (setq mu4e-alert-interesting-mail-query
-          "flag:unread maildir:/Gmail/INBOX"
-          )
-    (mu4e-alert-enable-mode-line-display)
-    (defun refresh-mu4e-alert-mode-line ()
-      (interactive)
-      (mu4e~proc-kill)
-      (mu4e-alert-enable-mode-line-display)
-      )
-    (run-with-timer 0 60 'refresh-mu4e-alert-mode-line))
+    (mu4e-alert-set-default-style 'notifications)
+    :hook ((after-init . mu4e-alert-enable-mode-line-display)
+           (after-init . mu4e-alert-enable-notifications)))
 #+END_SRC
 Since offline-imap can't send emails by default so enable this groundbreaking feature
 #+BEGIN_SRC emacs-lisp
   ;; I have my "default" parameters from Gmail
-  (setq mu4e-sent-folder "/Users/gustafbrostedt/Maildir/sent"
-	;; mu4e-sent-messages-behavior 'delete ;; Unsure how this should be configured
-	mu4e-drafts-folder "/Users/gustafbrostedt/Maildir/drafts"
-	user-mail-address "gustaf.brostedt@gmail.com"
-	smtpmail-default-smtp-server "smtp.gmail.com"
-	smtpmail-smtp-server "smtp.gmail.com"
-	smtpmail-smtp-service 587)
+  (setq mu4e-sent-folder "/Users/gustafbrostedt/Maildir/gmail-personal/[Mu4e].Sent"
+        ;; mu4e-sent-messages-behavior 'delete ;; Unsure how this should be configured
+        mu4e-drafts-folder "/Users/gustafbrostedt/Maildir/gmail-personal/[Mu4e].Drafts"
+        user-mail-address "gustaf.brostedt@gmail.com"
+        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587)
 
   ;; Now I set a list of
   (defvar my-mu4e-account-alist
-    '(("Gmail"
-       (mu4e-sent-folder "/Gmail/sent")
+    '(("gmail-personal"
+       (mu4e-sent-folder "/gmail-personal/[Mu4e].Sent")
        (user-mail-address "gustaf.brostedt@gmail.com")
        (smtpmail-smtp-user "gustaf.brostedt")
        (smtpmail-local-domain "gmail.com")
@@ -879,21 +897,22 @@ Since offline-imap can't send emails by default so enable this groundbreaking fe
      This function is taken from:
        https://www.djcbsoftware.nl/code/mu/mu4e/Multiple-accounts.html"
     (let* ((account
-	    (if mu4e-compose-parent-message
-		(let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
-		  (string-match "/\\(.*?\\)/" maildir)
-		  (match-string 1 maildir))
-	      (completing-read (format "Compose with account: (%s) "
-				       (mapconcat #'(lambda (var) (car var))
-						  my-mu4e-account-alist "/"))
-			       (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
-			       nil t nil nil (caar my-mu4e-account-alist))))
-	   (account-vars (cdr (assoc account my-mu4e-account-alist))))
+            (if mu4e-compose-parent-message
+                (let ((maildir (mu4e-message-field mu4e-compose-parent-message :maildir)))
+                  (string-match "/\\(.*?\\)/" maildir)
+                  (match-string 1 maildir))
+              (completing-read (format "Compose with account: (%s) "
+                                       (mapconcat #'(lambda (var) (car var))
+                                                  my-mu4e-account-alist "/"))
+                               (mapcar #'(lambda (var) (car var)) my-mu4e-account-alist)
+                               nil t nil nil (caar my-mu4e-account-alist))))
+           (account-vars (cdr (assoc account my-mu4e-account-alist))))
       (if account-vars
-	  (mapc #'(lambda (var)
-		    (set (car var) (cadr var)))
-		account-vars)
-	(error "No email account found"))))
+          (mapc #'(lambda (var)
+                    (set (car var) (cadr var)))
+                account-vars)
+        (error "No email account found 1"))))
+
   (add-hook 'mu4e-compose-pre-hook 'my-mu4e-set-account)
 #+END_SRC
 * Life Management
@@ -949,9 +968,9 @@ Any setup related to managing my agenda and life in general
   (use-package org-habit
     :ensure nil)
 #+END_SRC
-** =org-agenda=
+** Setting up the agenda
 Most of the below is taken from [[http://doc.norang.ca/org-mode.html][My Life In Plain Text]] by Bernt Hanson.
-
+*** =org-agenda=
 Tell the agenda where to search for files
 #+BEGIN_SRC emacs-lisp
   (setq org-agenda-files (quote( "~/Dropbox/org/agenda")))
@@ -1000,7 +1019,7 @@ They follow the below structure
                 ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
                 ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
 #+END_SRC
-** =org-capture=
+*** =org-capture=
 Configure org-capture and load templates
 #+BEGIN_SRC emacs-lisp
 
@@ -1027,7 +1046,7 @@ Configure org-capture and load templates
                 ("h" "Habit" entry (file "~/Dropbox/org/agenda/refile.org")
                  "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")))))
 #+END_SRC
-** =org-refile=
+*** =org-refile=
 Tell emacs where to look for refiling targets
 #+BEGIN_SRC emacs-lisp
   ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
@@ -1062,7 +1081,7 @@ Tell emacs where to look for refiling targets
 
   (setq org-refile-target-verify-function 'verify-refile-target)
 #+END_SRC
-** Creating custom agenda views
+*** Creating custom agenda views
 Custom functions to make this work
 #+BEGIN_SRC emacs-lisp
   (defun bh/find-project-task ()
