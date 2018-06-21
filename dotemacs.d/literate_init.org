@@ -818,6 +818,7 @@ Add mu and mu4e to load path
 Enabel mu4e and link to email account
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e
+    :bind ("<f9>" . mu4e)
     :config
     ;; Don't prompt for context on startup
     (setq mu4e-context-policy 'pick-first)
@@ -1047,7 +1048,7 @@ Configure org-capture and load templates
                  "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")))))
 #+END_SRC
 *** =org-refile=
-Tell emacs where to look for refiling targets
+Tell emacs where to look for refiling targets and some customizations to get ido to work its wonders
 #+BEGIN_SRC emacs-lisp
   ; Targets include this file and any file contributing to the agenda - up to 9 levels deep
   (setq org-refile-targets (quote ((nil :maxlevel . 9)
@@ -1430,4 +1431,8 @@ The view itself
                          (org-agenda-skip-function 'bh/skip-non-archivable-tasks)
                          (org-tags-match-list-sublevels nil))))
                  nil))))
+#+END_SRC
+*** Some key-bindings
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "<f12>") 'org-agenda)
 #+END_SRC
