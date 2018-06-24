@@ -290,7 +290,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
       '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
 
   (provide 'setup-flycheck)
-  (add-hook 'c-mode-common-hook #'flycheck-mode)
+
 #+END_SRC
 *** Load up which-key
 Sometimes my brain takes a fart and then its useful to know which key to press
@@ -705,6 +705,20 @@ Load regular rest client
     :ensure t
     :config
     (setq scss-compile-at-save nil))
+#+END_SRC
+** =c/c++=
+Enable flycheck for C
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'c-mode-common-hook #'flycheck-mode)
+#+END_SRC
+Always indent with 4 spaces, in the Linux kernel style.
+#+BEGIN_SRC emacs-lisp
+(setq-default c-default-style "linux"
+              c-basic-offset 4)
+#+END_SRC
+Enable hungry delete in C
+#+BEGIN_SRC emacs-lisp
+(setq-default c-hungry-delete-key t)
 #+END_SRC
 * Org Mode and Task Management
 ** =org-bullets=
@@ -1367,7 +1381,7 @@ The view itself
                  ((org-agenda-overriding-header "Habits")
                   (org-agenda-sorting-strategy
                    '(todo-state-down effort-up category-keep))))
-                ("A" "Agenda"
+                (" " "Agenda"
                  ((agenda "" nil)
                   (tags "REFILE"
                         ((org-agenda-overriding-header "Tasks to Refile")
