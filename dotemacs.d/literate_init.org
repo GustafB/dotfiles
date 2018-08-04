@@ -745,6 +745,13 @@ Load regular rest client
     (setq scss-compile-at-save nil))
 #+END_SRC
 ** =c/c++=
+#+BEGIN_SRC emacs-lisp
+      (add-auto-mode
+       'c++-mode
+       "\\.cpp"
+       "\\.h"
+       "\\.hpp")
+#+END_SRC
 Enable flycheck for C
 #+BEGIN_SRC emacs-lisp
   (add-hook 'c-mode-common-hook #'flycheck-mode)
@@ -760,8 +767,8 @@ Enable hungry delete in C
 #+END_SRC
 Auto-insert include guards in .h files
 #+BEGIN_SRC emacs-lisp
-
-  (define-auto-insert
+  (defun gb-insert-h-guard ()
+    (interactive)
     (cons "\\.\\([Hh]\\|hh\\|hpp\\)\\'" "My C/C++ header")
     '(nil
       (let* ((noext (substring buffer-file-name 0 (match-beginning 0)))
@@ -774,7 +781,7 @@ Auto-insert include guards in .h files
 #+END_SRC
 Switch between .h and .c/.cpp files
 #+BEGIN_SRC emacs-lisp
-  (defun cpp-switch-h-cpp (arg)
+  (defun gb-cpp-switch-h-cpp (arg)
     "Switch between .h and .cpp buffer or file. Look first into the
    open buffers, and look into the current directory if no matching
    buffer was found.
@@ -783,64 +790,83 @@ Switch between .h and .c/.cpp files
     (interactive "P")
     (let ((ext (bde-file-name-extension (buffer-file-name))))
       (let ((base-name    (string-truncate (buffer-name) (length ext)))
-	    (base-path    (string-truncate (buffer-file-name) (length ext)))
-	    (matching-ext (cdr (find-if (lambda (i)
-					  (string= (car i) ext))
-					exordium-cpp-header-switches))))
-	(when (and arg matching-ext)
-	  (setq matching-ext (cdr matching-ext)))
-	(cond (matching-ext
-	       (unless
-		   (catch 'found
-		     (flet ((when-exists-find-and-throw
-			     (file)
-			     (when (file-exists-p file)
-			       (find-file file)
-			       (throw 'found t))))
-		       (dolist (candidate-ext matching-ext)
-			 ;; Look for a buffer matching candidate-ext
-			 (let ((buff (concat base-name candidate-ext)))
-			   (when (bufferp (get-buffer buff))
-			     (switch-to-buffer buff)
-			     (throw 'found t)))
-			 ;; No buffer => look for a file
-			 (when-exists-find-and-throw
-			  (concat base-path candidate-ext))
-			 ;; No file in current dir => look in test subdirectory
-			 (cond (arg
-				(let ((base-dir (file-name-directory (buffer-file-name)))
-				      (test-dirs '("test" "tst")))
-				  (dolist (test-dir test-dirs)
-				    (let ((test-path
-					   (concat (file-name-as-directory test-dir)
-						   base-name candidate-ext)))
-				      (when-exists-find-and-throw
-				       (concat base-dir test-path))
-				      (when-exists-find-and-throw
-				       (concat (file-name-directory
-						(directory-file-name base-dir))
-					       test-path))))))
-			       ;; If test file => look in parent and group directories
-			       ((string-match ".*/t\\(e\\)?st/.*\.[gt]\.cpp$"
-					      (buffer-file-name))
-				(let ((base-dir
-				       (file-name-directory
-					(directory-file-name (file-name-directory
-							      (buffer-file-name))))))
-				  (when-exists-find-and-throw
-				   (concat base-dir base-name candidate-ext))
-				  (when (string-match "^\\([a-z]+\\)_" base-name)
-				    (when-exists-find-and-throw
-				     (concat base-dir
-					     (file-name-as-directory
-					      (match-string 1 base-name))
-					     base-name candidate-ext))))))))
-		     ;; No buffer or file for any matching-ext
-		     nil)
-		 (message "No matching buffer or file")))
-	      (t (message "This is not a C/C++ file"))))))
+      (base-path    (string-truncate (buffer-file-name) (length ext)))
+      (matching-ext (cdr (find-if (lambda (i)
+            (string= (car i) ext))
+          exordium-cpp-header-switches))))
+  (when (and arg matching-ext)
+    (setq matching-ext (cdr matching-ext)))
+  (cond (matching-ext
+         (unless
+       (catch 'found
+         (flet ((when-exists-find-and-throw
+           (file)
+           (when (file-exists-p file)
+             (find-file file)
+             (throw 'found t))))
+           (dolist (candidate-ext matching-ext)
+       ;; Look for a buffer matching candidate-ext
+       (let ((buff (concat base-name candidate-ext)))
+         (when (bufferp (get-buffer buff))
+           (switch-to-buffer buff)
+           (throw 'found t)))
+       ;; No buffer => look for a file
+       (when-exists-find-and-throw
+        (concat base-path candidate-ext))
+       ;; No file in current dir => look in test subdirectory
+       (cond (arg
+        (let ((base-dir (file-name-directory (buffer-file-name)))
+              (test-dirs '("test" "tst")))
+          (dolist (test-dir test-dirs)
+            (let ((test-path
+             (concat (file-name-as-directory test-dir)
+               base-name candidate-ext)))
+              (when-exists-find-and-throw
+               (concat base-dir test-path))
+              (when-exists-find-and-throw
+               (concat (file-name-directory
+            (directory-file-name base-dir))
+                 test-path))))))
+             ;; If test file => look in parent and group directories
+             ((string-match ".*/t\\(e\\)?st/.*\.[gt]\.cpp$"
+                (buffer-file-name))
+        (let ((base-dir
+               (file-name-directory
+          (directory-file-name (file-name-directory
+                    (buffer-file-name))))))
+          (when-exists-find-and-throw
+           (concat base-dir base-name candidate-ext))
+          (when (string-match "^\\([a-z]+\\)_" base-name)
+            (when-exists-find-and-throw
+             (concat base-dir
+               (file-name-as-directory
+                (match-string 1 base-name))
+               base-name candidate-ext))))))))
+         ;; No buffer or file for any matching-ext
+         nil)
+     (message "No matching buffer or file")))
+        (t (message "This is not a C/C++ file"))))))
 
-  (define-key c-mode-base-map [(control tab)] 'cpp-switch-h-cpp)
+  (define-key c-mode-base-map [(control tab)] 'gb-cpp-switch-h-cpp)
+#+END_SRC
+** =lisp=
+#+BEGIN_SRC emacs-lisp
+  (use-package slime
+    ;; :load-path (expand-site-lisp "slime")
+    :commands slime
+    :config
+
+    (progn
+      (add-hook
+       'slime-load-hook
+       #'(lambda ()
+     (slime-setup
+      '(slime-fancy
+        slime-repl
+        slime-fuzzy
+        slime-company))))
+      (setq slime-net-coding-system 'utf-8-unix)
+      (setq inferior-lisp-program "/usr/local/bin/clisp")))
 #+END_SRC
 * Org Mode and Task Management
 ** =org-bullets=
@@ -1583,28 +1609,32 @@ The view itself
     (setq-local flycheck-highlighting-mode nil)
     (setq-local flycheck-check-syntax-automatically nil))
 
-  ;; only run this if rtags is installed
-  (when (require 'rtags nil :noerror)
-    ;; make sure you have company-mode installed
-    (require 'company)
-    (define-key c-mode-base-map (kbd "M-.")
-      (function rtags-find-symbol-at-point))
-    (define-key c-mode-base-map (kbd "M-,")
-      (function rtags-find-references-at-point))
-    ;; install standard rtags keybindings. Do M-. on the symbol below to
-    ;; jump to definition and see the keybindings.
-    (rtags-enable-standard-keybindings)
-    ;; comment this out if you don't have or don't use helm
-    (setq rtags-use-helm t)
-    ;; company completion setup
-    (setq rtags-autostart-diagnostics t)
-    (rtags-diagnostics)
-    (setq rtags-completions-enabled t)
-    (push 'company-rtags company-backends)
-    (global-company-mode)
-    (define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
-    ;; use rtags flycheck mode -- clang warnings shown inline
-    (require 'flycheck-rtags)
-    ;; c-mode-common-hook is also called by c++-mode
-    (add-hook 'c-mode-common-hook #'setup-flycheck-rtags))
+  (use-package rtags
+    :commands (rtags-start-process-unless-running setup-flycheck-rtags)
+    :config (progn
+              (message "Rtags loaded")
+              (use-package company-rtags)
+              (use-package helm-rtags))
+    ;; only run this if rtags is installed
+    (when (require 'rtags nil :noerror)
+      ;; make sure you have company-mode installed
+      (require 'company)
+      (define-key c-mode-base-map (kbd "M-.")
+        (function rtags-find-symbol-at-point))
+      (define-key c-mode-base-map (kbd "M-,")
+        (function rtags-location-stack-back))
+      ;; install standard rtags keybindings. Do M-. on the symbol below to
+      ;; jump to definition and see the keybindings.
+      (rtags-enable-standard-keybindings)
+      ;; company completion setup
+      (setq rtags-autostart-diagnostics t)
+      (rtags-diagnostics)
+      (setq rtags-completions-enabled t)
+      (push 'company-rtags company-backends)
+      (global-company-mode)
+      (define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
+      ;; use rtags flycheck mode -- clang warnings shown inline
+      (require 'flycheck-rtags)
+      ;; c-mode-common-hook is also called by c++-mode
+      (add-hook 'c-mode-common-hook #'setup-flycheck-rtags)))
 #+END_SRC
