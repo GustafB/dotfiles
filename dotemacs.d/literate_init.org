@@ -868,6 +868,12 @@ Switch between .h and .c/.cpp files
       (setq slime-net-coding-system 'utf-8-unix)
       (setq inferior-lisp-program "/usr/local/bin/clisp")))
 #+END_SRC
+Enable lisp eval in org-mode
+#+BEGIN_SRC emacs-lisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((lisp . t)))
+#+END_SRC
 * Org Mode and Task Management
 ** =org-bullets=
 #+BEGIN_SRC emacs-lisp
