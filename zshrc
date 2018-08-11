@@ -548,3 +548,8 @@ zplug load
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
 export PATH="/usr/local/opt/llvm/bin:$PATH"
 export PATH="/usr/local/opt/llvm/bin:$PATH"
+
+alias gog="git log  --abbrev-commit --name-status --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'"
+alias gml="git log --stat --color --decorate --all --oneline"
+alias gdw="git diff --word-diff=color"
+alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
