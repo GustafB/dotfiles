@@ -42,7 +42,7 @@ zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 #zplug "robbyrussell/oh-my-zsh", use:"lib/*.zsh"
 
 # Miscellaneous commands
-#zplug "andrewferrier/fzf-z"
+zplug "andrewferrier/fzf-z"
 zplug "k4rthik/git-cal",  as:command
 zplug "peco/peco",        as:command, from:gh-r
 zplug "junegunn/fzf-bin", as:command, from:gh-r, rename-to:fzf, \
@@ -53,7 +53,7 @@ zplug "junegunn/fzf", use:"shell/*.zsh", as:plugin
 zplug "b4b4r07/enhancd", use:init.sh
 
 # Bookmarks and jump
-# zplug "jocelynmallon/zshmarks"
+zplug "jocelynmallon/zshmarks"
 
 # Enhanced dir list with git features
 zplug "supercrabtree/k"
@@ -73,20 +73,20 @@ zplug "bhilburn/powerlevel9k", use:powerlevel9k.zsh-theme
 zplug "plugins/common-aliase",     from:oh-my-zsh
 zplug "plugins/colored-man-pages", from:oh-my-zsh
 zplug "plugins/colorize",          from:oh-my-zsh
-# zplug "plugins/command-not-found", from:oh-my-zsh
-# zplug "plugins/copydir",           from:oh-my-zsh
-# zplug "plugins/copyfile",          from:oh-my-zsh
-# zplug "plugins/cp",                from:oh-my-zsh
-# zplug "plugins/dircycle",          from:oh-my-zsh
-# zplug "plugins/encode64",          from:oh-my-zsh
-# zplug "plugins/extract",           from:oh-my-zsh
-# zplug "plugins/history",           from:oh-my-zsh
+zplug "plugins/command-not-found", from:oh-my-zsh
+zplug "plugins/copydir",           from:oh-my-zsh
+zplug "plugins/copyfile",          from:oh-my-zsh
+zplug "plugins/cp",                from:oh-my-zsh
+zplug "plugins/dircycle",          from:oh-my-zsh
+zplug "plugins/encode64",          from:oh-my-zsh
+zplug "plugins/extract",           from:oh-my-zsh
+zplug "plugins/history",           from:oh-my-zsh
 # zplug "plugins/tmux",              from:oh-my-zsh
 # zplug "plugins/tmuxinator",        from:oh-my-zsh1y
-# zplug "plugins/urltools",          from:oh-my-zsh
-# zplug "plugins/web-search",        from:oh-my-zsh
-# zplug "plugins/z",                 from:oh-my-zsh
-# zplug "plugins/fancy-ctrl-z",      from:oh-my-zsh
+zplug "plugins/urltools",          from:oh-my-zsh
+zplug "plugins/web-search",        from:oh-my-zsh
+zplug "plugins/z",                 from:oh-my-zsh
+zplug "plugins/fancy-ctrl-z",      from:oh-my-zsh
 
 # Supports oh-my-zsh plugins and the like
 # if [[ $OSTYPE = (linux)* ]]; then
@@ -111,21 +111,21 @@ zplug "plugins/git",               from:oh-my-zsh, if:"(( $+commands[git] ))"
 # zplug "plugins/gem",               from:oh-my-zsh, if:"(( $+commands[gem] ))"
 # zplug "plugins/rbenv",             from:oh-my-zsh, if:"(( $+commands[rbenv] ))"
 # zplug "plugins/rvm",               from:oh-my-zsh, if:"(( $+commands[rvm] ))"
-# zplug "plugins/pip",               from:oh-my-zsh, if:"(( $+commands[pip] ))"
-# zplug "plugins/sudo",              from:oh-my-zsh, if:"(( $+commands[sudo] ))"
+zplug "plugins/pip",               from:oh-my-zsh, if:"(( $+commands[pip] ))"
+zplug "plugins/sudo",              from:oh-my-zsh, if:"(( $+commands[sudo] ))"
 # zplug "plugins/gpg-agent",         from:oh-my-zsh, if:"(( $+commands[gpg-agent] ))"
 # zplug "plugins/systemd",           from:oh-my-zsh, if:"(( $+commands[systemctl] ))"
 # zplug "plugins/docker",            from:oh-my-zsh, if:"(( $+commands[docker] ))"
 # zplug "plugins/docker-compose",    from:oh-my-zsh, if:"(( $+commands[docker-compose] ))"
 
-#zplug "djui/alias-tips"
-# zplug "hlissner/zsh-autopair", defer:2
-# zplug "zsh-users/zsh-completions"
-# zplug "zsh-users/zsh-autosuggestions"
-# zplug "zsh-users/zsh-history-substring-search"
+zplug "djui/alias-tips"
+zplug "hlissner/zsh-autopair", defer:2
+zplug "zsh-users/zsh-completions"
+zplug "zsh-users/zsh-autosuggestions"
+zplug "zsh-users/zsh-history-substring-search"
 # zsh-syntax-highlighting must be loaded after executing compinit command
 # and sourcing other plugins
-# zplug "zsh-users/zsh-syntax-highlighting", defer:3
+zplug "zsh-users/zsh-syntax-highlighting", defer:3
 # =============================================================================
 #                                   Options
 # =============================================================================
