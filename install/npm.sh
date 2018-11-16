@@ -1,8 +1,3 @@
-if ! is-executable brew -o ! is-executable git; then
-  echo "Skipped: npm (missing: brew and/or git)"
-  return
-fi
-
 brew install nvm
 
 export DOTFILES_BREW_PREFIX_NVM=`brew --prefix nvm`

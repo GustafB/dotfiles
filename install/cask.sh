@@ -1,8 +1,3 @@
-if ! is-macos -o ! is-executable brew; then
-  echo "Skipped: Homebrew-Cask"
-  return
-fi
-
 brew tap caskroom/versions
 brew tap caskroom/cask
 brew tap caskroom/fonts
@@ -10,23 +5,19 @@ brew tap caskroom/fonts
 # Install packages
 
 apps=(
-  dash2
-  dropbox
-  firefox
-  flux
-  google-chrome
-  google-chrome-canary
-  macdown
-  screenflow
-  slack
-  sourcetree
-  spotify
-  sublime-text
-  transmit
-  virtualbox
-  vlc
-  zeplin
-  iterm2
+    firefox
+    flux
+    google-chrome
+    google-chrome-canary
+    macdown
+    screenflow
+    slack
+    sourcetree
+    spotify
+    transmit
+    virtualbox
+    vlc
+    iterm2
 )
 
 brew cask install "${apps[@]}"

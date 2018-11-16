@@ -1,8 +1,7 @@
 #!/bin/bash
 
-
 if [ ! -d ~/powerlevel9k/ ]; then
-    git clone "https://github.com/bhilburn/powerlevel9k.git ~/.oh-my-zsh/custom/themes/powerlevel9k"
+    git clone "https://github.com/bhilburn/powerlevel9k.git"  ~/.oh-my-zsh/custom/themes/powerlevel9k
     echo "Cloned Powerlevel"
 fi
 
