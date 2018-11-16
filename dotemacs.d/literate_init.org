@@ -1,5 +1,4 @@
 #+TITLE:Emacs Config
-
 * Load better default settings
 This is a straight clone of [[https://github.com/hrs/sensible-defaults.el][HRS]] defaults setup
 #+BEGIN_SRC emacs-lisp
@@ -32,11 +31,11 @@ Compile packages and ensure latest version in available - not required anymore
 #+END_SRC
 Use quelpa
 #+BEGIN_SRC emacs-lisp
-  (use-package quelpa
-    :ensure t)
+  ;; (use-package quelpa
+  ;;   :ensure t)
 
-  (use-package quelpa-use-package
-    :ensure t)
+  ;; (use-package quelpa-use-package
+  ;;   :ensure t)
 
 #+END_SRC
 * Tweaking UX
@@ -131,6 +130,28 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
                   (package-install package-desc)
                   (package-delete  old-package)))))
         (message "All packages are up to date"))))
+
+
+  (defun duplicate-line-or-region (&optional n)
+    "Duplicate current line, or region if active"
+    (interactive "*p")
+    (let ((use-region (use-region-p)))
+      (save-excursion
+        (let ((text (if use-region
+                        (buffer-substring (region-beginning) (region-end))
+                      (prog1 (thing-at-point 'line)
+                        (end-of-line)
+                        (if (< 0 (forward-line 1))
+                            (newline))))))
+          (dotimes (i (abs (or n 1)))
+            (insert text))))
+      (if use-region nil
+        (let ((pos (- (point) (line-beginning-position) (line-end-position)))
+              (forward-line 1)
+              (forward-char pos))))))
+
+  (global-set-key (kbd "C-c C-d") 'duplicate-line-or-region)
+
 #+END_SRC
 ** UI/UX things
 *** Remove scroll bars
@@ -153,10 +174,8 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 *** Highlight current line
 #+BEGIN_SRC emacs-lisp
-  (when window-system
-    (global-hl-line-mode))
-;;  (set-face-background 'hl-line "#778184")
-
+  (progn (global-hl-line-mode)
+         (set-face-background 'hl-line "#2e3544"))
 #+END_SRC
 *** Load icons package
 #+BEGIN_SRC emacs-lisp
@@ -165,23 +184,23 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 #+END_SRC
 *** Load theme
 #+BEGIN_SRC emacs-lisp
-      (defun my/load-theme (frame)
-        (select-frame frame)
-        (load-theme 'zerodark t))
-      (if (daemonp)
-          (add-hook 'after-make-frame-functions #'my/load-theme)
-        (load-theme 'zerodark t))
-      ;;        (use-package zerodark-theme
-        ;;        :ensure t
-          ;;      :config
-            ;;    (load-theme 'zerodark 'no-confirm))
-      ;;          :hook 'zerodark-setup-modeline-format)
-       (use-package zerodark-theme
-          :ensure t
-          :config
-          :hook (my/load-theme)
-          :init
-          (add-hook 'after-init-hook 'zerodark-setup-modeline-format))
+  (defun my/load-theme (frame)
+    (select-frame frame)
+    (load-theme 'zerodark t))
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions #'my/load-theme)
+    (load-theme 'zerodark t))
+  ;;        (use-package zerodark-theme
+    ;;        :ensure t
+      ;;      :config
+        ;;    (load-theme 'zerodark 'no-confirm))
+  ;;          :hook 'zerodark-setup-modeline-format)
+   (use-package zerodark-theme
+      :ensure t
+      :config
+      :hook (my/load-theme)
+      :init
+      (add-hook 'after-init-hook 'zerodark-setup-modeline-format))
 
 #+END_SRC
 *** Load rainbow-mode
@@ -295,9 +314,91 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
 *** Load up which-key
 Sometimes my brain takes a fart and then its useful to know which key to press
 #+BEGIN_SRC emacs-lisp
-  (use-package which-key
-    :defer 5
-    :ensure t)
+    (use-package which-key
+      :defer 5
+      :ensure t
+      :config
+      (which-key-mode))
+#+END_SRC
+*** smartparens
+#+BEGIN_SRC emacs-lisp
+  (use-package smartparens
+    :ensure t
+    :config
+    (progn
+      (show-smartparens-global-mode t)))
+
+  (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
+
+  (defmacro gb/def-pairs (pairs)
+    `(progn
+       ,@(loop for (key . val) in pairs
+               collect
+               `(defun ,(read (concat
+                               "wrap-with-"
+                               (prin1-to-string key)
+                               "s"))
+                    (%optional arg)
+                  (interactive "p")
+                  (sp-wrap-with-pair, val)))))
+
+  (gb/def-pairs ((paren . "(")
+              (bracket . "[")
+              (brace . "{")
+              (single-quote . "'")
+              (double-quote . "\"")
+              (back-quote . "`")))
+
+  (bind-keys
+   :map smartparens-mode-map
+   ("C-M-a" . sp-beginning-of-sexp)
+   ("C-M-e" . sp-end-of-sexp)
+
+   ("C-<down>" . sp-down-sexp)
+   ("C-<up>"   . sp-up-sexp)
+   ("M-<down>" . sp-backward-down-sexp)
+   ("M-<up>"   . sp-backward-up-sexp)
+
+   ("C-M-f" . sp-forward-sexp)
+   ("C-M-b" . sp-backward-sexp)
+
+   ("C-M-n" . sp-next-sexp)
+   ("C-M-p" . sp-previous-sexp)
+
+   ("C-S-f" . sp-forward-symbol)
+   ("C-S-b" . sp-backward-symbol)
+
+   ("C-;" . sp-forward-slurp-sexp)
+   ("C-M-;" . sp-forward-barf-sexp)
+   ("M-<left>"  . sp-backward-slurp-sexp)
+   ("M-<left>"  . sp-backward-barf-sexp)
+
+   ("C-M-t" . sp-transpose-sexp)
+   ("C-M-k" . sp-kill-sexp)
+   ("C-k"   . sp-kill-hybrid-sexp)
+   ("M-k"   . sp-backward-kill-sexp)
+   ("C-M-w" . sp-copy-sexp)
+   ;; ("C-M-d" . delete-sexp)
+
+   ;; ("M-<backspace>" . backward-kill-word)
+   ;; ("C-<backspace>" . sp-backward-kill-word)
+   ;; ([remap sp-backward-kill-word] . backward-kill-word)
+
+   ("M-[" . sp-backward-unwrap-sexp)
+   ("M-]" . sp-unwrap-sexp)
+
+   ("C-x C-t" . sp-transpose-hybrid-sexp)
+
+   ("C-c ("  . sp-wrap-round)
+   ("C-c ["  . sp-wrap-square)
+   ("C-c {"  . sp-wrap-curly))
+#+END_SRC
+*** undo-tree
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree
+    :ensure t
+    :config
+    (global-undo-tree-mode))
 #+END_SRC
 * Navigation & Interface
 ** =ivy=
@@ -415,11 +516,6 @@ Ask before recursively deleting a directory
 #+BEGIN_SRC emacs-lisp
 (setq dired-recursive-deletes 'top)
 #+END_SRC
-Enable dired+
-#+BEGIN_SRC emacs-lisp
-  (use-package dired+
-    :quelpa (dired+ :fetcher github :repo "emacsmirror/dired-plus"))
-#+END_SRC
 Enable dired-toggle
 #+BEGIN_SRC emacs-lisp
   (use-package dired-toggle
@@ -473,12 +569,13 @@ Enable dired-toggle
 #+END_SRC
 ** =drag-stuff=
 #+BEGIN_SRC emacs-lisp
-  (use-package drag-stuff
+(use-package drag-stuff
    :ensure t)
   (drag-stuff-global-mode 1)
   (drag-stuff-define-keys)
 #+END_SRC
 ** =multiple-cursors=
+
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
     :ensure t)
@@ -486,9 +583,16 @@ Enable dired-toggle
   (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
   (global-set-key (kbd "C->") 'mc/mark-next-like-this)
   (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-  (global-set-key (kbd "C-M-g") 'mc/mark-all-like-this)
+  (global-set-key (kbd "C-x C-g") 'mc/mark-all-like-this)
   (global-set-key (kbd "C-.") 'mc/skip-to-next-like-this)
   (global-set-key (kbd "C-,") 'mc/skip-to-previous-like-this)
+#+END_SRC
+** =compile=
+#+BEGIN_SRC emacs-lisp
+  (use-package compile
+    :bind ("C-c x c" . compile)
+    :config
+    (setq compilation-scroll-output 'first-error))
 #+END_SRC
 * Version Control & Project Management
 ** Emacs Backups
@@ -693,8 +797,7 @@ Finally, we want to create a backup every time we save using =C-x C-s=. We will 
 (add-hook 'js2-mode-hook (lambda ()
   (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
 #+END_SRC
-** =markdown
--mode=
+** =markdown-mode=
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
     :ensure t
@@ -703,13 +806,13 @@ Finally, we want to create a backup every time we save using =C-x C-s=. We will 
            ("\\.markdown\\'"    . markdown-mode))
     :init (setq markdown-command "multimarkdown"))
 
-  (use-package markdown-preview-mode
-    :after markdown-mode
-    :config
-    (setq markdown-preview-stylesheets
-          (list (concat "https://github.com/dmarcotte/github-markdown-preview/"
-                        "blob/master/data/css/github.css"))))
-  (custom-set-variables '(markdown-command "/usr/local/bin/markdown"))
+  ;; (use-package markdown-preview-mode
+  ;;   :after markdown-mode
+  ;;   :config
+  ;;   (setq markdown-preview-stylesheets
+  ;;         (list (concat "https://github.com/dmarcotte/github-markdown-preview/"
+  ;;                       "blob/master/data/css/github.css"))))
+  ;; (custom-set-variables '(markdown-command "/usr/local/bin/markdown"))
 
 #+END_SRC
 ** =rest-client=
@@ -799,7 +902,7 @@ Switch between .h and .c/.cpp files
   (cond (matching-ext
          (unless
        (catch 'found
-         (flet ((when-exists-find-and-throw
+         (cl-flet ((when-exists-find-and-throw
            (file)
            (when (file-exists-p file)
              (find-file file)
@@ -851,22 +954,22 @@ Switch between .h and .c/.cpp files
 #+END_SRC
 ** =lisp=
 #+BEGIN_SRC emacs-lisp
-  (use-package slime
-    ;; :load-path (expand-site-lisp "slime")
-    :commands slime
-    :config
+  ;; (use-package slime
+  ;;   ;; :load-path (expand-site-lisp "slime")
+  ;;   :commands slime
+  ;;   :config
 
-    (progn
-      (add-hook
-       'slime-load-hook
-       #'(lambda ()
-     (slime-setup
-      '(slime-fancy
-        slime-repl
-        slime-fuzzy
-        slime-company))))
-      (setq slime-net-coding-system 'utf-8-unix)
-      (setq inferior-lisp-program "/usr/local/bin/clisp")))
+  ;;   (progn
+  ;;     (add-hook
+  ;;      'slime-load-hook
+  ;;      #'(lambda ()
+  ;;    (slime-setup
+  ;;     '(slime-fancy
+  ;;       slime-repl
+  ;;       slime-fuzzy
+  ;;       slime-company))))
+  ;;     (setq slime-net-coding-system 'utf-8-unix)
+  ;;     (setq inferior-lisp-program "/usr/local/bin/clisp")))
 #+END_SRC
 Enable lisp eval in org-mode
 #+BEGIN_SRC emacs-lisp
@@ -947,11 +1050,11 @@ I like to keep the current line highlighted
 #+END_SRC
 Setup paths for emacs shell
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'exec-path "/usr/local/bin")
-  (use-package exec-path-from-shell
-    :ensure t
-    :config (when (memq window-system '(mac ns))
-              (exec-path-from-shell-initialize)))
+  ;; (add-to-list 'exec-path "/usr/local/bin")
+  ;; (use-package exec-path-from-shell
+  ;;   :ensure t
+  ;;   :config (when (memq window-system '(mac ns))
+  ;;             (exec-path-from-shell-initialize)))
 #+END_SRC
 Testing new shell command
 #+BEGIN_SRC emacs-lisp
@@ -1235,6 +1338,7 @@ Tell emacs where to look for refiling targets and some customizations to get ido
   (setq org-completion-use-ido t)
   (setq ido-everywhere t)
   (setq ido-max-directory-size 100000)
+  (setq ido-enable-tramp-completion t)
   (ido-mode (quote both))
   ; Use the current window when visiting files and buffers with ido
   (setq ido-default-file-method 'selected-window)
@@ -1643,4 +1747,58 @@ The view itself
       (require 'flycheck-rtags)
       ;; c-mode-common-hook is also called by c++-mode
       (add-hook 'c-mode-common-hook #'setup-flycheck-rtags)))
+#+END_SRC
+* tramp
+#+BEGIN_SRC emacs-lisp
+
+    (use-package tramp
+      :ensure nil
+      :config
+      (setq tramp-default-method "toolkit")
+      (tramp-set-completion-function "toolkit"
+                                     '((tramp-parse-sconfig "~/.ssh/config")))
+      (setq tramp-terminal-type "dumb")
+      (setq tramp-inline-compress-start-size 10000000))
+
+    (add-to-list 'tramp-methods  '("toolkit"
+                                   (tramp-login-program "ssh")
+                                   (tramp-login-args
+                                    (("-p" "%p")
+                                     ("-t")
+                                     ("-t")
+                                     ("-o" "ControlPath=~/.ssh/%%u@v5devgateway.bdns.bloomberg.com:%%p")
+                                     ("-o" "ControlMaster=auto")
+                                     ("-o" "ControlPersist=yes")
+                                     ("-e" "none")
+                                     ("v5devgateway.bdns.bloomberg.com")
+                                     ("inline")
+                                     ("%h")))
+                                   (tramp-async-args
+                                    (("-q")))
+                                   (tramp-remote-shell "/bin/sh")
+                                   (tramp-remote-shell-args
+                                    ("-c"))
+                                   (tramp-gw-args
+                                    (("-o" "GlobalKnownHostsFile=/dev/null")
+                                     ("-o" "UserKnownHostsFile=/dev/null")
+                                     ("-o" "StrictHostKeyChecking=no")
+                                     ))
+                                   (tramp-default-port 22)))
+
+    (add-to-list 'tramp-remote-path "/opt/bb/bin")
+    ;; (use-package counsel-tramp
+    ;;   :ensure t
+    ;;   :config
+    ;;   (define-key global-map (kbd "C-c C-f") 'counsel-tramp)
+    ;;    (add-hook 'counsel-tramp-pre-command-hook '(lambda () (global-aggressive-indent-mode 0)
+    ;;                                                 (projectile-mode 0)
+    ;;                                                 (editorconfig-mode 0)))
+    ;;    (add-hook 'counsel-tramp-quit-hook '(lambda () (global-aggressive-indent-mode 1)
+    ;;                                          (projectile-mode 1)
+    ;;                                          (editorconfig-mode 1))))
+
+    ;; (use-package toolkit-tramp
+    ;;   :defer 60
+    ;;   :config
+    ;;   (setq password-cache-expiry t))
 #+END_SRC
