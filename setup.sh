@@ -40,6 +40,7 @@ fi
 
 # setup links
 setup_file_link "${CODE_HOME}/zshrc" "${HOME}/.zshrc"
+setup_file_link "${CODE_HOME}/zshenv" "${HOME}/.zshenv"
 setup_file_link "${CODE_HOME}/inputrc" "${HOME}/.inputrc"
 setup_file_link "${CODE_HOME}/gitconfig" "${HOME}/.gitconfig"
 setup_file_link "${CODE_HOME}/gitignore_global" "${HOME}/.gitignore_global"
@@ -49,12 +50,12 @@ setup_file_link "${CODE_HOME}/offlineimaprc" "${HOME}/.offlineimaprc"
 setup_file_link "${CODE_HOME}/.offlineimap.py" "${HOME}/.offlineimap.py"
 
 
-# if [ "$(uname)" == "Darwin" ]; then
-#     . "${CODE_HOME}/install/brew.sh"
-#     . "${CODE_HOME}/install/npm.sh"
-#     . "${CODE_HOME}/install/bash.sh"
-#     . "${CODE_HOME}/install/brew-cask.sh"
-# fi
+if [ "$(uname)" == "Darwin" ]; then
+    . "${CODE_HOME}/install/brew.sh"
+    . "${CODE_HOME}/install/bash.sh"
+    . "${CODE_HOME}/install/cask.sh"
+    . "${CODE_HOME}/install/ohmyzsh.sh"
+fi
 
 
 # to remove everything, run the following.  Not going to automate this, because it is too destructive
