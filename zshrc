@@ -19,6 +19,8 @@ export FZF_DEFAULT_OPTS='--height 40% --reverse --border --inline-info --color=d
 
 export ENHANCD_FILTER="fzf:peco:percol"
 export ENHANCD_COMMAND='c'
+export EDITOR="emacs -nw -q"
+export VISUAL="emacs -nw -q"
 
 if [ -n "$INSIDE_EMACS" ]; then
   chpwd() { print -P "\033AnSiTc %d" }
@@ -225,6 +227,10 @@ alias 9='pu -9'
 alias pu='() { pushd $1 &> /dev/null; dirs -v; }'
 alias po='() { popd &> /dev/null; dirs -v; }'
 
+# Housekeeping
+
+alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'
+
 zshaddhistory() { whence ${${(z)1}[1]} >| /dev/null || return 1 }
 
 # =============================================================================
@@ -241,8 +247,8 @@ bindkey "^d" delete-char
 bindkey "^y" accept-and-hold
 bindkey "^w" backward-kill-word
 bindkey "^u" backward-kill-line
-bindkey "^R" history-incremental-pattern-search-backward
-bindkey "^F" history-incremental-pattern-search-forward
+#bindkey "^R" history-incremental-pattern-search-backward
+#bindkey "^F" history-incremental-pattern-search-forward
 
 # Do not require a space when attempting to tab-complete.
 bindkey "^i" expand-or-complete-prefix
@@ -546,8 +552,6 @@ zplug load
 # Source exports and aliases.
 [[ -f ~/.zsh_exports ]] && source ~/.zsh_exports
 [[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
-export PATH="/usr/local/opt/llvm/bin:$PATH"
-export PATH="/usr/local/opt/llvm/bin:$PATH"
 
 alias gog="git log  --abbrev-commit --name-status --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'"
 alias gml="git log --stat --color --decorate --all --oneline"

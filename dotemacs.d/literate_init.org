@@ -1036,26 +1036,26 @@ Enable lisp eval in org-mode
 ** =org-ref=
 I like to be able to store notes when I read papers / studies
 #+BEGIN_SRC emacs-lisp
-  (use-package org-ref
-    :ensure t
-    :config
-    (setq org-ref-notes-directory "~/Dropbox/org/reading"
-          org-ref-bibliography-notes "~/Dropbox/org/reading/index.org"
-          org-ref-default-bibliography '("~/Dropbox/org/reading/index.bib")
-          org-ref-pdf-directory "~/Dropbox/org/reading/lib/")) ;; where documents are stored
+  ;; (use-package org-ref
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq org-ref-notes-directory "~/Dropbox/org/reading"
+  ;;         org-ref-bibliography-notes "~/Dropbox/org/reading/index.org"
+  ;;         org-ref-default-bibliography '("~/Dropbox/org/reading/index.bib")
+  ;;         org-ref-pdf-directory "~/Dropbox/org/reading/lib/")) ;; where documents are stored
 
 #+END_SRC
 ** =helm-bibtex=
 Library for creating and storing references and citations
 #+BEGIN_SRC emacs-lisp
-  (use-package helm-bibtex
-    :ensure t
-    :config
-    (setq helm-bibtex-bibliography "~/Dropbox/org/reading/index.bib" ;; where your references are stored
-        helm-bibtex-library-path "~/Dropbox/org/reading/lib/" ;; where your pdfs etc are stored
-        helm-bibtex-notes-path "~/Dropbox/org/reading/index.org" ;; where your notes are stored
-        bibtex-completion-bibliography "~/Dropbox/org/reading/index.bib" ;; writing completion
-        bibtex-completion-notes-path "~/Dropbox/org/reading/index.org"))
+  ;; (use-package helm-bibtex
+  ;;   :ensure t
+  ;;   :config
+  ;;   (setq helm-bibtex-bibliography "~/Dropbox/org/reading/index.bib" ;; where your references are stored
+  ;;       helm-bibtex-library-path "~/Dropbox/org/reading/lib/" ;; where your pdfs etc are stored
+  ;;       helm-bibtex-notes-path "~/Dropbox/org/reading/index.org" ;; where your notes are stored
+  ;;       bibtex-completion-bibliography "~/Dropbox/org/reading/index.bib" ;; writing completion
+  ;;       bibtex-completion-notes-path "~/Dropbox/org/reading/index.org"))
 #+END_SRC
 ** Cosmetics
 #+BEGIN_SRC emacs-lisp

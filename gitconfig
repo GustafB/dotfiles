@@ -4,12 +4,12 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 [user]
-  name = GustafN
-  email = gustaf.brostedt@gmail.com
+  email = gbrostedt1@bloomberg.net
+  name = gbrostedt1
 [core]
   autocrlf = false
   safecrlf = false
-	editor = sublime -n -w
+	editor = emacs -nw -q
 	excludesfile = /Users/gustafbrostedt/.gitignore_global
 	pager = less -R
 [alias]
@@ -28,3 +28,7 @@
   ac = add . && commit
   u = upstream
   dbr = branch -d
+[credential]
+  helper = cache
+[credential "https://bbgithub.dev.bloomberg.com"]
+  username = a637bc246ecb89ff38f2a88259fa494a40ce7eca
