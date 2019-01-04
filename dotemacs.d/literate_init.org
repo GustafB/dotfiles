@@ -1,3 +1,4 @@
+
 #+TITLE:Emacs Config
 * Load better default settings
 This is a straight clone of [[https://github.com/hrs/sensible-defaults.el][HRS]] defaults setup
@@ -399,6 +400,25 @@ Sometimes my brain takes a fart and then its useful to know which key to press
     :ensure t
     :config
     (global-undo-tree-mode))
+#+END_SRC
+*** linum-mode
+#+BEGIN_SRC emacs-lisp
+  (defun relative-abs-line-numbers-format (offset)
+    (if (= 0 offset)
+        (number-to-string (line-number-at-pos))
+      (number-to-string (abs offset))))
+
+  (use-package linum
+    :ensure nil
+    :config
+    (setq relative-line-numbers-format 'relative-abs-line-numbers-format)
+    (lambda() (global-linum-mode)))
+
+  (use-package linum-highlight-current-line-number
+    :ensure t
+    :config
+    (setq linum-format 'linum-highlight-current-line-number))
+
 #+END_SRC
 * Navigation & Interface
 ** =ivy=
@@ -1234,7 +1254,7 @@ Since offline-imap can't send emails by default so enable this groundbreaking fe
 Any setup related to managing my agenda and life in general
 ** Todo list and archive
 #+BEGIN_SRC emacs-lisp
-  (setq org-directory "~/Dropbox/org/agenda")
+  (setq org-directory "~/org/agenda")
 
   (defun org-file-path (filename)
     "Return the absolute address of an org file, given its relative name."
@@ -1269,7 +1289,7 @@ Any setup related to managing my agenda and life in general
 ** =org-journal=
 #+BEGIN_SRC emacs-lisp
   ;; Set default path
-  (setq org-journal-dir (concat "~/Dropbox/org/agenda/journal/" (format-time-string "%Y/%m/")))
+  (setq org-journal-dir (concat "~/org/agenda/journal/" (format-time-string "%Y/%m/")))
   ;; Define naming convention
   (setq org-journal-file-format "%Y-%m-%d.org")
   ;; Carry-over incomplete todos
@@ -1288,13 +1308,17 @@ Most of the below is taken from [[http://doc.norang.ca/org-mode.html][My Life In
 *** =org-agenda=
 Tell the agenda where to search for files
 #+BEGIN_SRC emacs-lisp
-  (setq org-agenda-files (quote( "~/Dropbox/org/agenda")))
+  (setq org-agenda-files (quote( "~/org/agenda")))
 #+END_SRC
 Add some additional todo keywords and edit highlighting
 #+BEGIN_SRC emacs-lisp
   (setq org-todo-keywords
-        (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+       (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
                 (sequence "WAITING(w@/!)" "HOLD(h@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+
+  ;; (setq org-todo-keywords
+  ;;       (quote ((sequence "TODO(t)" "|" "DONE(d)")
+  ;;               (sequence "WAITING(w@/!)" "|" "CANCELLED(c@/!)"))))
 
   (setq org-todo-keyword-faces
         (quote (("TODO" :foreground "red" :weight bold)
@@ -1343,22 +1367,22 @@ Configure org-capture and load templates
     :bind ("C-c c" . org-capture)
     :ensure nil
     :config
-    (setq org-directory "~/Dropbox/org/agenda")
-    (setq org-default-notes-file "~/Dropbox/org/agenda/refile.org")
+    (setq org-directory "~/org/agenda")
+    (setq org-default-notes-file "~/org/agenda/refile.org")
     (setq org-capture-templates
-        (quote (("t" "todo" entry (file "~/Dropbox/org/agenda/refile.org")
+        (quote (("t" "todo" entry (file "~/org/agenda/refile.org")
                  "* TODO %?\n%U\n%a\n")
-                ("r" "respond" entry (file "~/Dropbox/org/agenda/refile.org")
+                ("r" "respond" entry (file "~/org/agenda/refile.org")
                  "* NEXT Respond to %:from on %:subject\nSCHEDULED: %t\n%U\n%a\n")
-                ("n" "note" entry (file "~/Dropbox/org/agenda/refile.org")
+                ("n" "note" entry (file "~/org/agenda/refile.org")
                  "* %? :NOTE:\n%U\n%a\n")
-                ("w" "org-protocol" entry (file "~/Dropbox/org/agenda/refile.org")
+                ("w" "org-protocol" entry (file "~/org/agenda/refile.org")
                  "* TODO Review %c\n%U\n")
-                ("m" "Meeting" entry (file "~/Dropbox/org/agenda/refile.org")
+                ("m" "Meeting" entry (file "~/org/agenda/refile.org")
                  "* MEETING with %? :MEETING:\n%U")
-                ("p" "Phone call" entry (file "~/Dropbox/org/agenda/refile.org")
+                ("p" "Phone call" entry (file "~/org/agenda/refile.org")
                  "* PHONE %? :PHONE:\n%U")
-                ("h" "Habit" entry (file "~/Dropbox/org/agenda/refile.org")
+                ("h" "Habit" entry (file "~/org/agenda/refile.org")
                  "* NEXT %?\n%U\n%a\nSCHEDULED: %(format-time-string \"%<<%Y-%m-%d %a .+1d/3d>>\")\n:PROPERTIES:\n:STYLE: habit\n:REPEAT_TO_STATE: NEXT\n:END:\n")))))
 #+END_SRC
 *** =org-refile=
@@ -1794,54 +1818,41 @@ The view itself
 * tramp
 #+BEGIN_SRC emacs-lisp
 
-    (use-package tramp
-      :ensure nil
-      :config
-      (setq tramp-default-method "toolkit")
-      (tramp-set-completion-function "toolkit"
-                                     '((tramp-parse-sconfig "~/.ssh/config")))
-      (setq tramp-terminal-type "dumb")
-      (setq tramp-inline-compress-start-size 10000000))
+  (use-package tramp
+    :ensure nil
+    :config
+    (setq tramp-default-method "toolkit")
+    (tramp-set-completion-function "toolkit"
+                                   '((tramp-parse-sconfig "~/.ssh/config")))
+    (setq tramp-terminal-type "dumb")
+    (setq tramp-inline-compress-start-size 10000000)
+    (setq tramp-debug-buffer t)
+    (setq tramp-verbose 10))
 
-    (add-to-list 'tramp-methods  '("toolkit"
-                                   (tramp-login-program "ssh")
-                                   (tramp-login-args
-                                    (("-p" "%p")
-                                     ("-t")
-                                     ("-t")
-                                     ("-o" "ControlPath=~/.ssh/%%u@v5devgateway.bdns.bloomberg.com:%%p")
-                                     ("-o" "ControlMaster=auto")
-                                     ("-o" "ControlPersist=yes")
-                                     ("-e" "none")
-                                     ("v5devgateway.bdns.bloomberg.com")
-                                     ("inline")
-                                     ("%h")))
-                                   (tramp-async-args
-                                    (("-q")))
-                                   (tramp-remote-shell "/bin/sh")
-                                   (tramp-remote-shell-args
-                                    ("-c"))
-                                   (tramp-gw-args
-                                    (("-o" "GlobalKnownHostsFile=/dev/null")
-                                     ("-o" "UserKnownHostsFile=/dev/null")
-                                     ("-o" "StrictHostKeyChecking=no")
-                                     ))
-                                   (tramp-default-port 22)))
+  (add-to-list 'tramp-methods  '("toolkit"
+                                 (tramp-login-program "ssh")
+                                 (tramp-login-args
+                                  (("-p" "%p")
+                                   ("-t")
+                                   ("-t")
+                                   ("-o" "ControlPath=~/.ssh/%%u@v5devgateway.bdns.bloomberg.com:%%p")
+                                   ("-o" "ControlMaster=auto")
+                                   ("-o" "ControlPersist=yes")
+                                   ("-e" "none")
+                                   ("v5devgateway.bdns.bloomberg.com")
+                                   ("inline")
+                                   ("%h")))
+                                 (tramp-async-args
+                                  (("-q")))
+                                 (tramp-remote-shell "/bin/sh")
+                                 (tramp-remote-shell-args
+                                  ("-c"))
+                                 (tramp-gw-args
+                                  (("-o" "GlobalKnownHostsFile=/dev/null")
+                                   ("-o" "UserKnownHostsFile=/dev/null")
+                                   ("-o" "StrictHostKeyChecking=no")
+                                   ))
+                                 (tramp-default-port 22)))
 
-    (add-to-list 'tramp-remote-path "/opt/bb/bin")
-    ;; (use-package counsel-tramp
-    ;;   :ensure t
-    ;;   :config
-    ;;   (define-key global-map (kbd "C-c C-f") 'counsel-tramp)
-    ;;    (add-hook 'counsel-tramp-pre-command-hook '(lambda () (global-aggressive-indent-mode 0)
-    ;;                                                 (projectile-mode 0)
-    ;;                                                 (editorconfig-mode 0)))
-    ;;    (add-hook 'counsel-tramp-quit-hook '(lambda () (global-aggressive-indent-mode 1)
-    ;;                                          (projectile-mode 1)
-    ;;                                          (editorconfig-mode 1))))
-
-    ;; (use-package toolkit-tramp
-    ;;   :defer 60
-    ;;   :config
-    ;;   (setq password-cache-expiry t))
+  (add-to-list 'tramp-remote-path "/opt/bb/bin")
 #+END_SRC
