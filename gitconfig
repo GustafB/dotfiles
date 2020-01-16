@@ -30,5 +30,3 @@
   dbr = branch -d
 [credential]
   helper = cache
-[credential "https://bbgithub.dev.bloomberg.com"]
-  username = a637bc246ecb89ff38f2a88259fa494a40ce7eca
