@@ -93,6 +93,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
     (interactive)
     (split-window-below)
     (balance-windows)
+    (gb/toggle-normal)
     (other-window 1))
 
   (defun split-window-right-and-switch ()
@@ -100,6 +101,7 @@ Some handy functionality, mostly drawn from other configs ([[https://github.com/
     (interactive)
     (split-window-right)
     (balance-windows)
+    (gb/toggle-normal)
     (other-window 1))
 
   (defun package-upgrade-all ()
@@ -323,76 +325,91 @@ Sometimes my brain takes a fart and then its useful to know which key to press
 #+END_SRC
 *** smartparens
 #+BEGIN_SRC emacs-lisp
-  (use-package smartparens
-    :ensure t
-    :config
-    (progn
-      (show-smartparens-global-mode t)))
+  ;; (use-package smartparens
+  ;;   :ensure t
+  ;;   :config
+  ;;   (progn
+  ;;     (show-smartparens-global-mode t)))
 
-  (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
+  ;; (add-hook 'prog-mode-hook 'turn-on-smartparens-mode)
 
-  (defmacro gb/def-pairs (pairs)
-    `(progn
-       ,@(loop for (key . val) in pairs
-               collect
-               `(defun ,(read (concat
-                               "wrap-with-"
-                               (prin1-to-string key)
-                               "s"))
-                    (%optional arg)
-                  (interactive "p")
-                  (sp-wrap-with-pair, val)))))
+  ;; (defmacro gb/def-pairs (pairs)
+  ;;   `(progn
+  ;;      ,@(cl-loop for (key . val) in pairs
+  ;;              collect
+  ;;              `(defun ,(read (concat
+  ;;                              "wrap-with-"
+  ;;                              (prin1-to-string key)
+  ;;                              "s"))
+  ;;                   (%optional arg)
+  ;;                 (interactive "p")
+  ;;                 (sp-wrap-with-pair, val)))))
 
-  (gb/def-pairs ((paren . "(")
-              (bracket . "[")
-              (brace . "{")
-              (single-quote . "'")
-              (double-quote . "\"")
-              (back-quote . "`")))
+  ;; (gb/def-pairs ((paren . "(")
+  ;;             (bracket . "[")
+  ;;             (brace . "{")
+  ;;             (single-quote . "'")
+  ;;             (double-quote . "\"")
+  ;;             (cocodillo . "<")
+  ;;             (back-quote . "`")))
 
-  (bind-keys
-   :map smartparens-mode-map
-   ("C-M-a" . sp-beginning-of-sexp)
-   ("C-M-e" . sp-end-of-sexp)
+  ;; (sp-pair "<" ">" :actions '(wrap) :wrap "C-c <")
 
-   ("C-<down>" . sp-down-sexp)
-   ("C-<up>"   . sp-up-sexp)
-   ("M-<down>" . sp-backward-down-sexp)
-   ("M-<up>"   . sp-backward-up-sexp)
+  ;; (defun gb/wrap-cocodillo ()
+  ;;   "Wrap following sexp in <> sign."
+  ;;   (interactive)
+  ;;   (sp-wrap-with-pair "<"))
 
-   ("C-M-f" . sp-forward-sexp)
-   ("C-M-b" . sp-backward-sexp)
+  ;; (use-package evil-smartparens
+  ;;   :ensure t
+  ;;   :config
+  ;;   :init
+  ;;   ('smartparens-enabled-hook #'evil-smartparens-mode))
 
-   ("C-M-n" . sp-next-sexp)
-   ("C-M-p" . sp-previous-sexp)
+  ;; ;; (bind-keys
+  ;; ;;  :map smartparens-mode-map
+  ;; ;;  ("C-M-a" . sp-beginning-of-sexp)
+  ;; ;;  ("C-M-e" . sp-end-of-sexp)
 
-   ("C-S-f" . sp-forward-symbol)
-   ("C-S-b" . sp-backward-symbol)
+  ;; ;;  ("C-<down>" . sp-down-sexp)
+  ;; ;;  ("C-<up>"   . sp-up-sexp)
+  ;; ;;  ("M-<down>" . sp-backward-down-sexp)
+  ;; ;;  ("M-<up>"   . sp-backward-up-sexp)
 
-   ("C-;" . sp-forward-slurp-sexp)
-   ("C-M-;" . sp-forward-barf-sexp)
-   ("M-<left>"  . sp-backward-slurp-sexp)
-   ("M-<left>"  . sp-backward-barf-sexp)
+  ;; ;;  ("C-M-f" . sp-forward-sexp)
+  ;; ;;  ("C-M-b" . sp-backward-sexp)
 
-   ("C-M-t" . sp-transpose-sexp)
-   ("C-M-k" . sp-kill-sexp)
-   ("C-k"   . sp-kill-hybrid-sexp)
-   ("M-k"   . sp-backward-kill-sexp)
-   ("C-M-w" . sp-copy-sexp)
-   ;; ("C-M-d" . delete-sexp)
+  ;; ;;  ("C-M-n" . sp-next-sexp)
+  ;; ;;  ("C-M-p" . sp-previous-sexp)
 
-   ;; ("M-<backspace>" . backward-kill-word)
-   ;; ("C-<backspace>" . sp-backward-kill-word)
-   ;; ([remap sp-backward-kill-word] . backward-kill-word)
+  ;; ;;  ("C-S-f" . sp-forward-symbol)
+  ;; ;;  ("C-S-b" . sp-backward-symbol)
 
-   ("M-[" . sp-backward-unwrap-sexp)
-   ("M-]" . sp-unwrap-sexp)
+  ;; ;;  ("C-;" . sp-forward-slurp-sexp)
+  ;; ;;  ("C-M-;" . sp-forward-barf-sexp)
+  ;; ;;  ("M-<left>"  . sp-backward-slurp-sexp)
+  ;; ;;  ("M-<left>"  . sp-backward-barf-sexp)
 
-   ("C-x C-t" . sp-transpose-hybrid-sexp)
+  ;; ;;  ("C-M-t" . sp-transpose-sexp)
+  ;; ;;  ("C-M-k" . sp-kill-sexp)
+  ;; ;;  ("C-k"   . sp-kill-hybrid-sexp)
+  ;; ;;  ("M-k"   . sp-backward-kill-sexp)
+  ;; ;;  ("C-M-w" . sp-copy-sexp)
+  ;; ;;  ;; ("C-M-d" . delete-sexp)
 
-   ("C-c ("  . sp-wrap-round)
-   ("C-c ["  . sp-wrap-square)
-   ("C-c {"  . sp-wrap-curly))
+  ;; ;;  ;; ("M-<backspace>" . backward-kill-word)
+  ;; ;;  ;; ("C-<backspace>" . sp-backward-kill-word)
+  ;; ;;  ;; ([remap sp-backward-kill-word] . backward-kill-word)
+
+  ;; ;;  ("M-[" . sp-backward-unwrap-sexp)
+  ;; ;;  ("M-]" . sp-unwrap-sexp)
+
+  ;; ;;  ("C-x C-t" . sp-transpose-hybrid-sexp)
+
+  ;; ;;  ("C-c ("  . sp-wrap-round)
+  ;; ;;  ("C-c ["  . sp-wrap-square)
+  ;; ;;  ("C-c {"  . sp-wrap-curly)
+  ;; ;;  ("C-c <"  . gb/wrap-cocodillo))
 #+END_SRC
 *** undo-tree
 #+BEGIN_SRC emacs-lisp
@@ -551,35 +568,22 @@ Enable dired-toggle
     :init (progn
       (add-hook 'prog-mode-hook 'company-mode))
     :config (progn
-        (setq company-idle-delay 0.5)
-        (setq company-tooltip-limit 10)
-        (setq company-minimum-prefix-length 2)
-        (setq company-tooltip-flip-when-above t)))
-
-  ;; (setenv "GTAGSLIBPATH" (concat "/Library/Developer/CommandLineTools/usr/include/c++/v1/"
-  ;; 			 ":"
-  ;; 			 "/usr/local/include/"
-  ;; 			 ":"
-  ;; 			 "~/headers/bb/build/SunOS-sparc-32/release/robolibs/big2019.09-1002001-20190227T061258/opt/bb/"))
-  ;; (setenv "MAKEOBJDIRPREFIX" (file-truename "~/obj/"))
-  ;; (setq company-backends '((company-dabbrev-code company-gtags)))
+	(setq company-idle-delay 0.5)
+	(setq company-tooltip-limit 10)
+	(setq company-minimum-prefix-length 2)
+	(setq company-tooltip-flip-when-above t)))
 
   (use-package company-c-headers
-    :config (progn
-        (add-to-list 'company-backends 'company-c-headers)
-        (add-to-list 'company-c-headers-path-system "/Library/Developer/CommandLineTools/usr/include/c++/")
-        (add-to-list 'company-c-headers-path-system "/Library/Developer/CommandLineTools/usr/include/c++/v1/")
-        (add-to-list 'company-c-headers-path-system "/usr/local/include/")
-        (add-to-list 'company-c-headers-path-system "~/headers/bb/build/SunOS-sparc-32/release/robolibs/big2019.09-1002001-20190227T061258/opt/bb/")))
-
-  ;; (add-to-list 'company-c-headers-path-system "/Library/Developer/CommandLineTools/usr/include/c++/")
-
+    :after (company)
+    :config
+      (add-to-list 'company-backends 'company-c-headers)
+      (add-to-list 'company-c-headers-path-system "/usr/local/include/"))
 
   (use-package company-dabbrev
     :ensure nil
     :config (progn
-        (setq company-dabbrev-ignore-case t)
-        (setq company-dabbrev-downcase nil)))
+	(setq company-dabbrev-ignore-case t)
+	(setq company-dabbrev-downcase nil)))
   (add-hook 'after-init-hook 'global-company-mode)
 #+END_SRC
 ** =drag-stuff=
@@ -614,7 +618,7 @@ Quickly navigate to a symbol using Avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
     :config
-    (global-set-key (kbd "C-r") 'avy-goto-char-timer))
+    (global-set-key (kbd "s-r") 'avy-goto-char-timer))
 #+END_SRC
 ** general navigation
 Open projects based on git repo
@@ -650,6 +654,7 @@ Go back to old cursor location after a jump
 
   (global-set-key (kbd "s-<") 'previous-buffer)
   (global-set-key (kbd "s->") 'next-buffer)
+
 #+END_SRC
 * Version Control & Project Management
 ** Emacs Backups
@@ -693,7 +698,6 @@ Finally, we want to create a backup every time we save using =C-x C-s=. We will 
 ** =Magit=
 #+BEGIN_SRC emacs-lisp
   (use-package magit
-    :ensure t
     :bind (("C-x g" . magit-status)
            ("C-x G" . magit-status-with-prefix))
     :bind (:map magit-mode-map
@@ -702,6 +706,8 @@ Finally, we want to create a backup every time we save using =C-x C-s=. We will 
     :bind (:map magit-file-section-map ("<C-return>"))
     :bind (:map magit-hunk-section-map ("<C-return>"))
     :preface
+    ;; History can be viewed with:
+    ;; git log refs/snapshots/$(git symbolic-ref HEAD)
     (defun magit-monitor (&optional no-display)
       "Start git-monitor in the current directory."
       (interactive)
@@ -724,6 +730,16 @@ Finally, we want to create a backup every time we save using =C-x C-s=. We will 
       (let ((current-prefix-arg '(4)))
         (call-interactively 'magit-status)))
 
+    (defun endless/visit-pull-request-url ()
+      "Visit the current branch's PR on Github."
+      (interactive)
+      (browse-url
+       (format "https://github.com/%s/pull/new/%s"
+               (replace-regexp-in-string
+                "\\`.+github\\.com:\\(.+?\\)\\(\\.git\\)?\\'" "\\1"
+                (magit-get "remote" (magit-get-remote) "url"))
+               (magit-get-current-branch))))
+
     :hook (magit-mode . hl-line-mode)
     :config
     (use-package magit-commit
@@ -732,27 +748,31 @@ Finally, we want to create a backup every time we save using =C-x C-s=. We will 
 
     (use-package magit-files
       :config
-      (global-magit-file-mode))
+      ;;(global-magit-file-mode)
+      )
 
     (add-hook 'magit-status-mode-hook #'(lambda () (magit-monitor t)))
 
-    (eval-after-load 'magit-remote
-      '(progn
-         (magit-define-popup-action 'magit-fetch-popup
-           ?f 'magit-get-remote #'magit-fetch-from-upstream ?u t)
-         (magit-define-popup-action 'magit-pull-popup
-           ?F 'magit-get-upstream-branch #'magit-pull-from-upstream ?u t)
-         (magit-define-popup-action 'magit-push-popup
-           ?P 'magit--push-current-to-upstream-desc
-           #'magit-push-current-to-upstream ?u t))))
+    (define-key magit-mode-map "G" #'endless/visit-pull-request-url)
+
+    (eval-after-load 'magit-pull
+      '(transient-insert-suffix 'magit-pull "p"
+         '("F" "default" magit-fetch-from-upstream)))
+
+    (eval-after-load 'magit-push
+      '(transient-insert-suffix 'magit-push "p"
+         '("P" "default" magit-push-current-to-upstream)))
+
+    ;; (remove-hook 'magit-status-sections-hook 'magit-insert-status-headers)
+    ;; (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
+    ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-pushremote)
+    ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpushed-to-upstream-or-recent)
+    ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-pushremote)
+    ;; (remove-hook 'magit-status-sections-hook 'magit-insert-unpulled-from-upstream)
+    )
 
   (use-package magit-popup
     :defer t)
-
-  (use-package magit-imerge
-    ;; jww (2017-12-10): Need to configure.
-    :disabled t
-    :after magit)
 
   (use-package magithub
     :disabled t
@@ -912,6 +932,13 @@ Load regular rest client
        "\\.h"
        "\\.hpp")
 #+END_SRC
+Add c++11 keywords
+#+BEGIN_SRC emacs-lisp
+  (font-lock-add-keywords 'c++-mode
+                          '(("\\<\\(thread_local\\)\\>" . font-lock-warning-face)
+                            ("\\<\\(constexpr\\)\\>" . font-lock-keyword-face)
+                            ))
+#+END_SRC
 Enable flycheck for C
 #+BEGIN_SRC emacs-lisp
   ;; (add-hook 'c-mode-common-hook #'flycheck-mode)
@@ -939,76 +966,7 @@ Auto-insert include guards in .h files
                 "\n\n#endif // " ident "\n"))
       ))
 #+END_SRC
-Switch between .h and .c/.cpp files
-#+BEGIN_SRC emacs-lisp
-  ;; (defun gb-cpp-switch-h-cpp (arg)
-  ;;   "Switch between .h and .cpp buffer or file. Look first into the
-  ;;  open buffers, and look into the current directory if no matching
-  ;;  buffer was found.
-  ;;  With argument, switch to the second choice. For example, from a
-  ;;  .h or a .cpp open the .t.cpp, or from a .t.cpp open the .cpp."
-  ;;   (interactive "P")
-  ;;   (let ((ext (bde-file-name-extension (buffer-file-name))))
-  ;;     (let ((base-name    (string-truncate (buffer-name) (length ext)))
-  ;;     (base-path    (string-truncate (buffer-file-name) (length ext)))
-  ;;     (matching-ext (cdr (find-if (lambda (i)
-  ;;           (string= (car i) ext))
-  ;;         exordium-cpp-header-switches))))
-  ;; (when (and arg matching-ext)
-  ;;   (setq matching-ext (cdr matching-ext)))
-  ;; (cond (matching-ext
-  ;;        (unless
-  ;;      (catch 'found
-  ;;        (cl-flet ((when-exists-find-and-throw
-  ;;          (file)
-  ;;          (when (file-exists-p file)
-  ;;            (find-file file)
-  ;;            (throw 'found t))))
-  ;;          (dolist (candidate-ext matching-ext)
-  ;;      ;; Look for a buffer matching candidate-ext
-  ;;      (let ((buff (concat base-name candidate-ext)))
-  ;;        (when (bufferp (get-buffer buff))
-  ;;          (switch-to-buffer buff)
-  ;;          (throw 'found t)))
-  ;;      ;; No buffer => look for a file
-  ;;      (when-exists-find-and-throw
-  ;;       (concat base-path candidate-ext))
-  ;;      ;; No file in current dir => look in test subdirectory
-  ;;      (cond (arg
-  ;;       (let ((base-dir (file-name-directory (buffer-file-name)))
-  ;;             (test-dirs '("test" "tst")))
-  ;;         (dolist (test-dir test-dirs)
-  ;;           (let ((test-path
-  ;;            (concat (file-name-as-directory test-dir)
-  ;;              base-name candidate-ext)))
-  ;;             (when-exists-find-and-throw
-  ;;              (concat base-dir test-path))
-  ;;             (when-exists-find-and-throw
-  ;;              (concat (file-name-directory
-  ;;           (directory-file-name base-dir))
-  ;;                test-path))))))
-  ;;            ;; If test file => look in parent and group directories
-  ;;            ((string-match ".*/t\\(e\\)?st/.*\.[gt]\.cpp$"
-  ;;               (buffer-file-name))
-  ;;       (let ((base-dir
-  ;;              (file-name-directory
-  ;;         (directory-file-name (file-name-directory
-  ;;                   (buffer-file-name))))))
-  ;;         (when-exists-find-and-throw
-  ;;          (concat base-dir base-name candidate-ext))
-  ;;         (when (string-match "^\\([a-z]+\\)_" base-name)
-  ;;           (when-exists-find-and-throw
-  ;;            (concat base-dir
-  ;;              (file-name-as-directory
-  ;;               (match-string 1 base-name))
-  ;;              base-name candidate-ext))))))))
-  ;;        ;; No buffer or file for any matching-ext
-  ;;        nil)
-  ;;    (message "No matching buffer or file")))
-  ;;       (t (message "This is not a C/C++ file"))))))
 
-  ;; ;; (define-key c-mode-base-map [(control tab)] 'gb-cpp-switch-h-cpp)
-#+END_SRC
 enable bde-style formatting
 #+BEGIN_SRC emacs-lisp
   (defun bde-statement-block-intro-offset (element)
@@ -1046,36 +1004,36 @@ enable bde-style formatting
                           // my comment at whatever column I want
                           // tab goes here
   3. nil otherwise."
-    (case (caar c-syntactic-context)
+    (cl-case (caar c-syntactic-context)
       ((inclass innamespace)
        (save-excursion
          (let ((class-offset         ; extra offset for inner structs
                 (c-langelem-col (car c-syntactic-context) t))
                (comment-column nil)) ; column number of last //
-           (loop
+           (cl-loop
             (beginning-of-line)
             (cond ((= (point) (point-min))
-                   (return nil))
+                   (cl-return nil))
                   ((re-search-forward "^ *//" (point-at-eol) t)
                    ;; looking at a comment line
                    (setq comment-column (- (current-column) 2))
                    (forward-line -1))
                   ((bde-is-member-function-declaration)
                    ;; looking at end of method declaration
-                   (return '+))
+                   (cl-return '+))
                   ((re-search-forward "} *$" (point-at-eol) t)
                    ;; looking at end of inline method definition
-                   (return '+))
+                   (cl-return '+))
                   ((re-search-forward "; *//" (point-at-eol) t)
                    ;; looking at beginning of data member comment block
-                   (return (- (current-column) 2 class-offset c-basic-offset)))
+                   (cl-return (- (current-column) 2 class-offset c-basic-offset)))
                   ((and comment-column
                         (re-search-forward "[_A-Za-z0-9]+; *$"
                                            (point-at-eol) t))
                    ;; looking at end of (long?) data member declaration
-                   (return (- comment-column class-offset c-basic-offset)))
+                   (cl-return (- comment-column class-offset c-basic-offset)))
                   (t
-                   (return nil)))))))
+                   (cl-return nil)))))))
       (t nil)))
 
 
@@ -1136,28 +1094,32 @@ enable bde-formatting
 #+END_SRC
 ** =lisp=
 #+BEGIN_SRC emacs-lisp
-  ;; (use-package slime
-  ;;   ;; :load-path (expand-site-lisp "slime")
-  ;;   :commands slime
-  ;;   :config
+  (use-package slime
+    ;; :load-path (expand-site-lisp "slime")
+    :commands slime
+    :config
 
-  ;;   (progn
-  ;;     (add-hook
-  ;;      'slime-load-hook
-  ;;      #'(lambda ()
-  ;;    (slime-setup
-  ;;     '(slime-fancy
-  ;;       slime-repl
-  ;;       slime-fuzzy
-  ;;       slime-company))))
-  ;;     (setq slime-net-coding-system 'utf-8-unix)
-  ;;     (setq inferior-lisp-program "/usr/local/bin/clisp")))
+    (progn
+      (add-hook
+       'slime-load-hook
+       #'(lambda ()
+     (slime-setup
+      '(slime-fancy
+        slime-repl
+        slime-fuzzy
+        slime-company))))
+      (setq slime-net-coding-system 'utf-8-unix)
+      (setq inferior-lisp-program "/usr/local/bin/clisp")))
 #+END_SRC
 Enable lisp eval in org-mode
 #+BEGIN_SRC emacs-lisp
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((lisp . t)))
+#+END_SRC
+Use UCB STK as scheme interpreter
+#+BEGIN_SRC emacs-lisp
+  (setq scheme-program-name "stk-simply")
 #+END_SRC
 * Org Mode and Task Management
 ** =org-bullets=
@@ -1205,6 +1167,14 @@ Library for creating and storing references and citations
 #+END_SRC
 
 * Keybindings
+#+BEGIN_SRC emacs-lisp
+  (defun replace-char-at-point ()
+    (interactive)
+    (delete-char 1)
+    (save-excursion (insert (read-key "Character to replace with: "))))
+  (global-set-key (kbd "C-c r") 'replace-char-at-point)
+#+END_SRC
+
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-x 2") 'split-window-below-and-switch)
   (global-set-key (kbd "C-x 3") 'split-window-right-and-switch)
@@ -1901,46 +1871,7 @@ The view itself
 *** Some key-bindings
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "C-c o a") 'org-agenda)
-#+END_SRC
-* rtags
-#+BEGIN_SRC emacs-lisp
-  ;; ensure that we use only rtags checking
-  ;; https://github.com/Andersbakken/rtags#optional-1
-  (defun setup-flycheck-rtags ()
-    (interactive)
-    (flycheck-select-checker 'rtags)
-    ;; RTags creates more accurate overlays.
-    (setq-local flycheck-highlighting-mode nil)
-    (setq-local flycheck-check-syntax-automatically nil))
 
-  (use-package rtags
-    :commands (rtags-start-process-unless-running setup-flycheck-rtags)
-    :config (progn
-              (message "Rtags loaded")
-              (use-package company-rtags)
-              (use-package helm-rtags))
-    ;; only run this if rtags is installed
-    (when (require 'rtags nil :noerror)
-      ;; make sure you have company-mode installed
-      (require 'company)
-      (define-key c-mode-base-map (kbd "M-.")
-        (function rtags-find-symbol-at-point))
-      (define-key c-mode-base-map (kbd "M-,")
-        (function rtags-location-stack-back))
-      ;; install standard rtags keybindings. Do M-. on the symbol below to
-      ;; jump to definition and see the keybindings.
-      (rtags-enable-standard-keybindings)
-      ;; company completion setup
-      (setq rtags-autostart-diagnostics t)
-      (rtags-diagnostics)
-      (setq rtags-completions-enabled t)
-      (push 'company-rtags company-backends)
-      (global-company-mode)
-      (define-key c-mode-base-map (kbd "<C-tab>") (function company-complete))
-      ;; use rtags flycheck mode -- clang warnings shown inline
-      (require 'flycheck-rtags)
-      ;; c-mode-common-hook is also called by c++-mode
-      (add-hook 'c-mode-common-hook #'setup-flycheck-rtags)))
 #+END_SRC
 * tramp
 #+BEGIN_SRC emacs-lisp
@@ -1984,4 +1915,62 @@ The view itself
                                  (tramp-default-port 22)))
 
   (add-to-list 'tramp-remote-path "/opt/bb/bin")
+#+END_SRC
+* evil mode
+#+BEGIN_SRC emacs-lisp
+  (use-package evil
+    :init
+    (setq evil-want-abbrev-expand-on-insert-exit nil
+          evil-want-keybinding nil)
+    :config
+    (add-hook 'after-save-hook #'evil-normal-state)
+    (evil-mode 1))
+
+  (use-package evil-collection
+    :after evil
+    :config
+    (setq evil-collection-mode-list
+          '(ag dired magit mu4e which-key))
+    (evil-collection-init))
+
+  (use-package evil-surround
+    :config
+    (global-evil-surround-mode 1))
+
+  (use-package evil-org
+    :after org
+    :config
+    (add-hook 'org-mode-hook 'evil-org-mode)
+    (add-hook 'evil-org-mode-hook
+              (lambda () (evil-org-set-key-theme)))
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
+
+
+  (add-hook 'c++-mode-hook (lambda ()
+                             (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
+
+  (evil-set-undo-system 'undo-tree)
+
+  (defun gb/toggle-normal (&optional arg)
+      (evil-normal-state))
+
+  (defun gb/other-window ()
+    (interactive)
+    (ace-select-window)
+    (gb/toggle-normal))
+
+  (defun gb/prev-window ()
+    (interactive)
+    (other-window -1)
+    (gb/toggle-normal))
+
+  (defun gb/next-window ()
+    (interactive)
+    (other-window 1)
+    (gb/toggle-normal))
+
+  (global-set-key (kbd "s-]") #'gb/next-window)
+  (global-set-key (kbd "s-[") #'gb/prev-window)
+  (global-set-key (kbd "C-x o") #'gb/other-window)
 #+END_SRC
