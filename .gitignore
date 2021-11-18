@@ -24,3 +24,13 @@ mc-lists.el
 projectile-bookmarks.eld
 recentf
 /backup/
+dotemacs.d/.tutor/
+dotemacs.d/bookmarks
+dotemacs.d/eshell/
+dotemacs.d/package-quickstart.el
+dotemacs.d/temp.org
+dotemacs.d/tramp
+dotemacs.d/transient/
+dotemacs.d/tutorial/
+emacs_everywhere.dict
+the-one-theme/
