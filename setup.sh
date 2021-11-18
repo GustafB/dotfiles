@@ -46,8 +46,6 @@ setup_file_link "${CODE_HOME}/gitconfig" "${HOME}/.gitconfig"
 setup_file_link "${CODE_HOME}/gitignore_global" "${HOME}/.gitignore_global"
 setup_dir_link "${CODE_HOME}/dotemacs.d" "${HOME}/.emacs.d"
 setup_dir_link "${CODE_HOME}/bin" "${HOME}/bin"
-setup_file_link "${CODE_HOME}/offlineimaprc" "${HOME}/.offlineimaprc"
-setup_file_link "${CODE_HOME}/.offlineimap.py" "${HOME}/.offlineimap.py"
 
 
 if [ "$(uname)" == "Darwin" ]; then
