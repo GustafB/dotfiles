@@ -24,7 +24,9 @@ alias mount_mbig='sshfs devsftp:/bb/mbig/mbig7278/ /Users/gbrostedt1/Documents/b
 
 alias run_docker='docker run --rm -it -v $1 bash'
 
-alias g++="/usr/local/Cellar/gcc/8.3.0_2/bin/g++-8"
+alias g++="/usr/local/bin/g++-11"
+export CC="/usr/local/bin/gcc-11"
+export CXX="/usr/local/bin/g++-11"
 
 alias start_tinyproxy='launchctl load -w /usr/local/Cellar/tinyproxy/1.11.0/homebrew.mxcl.tinyproxy.plist'
 

@@ -33,7 +33,9 @@
   helper = cache
 [credential "https://bbgithub.dev.bloomberg.com"]
   username = a637bc246ecb89ff38f2a88259fa494a40ce7eca
-[http]
-  proxy = http://localhost:8888
 [http "https://bbgithub.dev.bloomberg.com"]
 	proxy = http://devproxy.bloomberg.com:82
+[github]
+	user = gustafb
+[bbgithub "dev.bloomberg.com"]
+	user = gbrostedt1
