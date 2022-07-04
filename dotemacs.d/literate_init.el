@@ -1,4 +1,3 @@
-
 (load-file "~/.emacs.d/sensible-defaults.el")
 (sensible-defaults/use-all-settings)
 (sensible-defaults/use-all-keybindings)
@@ -7,32 +6,117 @@
 (require 'package)
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
+(add-to-list 'package-archives
+             '("org" . "https://orgmode.org/elpa") t)
 
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+(require 'use-package)
+(setq use-package-always-ensure t)
 
-(use-package auto-compile
-  :config (auto-compile-on-load-mode))
-(setq load-prefer-newer t)
+(column-number-mode)
+(global-display-line-numbers-mode t)
 
-(defun generate-scratch-buffer ()
+(use-package ivy
+  :ensure t
+  :diminish
+  :bind (("C-s" . swiper)
+         :map ivy-minibuffer-map
+         ("TAB" . ivy-alt-done)
+         ("C-l" . ivy-alt-done)
+         ("C-j" . ivy-next-line)
+         ("C-k" . ivy-previous-line)
+         :map ivy-switch-buffer-map
+         ("C-k" . ivy-previous-line)
+         ("C-l" . ivy-done)
+         ("C-d" . ivy-switch-buffer-kill)
+         :map ivy-reverse-i-search-map
+         ("C-k" . ivy-previous-line)
+         ("C-d" . ivy-reverse-i-search-kill))
+  :config
+  (ivy-mode 1))
+
+(use-package diminish)
+
+(use-package doom-modeline
+  :ensure t
+  :init
+  (doom-modeline-mode 1)
+  :config
+  (setq doom-modeline-height 15)
+  (setq doom-modeline-bar-width 6)
+  (setq doom-modeline-lsp t)
+  (setq doom-modeline-github t)
+  (setq doom-modeline-irc t)
+  (setq doom-modeline-minor-modes nil)
+  (setq doom-modeline-persp-name nil)
+  (setq doom-modeline-evil-state-icon nil)
+  (setq doom-modeline-unicode-fallback nil)
+  (setq doom-modeline-buffer-file-name-style 'truncate-except-project)
+  (setq doom-modeline-major-mode-icon nil)
+  :custom ((doom-modeline-height 1)))
+
+(use-package doom-themes
+  :ensure t
+  :init
+  (load-theme 'doom-palenight t)
+  (doom-themes-visual-bell-config))
+
+(use-package all-the-icons)
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
+
+(set-face-attribute 'show-paren-match-expression nil :background "#363e4a")
+(show-paren-mode 1)
+
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 1))
+
+(use-package ivy-rich
+  :init
+  (ivy-rich-mode 1))
+
+(use-package counsel
+  :bind (("M-x" . counsel-M-x)
+         ("C-x b" . counsel-ibuffer)
+         ("C-x C-f" . counsel-find-file)
+         :map minibuffer-local-map
+         ("C-r" . 'counsel-minibuffer-history)))
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+(use-package drag-stuff
+  :ensure t
+  :config
+  (drag-stuff-global-mode 1)
+  (drag-stuff-define-keys))
+
+(defun gb/generate-scratch-buffer ()
   "Create and switch to a temporary scratch buffer with a random
-     name."
+       name."
   (interactive)
   (switch-to-buffer (make-temp-name "scratch-")))
+(define-key global-map (kbd "C-c g") 'generate-scratch-buffer)
 
-(defun add-auto-mode (mode &rest patterns)
-  "Add entries to `auto-mode-alist' to use `MODE' for all given file `PATTERNS'."
-  (dolist (pattern patterns)
-    (add-to-list 'auto-mode-alist (cons pattern mode))))
-
-(defun kill-current-buffer ()
+(defun gb/kill-current-buffer ()
   "Kill the current buffer without prompting."
   (interactive)
   (kill-buffer (current-buffer)))
 
-(defun iterm-goto-filedir-or-home ()
+(defun gb/iterm-goto-filedir-or-home ()
   "Go to present working dir and focus iterm"
   (interactive)
   (do-applescript
@@ -49,79 +133,109 @@
     ))
   )
 ;; Opens iterm
-(defun iterm-focus ()
+(defun gb/iterm-focus ()
   (interactive)
   (do-applescript
    " do shell script \"open -a iTerm\"\n"
    ))
 
 
-(defun split-window-below-and-switch ()
+(defun gb/split-window-below-and-switch ()
   "Split the window horizontally, then switch to the new pane."
   (interactive)
   (split-window-below)
   (balance-windows)
+  (gb/toggle-normal)
   (other-window 1))
 
-(defun split-window-right-and-switch ()
+(defun gb/split-window-right-and-switch ()
   "Split the window vertically, then switch to the new pane."
   (interactive)
   (split-window-right)
   (balance-windows)
+  (gb/toggle-normal)
   (other-window 1))
 
+(defun gb/toggle-normal (&optional arg)
+  (evil-normal-state))
+
+(defun gb/other-window ()
+  (interactive)
+  (ace-select-window)
+  (gb/toggle-normal))
+
+(defun gb/prev-window ()
+  (interactive)
+  (other-window -1)
+  (gb/toggle-normal))
+
+(defun gb/next-window ()
+  (interactive)
+  (other-window 1)
+
+(defun gb/toggle-normal (&optional arg)
+  (evil-normal-state))
+
+(defun gb/other-window ()
+  (interactive)
+  (ace-select-window)
+  (gb/toggle-normal))
+
+(defun gb/prev-window ()
+  (interactive)
+  (other-window -1)
+  (gb/toggle-normal))
+
+(defun gb/next-window ()
+  (interactive)
+  (other-window 1)
+  (gb/toggle-normal))
+
+(global-set-key (kbd "s-]") #'gb/next-window)
+(global-set-key (kbd "s-[") #'gb/prev-window)
+(global-set-key (kbd "C-x o") #'gb/other-window)(gb/toggle-normal))
+
+(global-set-key (kbd "s-]") #'gb/next-window)
+(global-set-key (kbd "s-[") #'gb/prev-window)
+(global-set-key (kbd "C-x o") #'gb/other-window)
+
+(global-set-key (kbd "C-x 2") 'gb/split-window-below-and-switch)
+(global-set-key (kbd "C-x 3") 'gb/split-window-right-and-switch)
+(global-set-key (kbd "C-x C-t") 'gb/iterm-goto-filedir-or-home)
+(global-set-key (kbd "C-x k") 'gb/kill-current-buffer)
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+(global-set-key (kbd "C-c g") 'gb/generate-scratch-buffer)
+
+(setq-default indent-tabs-mode nil)
+(setq vc-follow-symlinks t)
+(setq-default tab-width 2)
 (tool-bar-mode 0)
 (menu-bar-mode 0)
-(when window-system
-  (scroll-bar-mode -1))
-
-;;(setq evil-want-abbrev-expand-on-insert-exit nil)
-;;(evil-mode 0)
-;;(add-to-list'evil-emacs-state-modes 'eshell)
-
+(scroll-bar-mode -1)
 (setq inhibit-startup-message t)
-
 (setq ring-bell-function 'ignore)
-
 (setq scroll-conservatively 100)
+(progn (global-hl-line-mode)
+    (set-face-background 'hl-line "#2e3544"))
+(global-display-line-numbers-mode t)
 
-(when window-system
-    (global-hl-line-mode))
-;;  (set-face-background 'hl-line "#778184")
+(dolist (mode '(org-mode-hook
+            term-mode-hook
+            shell-mode-hook
+            treemacs-mode-hook
+            eshell-mode-hook))
+(add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-(use-package all-the-icons
- :ensure t)
-
-(defun my/load-theme (frame)
-  (select-frame frame)
-  (load-theme 'zerodark t))
-(if (daemonp)
-    (add-hook 'after-make-frame-functions #'my/load-theme)
-  (load-theme 'zerodark t))
-;;        (use-package zerodark-theme
-  ;;        :ensure t
-    ;;      :config
-      ;;    (load-theme 'zerodark 'no-confirm))
-;;          :hook 'zerodark-setup-modeline-format)
- (use-package zerodark-theme
-    :ensure t
-    :config
-    :hook ('my/load-theme))
-
-(use-package rainbow-mode
-  :ensure t
-  :commands rainbow-mode)
-
-(setq default-font "Menlo")
+(setq default-font "JetBrains Mono")
 (setq default-font-size 14)
 (setq current-font-size default-font-size)
 
 (setq font-change-increment 1.1)
 
 (defun font-code ()
-  (concat default-font "-" (number-to-string current-font-size)))
+(concat default-font "-" (number-to-string current-font-size)))
 
-(defun set-font-size ()
+(defun gb/set-font-size ()
   "Set the font to `default-font' at `current-font-size'.
 Set that for the current frame, and also make it the default for
 other, future frames."
@@ -129,143 +243,520 @@ other, future frames."
     (add-to-list 'default-frame-alist (cons 'font font-code))
     (set-frame-font font-code)))
 
-(defun reset-font-size ()
+(defun gb/reset-font-size ()
   "Change font size back to `default-font-size'."
   (interactive)
   (setq current-font-size default-font-size)
-  (set-font-size))
+  (gb/set-font-size))
 
-(defun increase-font-size ()
-  "Increase current font size by a factor of `font-change-increment'."
+(defun gb/increase-font-size ()
+  "Gb/Increase current font size by a factor of `font-change-increment'."
   (interactive)
   (setq current-font-size
         (ceiling (* current-font-size font-change-increment)))
-  (set-font-size))
+  (gb/set-font-size))
 
-(defun decrease-font-size ()
-  "Decrease current font size by a factor of `font-change-increment', down to a minimum size of 1."
+(defun gb/decrease-font-size ()
+  "Gb/Decrease current font size by a factor of `font-change-increment', down to a minimum size of 1."
   (interactive)
   (setq current-font-size
         (max 1
              (floor (/ current-font-size font-change-increment))))
-  (set-font-size))
+  (gb/set-font-size))
 
-(define-key global-map (kbd "C-)") 'reset-font-size)
-(define-key global-map (kbd "C-+") 'increase-font-size)
-(define-key global-map (kbd "C-=") 'increase-font-size)
-(define-key global-map (kbd "C-_") 'decrease-font-size)
-(define-key global-map (kbd "C--") 'decrease-font-size)
+(define-key global-map (kbd "C-)") 'gb/reset-font-size)
+(define-key global-map (kbd "C-+") 'gb/increase-font-size)
+(define-key global-map (kbd "C-=") 'gb/increase-font-size)
+(define-key global-map (kbd "C-_") 'gb/decrease-font-size)
+(define-key global-map (kbd "C--") 'gb/decrease-font-size)
 
-(reset-font-size)
+(gb/reset-font-size)
 
-(use-package origami
-        :ensure t
-        :bind (:map origami-mode-map
-                    ("C-c C-o" . 'origami-toggle-node)
-                    ("C-c C-f" . 'origami-toggle-all-nodes)))
-      (add-hook 'global-origami-mode #'origami-mode)
-;;        :hook global-origami-mode)
+(use-package no-littering)
+(setq auto-save-file-name-transforms
+      `((".*" ,(no-littering-expand-var-file-name "auto-save/") t)))
 
-(use-package expand-region
-  :ensure t
-  :commands (er/expand-region er/contract-region)
-  :bind (
-         ("M-=" . er/expand-region)
-         ("M--" . er/contract-region)))
+;; Change the user-emacs-directory to keep unwanted things out of ~/.emacs.d
+(setq user-emacs-directory (expand-file-name "~/.cache/emacs/")
+      url-history-file (expand-file-name "url/history" user-emacs-directory))
 
-(use-package flycheck
-  :ensure t)
+;; Keep customization settings in a temporary file (thanks Ambrevar!)
+(setq custom-file
+      (if (boundp 'server-socket-dir)
+          (expand-file-name "custom.el" server-socket-dir)
+        (expand-file-name (format "emacs-custom-%s.el" (user-uid)) temporary-file-directory)))
+(load custom-file t)
 
-(defun adjust-syntax-spellcheck-timer ()
-  "Adjust how often we check for errors based on if there are any.
-  This lets us fix any errors as quickly as possible, but in a
-  clean buffer we're an order of magnitude laxer about checking."
-  (setq flycheck-idle-change-delay
-        (if flycheck-current-errors 0.5 30.0)))
+(use-package evil
+  :init
+    (setq evil-want-abbrev-expand-on-insert-exit nil
+          evil-want-keybinding nil)
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+  :config
+  (add-hook 'after-save-hook #'evil-normal-state)
+  (evil-mode 1)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+    ;; Use visual line motions even outside of visual-line-mode buffers
+  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+  (evil-set-initial-state 'messages-buffer-mode 'normal)
+  (evil-set-initial-state 'dashboard-mode 'normal))
 
-;; Each buffer gets its own idle-change-delay because of the
-;; buffer-sensitive adjustment above.
-(make-variable-buffer-local 'flycheck-idle-change-delay)
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init))
 
-(add-hook 'flycheck-after-syntax-check-hook
-          'adjust-syntax-spellcheck-timer)
+(use-package evil-surround
+  :config
+  (global-evil-surround-mode 1))
 
-;; Remove newline checks, since they would trigger an immediate check
-;; when we want the idle-change-delay to be in effect while editing.
-(setq flycheck-check-syntax-automatically '(save
-                                            idle-change
-                                            mode-enabled))
+(use-package evil-org
+  :after org
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda () (evil-org-set-key-theme)))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 
-(eval-after-load 'flycheck
-  '(custom-set-variables
-    '(flycheck-display-errors-function #'flycheck-pos-tip-error-messages)))
+(use-package evil-nerd-commenter
+  :bind ("M-;" . evilnc-comment-or-uncomment-lines))
 
-(provide 'setup-flycheck)
-(add-hook 'c-mode-common-hook #'flycheck-mode)
+(add-hook 'c++-mode-hook (lambda ()
+                           (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
 
-(use-package ivy
-  :ensure t
-  :diminish
-  :bind (("C-x b" . ivy-switch-buffer)
-         ("C-x B" . ivy-switch-buffer-other-window)
-         ("M-H"   . ivy-resume))
+;; (evil-set-undo-system 'undo-tree)
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-  :bind (:map ivy-minibuffer-map
-              ("<tab>" . ivy-alt-done)
-              ("SPC"   . ivy-alt-done-or-space)
-              ("C-d"   . ivy-done-or-delete-char)
-              ("C-i"   . ivy-partial-or-done)
-              ("C-r"   . ivy-previous-line-or-history)
-              ("M-r"   . ivy-reverse-i-search))
+(use-package general
+  :config
+  (general-create-definer gb/leader-keys
+    :keymaps '(normal insert visual emacs)
+    :prefix "SPC"
+    :global-prefix "C-SPC")
 
-  :bind (:map ivy-switch-buffer-map
-              ("C-k" . ivy-switch-buffer-kill))
+  (gb/leader-keys
+    "c"  '(:ignore t :which-key "compilation")
+    "cc" '(compile :which-key "compile project")
+    "e"  '(:ignore t :which-key "emacs commands")
+    "ei" '(package-install :which-key "package-install")
+    "el" '(list-packages :which-key "list-packages")
+    "eu" '(gb/package-upgrade-all :which-key "upgrade all packages")
+    "ec" '(tramp-cleanup-all-connections :which-key "tramp cleanup connections")
+    "ev" '(set-variable :which-key "set variable")
+    "t"  '(:ignore t :which-key "toggles")
+    "tt" '(counsel-load-theme :which-key "choose theme")))
 
+(use-package hydra)
+
+(defhydra hydra-text-scale (:timeout 4)
+  "scale text"
+  ("j" text-scale-increase "in")
+  ("k" text-scale-decrease "out")
+  ("f" nil "finished" :exit t))
+
+(gb/leader-keys
+  "ts" '(hydra-text-scale/body :which-key "scale text"))
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  (setq projectile-switch-project-action #'projectile-dired)
+  :config
+  (projectile-global-mode))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+(use-package magit
   :custom
-  (ivy-dynamic-exhibit-delay-ms 200)
-  (ivy-height 10)
-  (ivy-initial-inputs-alist nil t)
-  (ivy-magic-tilde nil)
-  (ivy-re-builders-alist '((t . ivy--regex-ignore-order)))
-  (ivy-use-virtual-buffers t)
-  (ivy-wrap t)
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+  :bind ("C-x g" . magit-status))
 
-  :preface
-  (defun ivy-done-or-delete-char ()
-    (interactive)
-    (call-interactively
-     (if (eolp)
-         #'ivy-immediate-done
-       #'ivy-delete-char)))
+;; (use-package forge)
 
-  (defun ivy-alt-done-or-space ()
-    (interactive)
-    (call-interactively
-     (if (= ivy--length 1)
-         #'ivy-alt-done
-       #'self-insert-command)))
+;; (use-package evil-magit
+  ;; :after magit)
 
-  (defun ivy-switch-buffer-kill ()
-    (interactive)
-    (debug)
-    (let ((bn (ivy-state-current ivy-last)))
-      (when (get-buffer bn)
-        (kill-buffer bn))
-      (unless (buffer-live-p (ivy-state-buffer ivy-last))
-        (setf (ivy-state-buffer ivy-last)
-              (with-ivy-window (current-buffer))))
-      (setq ivy--all-candidates (delete bn ivy--all-candidates))
-      (ivy--exhibit)))
+(defun gb/lsp-mode-setup ()
+  (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+  (lsp-headerline-breadcrumb-mode))
 
-  ;; This is the value of `magit-completing-read-function', so that we see
-  ;; Magit's own sorting choices.
-  (defun my-ivy-completing-read (&rest args)
-    (let ((ivy-sort-functions-alist '((t . nil))))
-      (apply 'ivy-completing-read args)))
+(use-package lsp-mode
+  :commands (lsp lsp-deferred)
+  :hook (lsp-mode . gb/lsp-mode-setup)
+  :init
+  (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+  :config
+  (lsp-enable-which-key-integration t)
+  (add-hook 'lsp-mode-hook #'lsp-headerline-breadcrumb-mode)
+  (setq lsp-headerline-breadcrumb-enable nil)
+  (setq lsp-clients-clangd-args '(
+                                  ;; If set to true, code completion will include index symbols that are not defined in the scopes
+                                  ;; (e.g. namespaces) visible from the code completion point. Such completions can insert scope qualifiers
+                                  "--all-scopes-completion"
+                                  ;; Index project code in the background and persist index on disk.
+                                  "--background-index"
+                                  ;; Enable clang-tidy diagnostics
+                                  "--clang-tidy"
+                                  ;; Whether the clang-parser is used for code-completion
+                                  ;;   Use text-based completion if the parser is not ready (auto)
+                                  "--completion-parse=auto"
+                                  ;; Granularity of code completion suggestions
+                                  ;;   One completion item for each semantically distinct completion, with full type information (detailed)
+                                  "--completion-style=detailed"
+                                  ;; clang-format style to apply by default when no .clang-format file is found
+                                  "--fallback-style=Chromium"
+                                  ;; When disabled, completions contain only parentheses for function calls.
+                                  ;; When enabled, completions also contain placeholders for method parameters
+                                  "--function-arg-placeholders"
+                                  ;; Add #include directives when accepting code completions
+                                  ;;   Include what you use. Insert the owning header for top-level symbols, unless the
+                                  ;;   header is already directly included or the symbol is forward-declared
+                                  "--header-insertion=iwyu"
+                                  ;; Prepend a circular dot or space before the completion label, depending on whether an include line will be inserted or not
+                                  "--header-insertion-decorators"
+                                  ;; Enable index-based features. By default, clangd maintains an index built from symbols in opened files.
+                                  ;; Global index support needs to enabled separatedly
+                                  "--index"
+                                  ;; Attempts to fix diagnostic errors caused by missing includes using index
+                                  "--suggest-missing-includes"
+                                  ;; Number of async workers used by clangd. Background index also uses this many workers.
+                                  "-j=4"
+                                  )))
+
+(gb/leader-keys
+  "tl" '(lsp-headerline-breadcrumb-mode :which-key "toggle lsp-headerline")
+  "cf" '(lsp-format-buffer :which-key "lsp-format buffer")
+  "cl" '(lsp-find-definition :which-key "lsp find definition")
+  "ck" '(lsp-find-references :which-key "lsp find references")
+  "c;" '(lsp-ui-peek-find-references :which-key "lsp peek references"))
+
+(use-package lsp-ui
+  :hook (lsp-mode . lsp-ui-mode)
+  :custom
+  (lsp-ui-doc-position 'bottom))
+
+(use-package lsp-treemacs
+  :after lsp)
+
+(use-package lsp-ivy)
+
+(use-package company
+  :after lsp-mode
+  :hook (lsp-mode . company-mode)
+  :bind (:map company-active-map
+         ("<tab>" . company-complete-selection))
+        (:map lsp-mode-map
+         ("<tab>" . company-indent-or-complete-common))
+  :custom
+  (company-minimum-prefix-length 1)
+  (company-idle-delay 0.3))
+
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
+(use-package company-c-headers
+  :after (company)
+  :config
+    (add-to-list 'company-backends 'company-c-headers)
+    (add-to-list 'company-c-headers-path-system "/usr/local/include/"))
+
+(use-package company-dabbrev
+  :ensure nil
+  :config (progn
+    (setq company-dabbrev-ignore-case t)
+    (setq company-dabbrev-downcase nil)))
+    (add-hook 'after-init-hook 'global-company-mode)
+
+(use-package avy
+  :config
+  (global-set-key (kbd "s-r") 'avy-goto-char-timer))
+
+
+(defun gb/pop-local-mark-ring ()
+  (interactive)
+  (set-mark-command t))
+
+(defun gb/unpop-to-mark-command ()
+  "Unpop off mark ring. Does nothing if mark ring is empty."
+  (interactive)
+      (when mark-ring
+        (setq mark-ring (cons (copy-marker (mark-marker)) mark-ring))
+        (set-marker (mark-marker) (car (last mark-ring)) (current-buffer))
+        (when (null (mark t)) (ding))
+        (setq mark-ring (nbutlast mark-ring))
+        (goto-char (marker-position (car (last mark-ring))))))
+
+(global-set-key (kbd "s-,") 'gb/pop-local-mark-ring)
+(global-set-key (kbd "s-.") 'gb/unpop-to-mark-command)
+
+(global-set-key (kbd "s-<") 'previous-buffer)
+(global-set-key (kbd "s->") 'next-buffer)
+
+(use-package term
+  :ensure t
+  :config
+  (setq explicit-shell-file-name "zsh") ;; Change this to zsh, etc
+  ;;(setq explicit-zsh-args '())         ;; Use 'explicit-<shell>-args for shell-specific args
+
+  ;; Match the default Bash shell prompt.  Update this if you have a custom prompt
+  (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *"))
+
+(use-package eterm-256color
+  :hook (term-mode . eterm-256color-mode))
+
+(use-package vterm
+  :commands vterm
+  :config
+  ;; (setq term-prompt-regexp "^[^#$%>\n]*[#$%>] *")  ;; Set this to match your custom shell prompt
+  (setq vterm-shell "zsh")                       ;; Set this to customize the shell to launch
+  (setq vterm-max-scrollback 10000))
+
+(gb/leader-keys
+  "ct" '(vterm :which-key "open vterm"))
+
+(when (eq system-type 'windows-nt)
+  (setq explicit-shell-file-name "powershell.exe")
+  (setq explicit-powershell.exe-args '()))
+
+(defun gb/configure-eshell ()
+  ;; Save command history when commands are entered
+  (add-hook 'eshell-pre-command-hook 'eshell-save-some-history)
+
+  ;; Truncate buffer for performance
+  (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
+
+  ;; Bind some useful keys for evil-mode
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
+  (evil-normalize-keymaps)
+
+  (setq eshell-history-size         10000
+        eshell-buffer-maximum-lines 10000
+        eshell-hist-ignoredups t
+        eshell-scroll-to-bottom-on-input t))
+
+(use-package eshell-git-prompt)
+
+(use-package eshell
+  :hook (eshell-first-time-mode . gb/configure-eshell)
+  :config
+
+  (with-eval-after-load 'esh-opt
+    (setq eshell-destroy-buffer-when-process-dies t)
+    (setq eshell-visual-commands '("htop" "zsh" "vim")))
+
+  (eshell-git-prompt-use-theme 'powerline))
+
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :bind (("C-x C-j" . dired-jump))
+  :custom ((dired-listing-switches "-agho --group-directories-first"))
+  :config
+  (setq dired-clean-up-buffers-too t)
+  (setq dired-recursive-copies 'always)
+  (setq dired-recursive-deletes 'top)
+  (setq insert-directory-program "gls" dired-use-ls-dired t)
+  (setq dired-listing-switches "-al --group-directories-first")
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-single-up-directory
+    "l" 'dired-single-buffer))
+
+(use-package dired-single)
+
+(use-package all-the-icons-dired
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+(use-package dired-open
+  :config
+  ;; Doesn't work as expected!
+  ;;(add-to-list 'dired-open-functions #'dired-open-xdg t)
+  (setq dired-open-extensions '(("png" . "feh")
+                                ("mkv" . "mpv"))))
+
+(use-package dired-hide-dotfiles
+  :hook (dired-mode . dired-hide-dotfiles-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "H" 'dired-hide-dotfiles-mode))
+
+(setq version-control t     ;; Use version numbers for backups.
+    kept-new-versions 10  ;; Number of newest versions to keep.
+    kept-old-versions 0   ;; Number of oldest versions to keep.
+    delete-old-versions t ;; Don't ask to delete excess backup versions.
+    backup-by-copying t)  ;; Copy all files, don't rename them.
+(setq vc-make-backup-files t)
+;; Default and per-save backups go here:
+(setq backup-directory-alist '(("" . "~/.emacs.d/backup/per-save")))
+
+(defun force-backup-of-buffer ()
+;; Make a special "per session" backup at the first save of each
+;; emacs session.
+(when (not buffer-backed-up)
+    ;; Override the default parameters for per-session backups.
+    (let ((backup-directory-alist '(("" . "~/.emacs.d/backup/per-session")))
+        (kept-new-versions 3))
+    (backup-buffer)))
+;; Make a "per save" backup on each save.  The first save results in
+;; both a per-session and a per-save backup, to keep the numbering
+;; of per-save backups consistent.
+(let ((buffer-backed-up nil))
+    (backup-buffer)))
+
+(add-hook 'before-save-hook  'force-backup-of-buffer)
+
+(defun gb/duplicate-line-or-region (&optional n)
+  "Gb/Duplicate current line, or region if active"
+  (interactive "*p")
+  (let ((use-region (use-region-p)))
+    (save-excursion
+      (let ((text (if use-region
+                      (buffer-substring (region-beginning) (region-end))
+                    (prog1 (thing-at-point 'line)
+                      (end-of-line)
+                      (if (< 0 (forward-line 1))
+                          (newline))))))
+        (dotimes (i (abs (or n 1)))
+          (insert text))))
+    (if use-region nil
+      (let ((pos (- (point) (line-beginning-position) (line-end-position)))
+            (forward-line 1)
+            (forward-char pos))))))
+
+(defun gb/open-init-file ()
+  "Open the init file."
+  (interactive)
+  (find-file "~/.emacs.d/literate_init.org"))
+
+(gb/leader-keys
+  "cd" '(gb/duplicate-line-or-region :which-key "duplicate line or region")
+  "ee" '(gb/open-init-file :which-key "open init file"))
+
+(global-set-key (kbd "C-c C-d") 'gb/duplicate-line-or-region)
+
+(use-package tramp
+  :ensure nil
+  :config
+  (setq tramp-default-method "toolkit")
+  (tramp-set-completion-function "toolkit"
+                                 '((tramp-parse-sconfig "~/.ssh/config")))
+  (setq tramp-terminal-type "dumb")
+  (setq tramp-inline-compress-start-size 10000000)
+  (setq tramp-debug-buffer t)
+  (setq tramp-verbose 10))
+
+;; (setf tramp-ssh-controlmaster-options (concat "-o SendEnv TRAMP=yes " tramp-ssh-controlmaster-options))
+
+(add-to-list 'tramp-methods  '("toolkit"
+                               (tramp-login-program "ssh")
+                               (tramp-login-args
+                                (("-p" "%p")
+                                 ("-t")
+                                 ("-t")
+                                 ("-o" "ControlPath=~/.ssh/%%u@v5devgateway.bdns.bloomberg.com:%%p")
+                                 ("-o" "ControlMaster=auto")
+                                 ("-o" "ControlPersist=yes")
+                                 ;; ("-o" "SendEnv TRAMP=yes")
+                                 ("-e" "none")
+                                 ("v5devgateway.bdns.bloomberg.com")
+                                 ("inline")
+                                 ("%h")))
+                               (tramp-async-args
+                                (("-q")))
+                               (tramp-remote-shell "/bin/sh")
+                               (tramp-remote-shell-args
+                                ("-c"))
+                               (tramp-gw-args
+                                (("-o" "GlobalKnownHostsFile=/dev/null")
+                                 ("-o" "UserKnownHostsFile=/dev/null")
+                                 ("-o" "StrictHostKeyChecking=no")
+                                 ))
+                               (tramp-default-port 22)))
+
+(add-to-list 'tramp-remote-path "/opt/bb/bin")
+
+;; (add-auto-mode
+ ;; 'c++-mode
+ ;; "\\.cpp"
+ ;; "\\.h"
+ ;; "\\.hpp")
+
+(font-lock-add-keywords 'c++-mode
+                        '(("\\<\\(thread_local\\)\\>" . font-lock-warning-face)
+                          ("\\<\\(constexpr\\)\\>" . font-lock-keyword-face)
+                          ))
+
+(setq-default c-default-style "linux"
+              c-basic-offset 4)
+
+(setq-default c-hungry-delete-key t)
+
+(defun gb/insert-h-guard ()
+  (interactive)
+  (cons "\\.\\([Hh]\\|hh\\|hpp\\)\\'" "My C/C++ header")
+  '(nil
+    (let* ((noext (substring buffer-file-name 0 (match-beginning 0)))
+           (nopath (file-name-nondirectory noext))
+           (ident (concat (upcase nopath) "_H_")))
+      (concat "#ifndef " ident "\n"
+              "#define " ident "\n\n\n"
+              "\n\n#endif // " ident "\n"))
+    ))
+
+(defconst my-cc-style
+  '("cc-mode"
+    (c-offsets-alist . ((innamespace . [0])))))
+
+(use-package cc-mode
+  :hook (cc-mode . modern-c++-font-lock--mode)
+  :config
+  (setq-default shell-dirtrackp nil)
+  (c-add-style "my-cc-mode" my-cc-style)
+  (setq c-default-style '(((c-mode . "my-cc-mode")
+                           (cc-mode . "my-cc-mode")))))
+
+(global-set-key (kbd "C-c TAB") 'ff-find-other-file)
+(add-hook 'prog-mode-hook 'lsp-deferred)
+
+(use-package dap-mode
+  ;; Uncomment the config below if you want all UI panes to be hidden by default!
+  ;; :custom
+  ;; (lsp-enable-dap-auto-configure nil)
+  ;; :config
+  ;; (dap-ui-mode 1)
 
   :config
-  (ivy-mode 1)
-  (ivy-set-occur 'ivy-switch-buffer 'ivy-switch-buffer-occur))
+  ;; Set up Node debugging
+  (require 'dap-node)
+  (dap-node-setup) ;; Automatically installs Node debug adapter if needed
+
+  ;; Bind `C-c l d` to `dap-hydra` for easy access
+  (general-define-key
+    :keymaps 'lsp-mode-map
+    :prefix lsp-keymap-prefix
+    "d" '(dap-hydra t :wk "debugger")))
+
+(use-package python-mode
+  :ensure t
+  :hook (python-mode . lsp-deferred)
+  :custom
+  ;; NOTE: Set these if Python 3 is called "python3" on your system!
+  ;; (python-shell-interpreter "python3")
+  ;; (dap-python-executable "python3")
+  (dap-python-debugger 'debugpy)
+  :config
+  (require 'dap-python))
 
 (use-package ace-window
   :ensure t
@@ -277,490 +768,14 @@ other, future frames."
        ((t (:inherit ace-jump-face-foreground :height 3.0)))))
     ))
 
-(use-package counsel
-  :ensure t)
-
-(use-package swiper
-  :ensure try
-  :bind (("C-s" . swiper)
-   ("C-r" . swiper)
-   ("C-c C-r" . ivy-resume)
-   ("M-x" . counsel-M-x)
-   ("C-x C-f" . counsel-find-file))
-  :config
-  (progn
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
-    (setq ivy-display-style 'fancy)
-    (define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
-    ))
-
-(use-package dired
-  :ensure nil
-  :bind ("C-c j" . dired-two-pane)
-  :bind (:map dired-mode-map
-              ("j"     . dired)
-              ("z"     . pop-window-configuration)
-              ("e"     . ora-ediff-files)
-              ("l"     . dired-up-directory)
-              ("q"     . dired-up-directory)
-              ("Y"     . ora-dired-rsync)
-              ("M-!"   . async-shell-command)
-              ("<tab>" . dired-next-window)
-              ("M-G")
-              ("M-s f"))
-  :diminish dired-omit-mode
-  :hook (dired-mode . dired-hide-details-mode)
-  :preface
-  (defun dired-two-pane ()
-    (interactive)
-    (push-window-configuration)
-    (let ((here default-directory))
-      (delete-other-windows)
-      (dired "~/dl")
-      (split-window-horizontally)
-      (dired here)))
-
-  (defun dired-next-window ()
-    (interactive)
-    (let ((next (car (cl-remove-if-not #'(lambda (wind)
-                                           (with-current-buffer (window-buffer wind)
-                                             (eq major-mode 'dired-mode)))
-                                       (cdr (window-list))))))
-      (when next
-        (select-window next))))
-
-  (defvar mark-files-cache (make-hash-table :test #'equal))
-
-  (defun mark-similar-versions (name)
-    (let ((pat name))
-      (if (string-match "^\\(.+?\\)-[0-9._-]+$" pat)
-          (setq pat (match-string 1 pat)))
-      (or (gethash pat mark-files-cache)
-          (ignore (puthash pat t mark-files-cache)))))
-
-  (defun dired-mark-similar-version ()
-    (interactive)
-    (setq mark-files-cache (make-hash-table :test #'equal))
-    (dired-mark-sexp '(mark-similar-versions name)))
-
-  (defun ora-dired-rsync (dest)
-    (interactive
-     (list
-      (expand-file-name
-       (read-file-name "Rsync to: " (dired-dwim-target-directory)))))
-    (let ((files (dired-get-marked-files
-                  nil current-prefix-arg))
-          (tmtxt/rsync-command "rsync -aP "))
-      (dolist (file files)
-        (setq tmtxt/rsync-command
-              (concat tmtxt/rsync-command
-                      (shell-quote-argument file)
-                      " ")))
-      (setq tmtxt/rsync-command
-            (concat tmtxt/rsync-command
-                    (shell-quote-argument dest)))
-      (async-shell-command tmtxt/rsync-command "*rsync*")
-      (other-window 1)))
-
-  (defun ora-ediff-files ()
-    (interactive)
-    (let ((files (dired-get-marked-files))
-          (wnd (current-window-configuration)))
-      (if (<= (length files) 2)
-          (let ((file1 (car files))
-                (file2 (if (cdr files)
-                           (cadr files)
-                         (read-file-name
-                          "file: "
-                          (dired-dwim-target-directory)))))
-            (if (file-newer-than-file-p file1 file2)
-                (ediff-files file2 file1)
-              (ediff-files file1 file2))
-            (add-hook 'ediff-after-quit-hook-internal
-                      `(lambda ()
-                         (setq ediff-after-quit-hook-internal nil)
-                         (set-window-configuration ,wnd))))
-        (error "no more than 2 files should be marked"))))
-
-  :config
-  (defvar dired-omit-regexp-orig (symbol-function 'dired-omit-regexp))
-
-  ;; Omit files that Git would ignore
-  (defun dired-omit-regexp ()
-    (let ((file (expand-file-name ".git"))
-          parent-dir)
-      (while (and (not (file-exists-p file))
-                  (progn
-                    (setq parent-dir
-                          (file-name-directory
-                           (directory-file-name
-                            (file-name-directory file))))
-                    ;; Give up if we are already at the root dir.
-                    (not (string= (file-name-directory file)
-                                  parent-dir))))
-        ;; Move up to the parent dir and try again.
-        (setq file (expand-file-name ".git" parent-dir)))
-      ;; If we found a change log in a parent, use that.
-      (if (file-exists-p file)
-          (let ((regexp (funcall dired-omit-regexp-orig))
-                (omitted-files
-                 (shell-command-to-string "git clean -d -x -n")))
-            (if (= 0 (length omitted-files))
-                regexp
-              (concat
-               regexp
-               (if (> (length regexp) 0)
-                   "\\|" "")
-               "\\("
-               (mapconcat
-                #'(lambda (str)
-                    (concat
-                     "^"
-                     (regexp-quote
-                      (substring str 13
-                                 (if (= ?/ (aref str (1- (length str))))
-                                     (1- (length str))
-                                   nil)))
-                     "$"))
-                (split-string omitted-files "\n" t)
-                "\\|")
-               "\\)")))
-        (funcall dired-omit-regexp-orig)))))
-
-(use-package dired-toggle
-  :ensure nil
-  :bind ("C-c ~" . dired-toggle)
-  :preface
-  (defun my-dired-toggle-mode-hook ()
-    (interactive)
-    (visual-line-mode 1)
-    (setq-local visual-line-fringe-indicators '(nil right-curly-arrow))
-    (setq-local word-wrap nil))
-  :hook (dired-toggle-mode . my-dired-toggle-mode-hook))
-
-(use-package company
-  :ensure t
-  :init (progn
-          (add-hook 'prog-mode-hook 'company-mode))
-  :config (progn
-            (setq company-idle-delay 0.5)
-            (setq company-tooltip-limit 10)
-            (setq company-minimum-prefix-length 2)
-            (setq company-tooltip-flip-when-above t)))
-
-(use-package company-dabbrev
-  :ensure nil
-  :config (progn
-            (setq company-dabbrev-ignore-case t)
-            (setq company-dabbrev-downcase nil)))
-(add-hook 'after-init-hook 'global-company-mode)
-
-(use-package google-this
-  :ensure t
-  :bind-keymap ("C-c /" . google-this-mode-submap)
-  :bind* ("M-SPC" . google-this-search)
-  :bind (:map google-this-mode-map
-              ("/" . google-this-search)))
-
-(use-package indent-shift
-  :ensure nil
-  :bind (("C-c <" . indent-shift-left)
-         ("C-c >" . indent-shift-right)))
-
-(use-package drag-stuff
- :ensure t)
-(drag-stuff-global-mode 1)
-(drag-stuff-define-keys)
-
-(use-package multiple-cursors
-  :ensure t)
-;; Edit all selected lines
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-M-g") 'mc/mark-all-like-this)
-
-(use-package ido
-  :ensure t)
-(use-package flx-ido
-  :ensure t)
-(use-package ido-vertical-mode
-  :ensure t)
-(setq ido-enable-flex-matching t)
-(setq ido-everywhere t)
-(ido-mode 1)
-(flx-ido-mode 1) ; better/faster matching
-(setq ido-create-new-buffer 'always) ; don't confirm to create new buffers
-(ido-vertical-mode 1)
-(setq ido-vertical-define-keys 'C-n-and-C-p-only)
-
-(use-package magit
-  :ensure t
-  :bind (("C-x g" . magit-status)
-         ("C-x G" . magit-status-with-prefix))
-  :bind (:map magit-mode-map
-              ("U" . magit-unstage-all)
-              ("M-h") ("M-s") ("M-m") ("M-w"))
-  :bind (:map magit-file-section-map ("<C-return>"))
-  :bind (:map magit-hunk-section-map ("<C-return>"))
-  :preface
-  (defun magit-monitor (&optional no-display)
-    "Start git-monitor in the current directory."
-    (interactive)
-    (let* ((path (file-truename
-                  (directory-file-name
-                   (expand-file-name default-directory))))
-           (name (format "*git-monitor: %s*"
-                         (file-name-nondirectory path))))
-      (unless (and (get-buffer name)
-                   (with-current-buffer (get-buffer name)
-                     (string= path (directory-file-name default-directory))))
-        (with-current-buffer (get-buffer-create name)
-          (cd path)
-          (ignore-errors
-            (start-process "*git-monitor*" (current-buffer)
-                           "git-monitor" "-d" path))))))
-
-  (defun magit-status-with-prefix ()
-    (interactive)
-    (let ((current-prefix-arg '(4)))
-      (call-interactively 'magit-status)))
-
-  :hook (magit-mode . hl-line-mode)
-  :config
-  (use-package magit-commit
-    :config
-    (use-package git-commit))
-
-  (use-package magit-files
-    :config
-    (global-magit-file-mode))
-
-  (add-hook 'magit-status-mode-hook #'(lambda () (magit-monitor t)))
-
-  (eval-after-load 'magit-remote
-    '(progn
-       (magit-define-popup-action 'magit-fetch-popup
-         ?f 'magit-get-remote #'magit-fetch-from-upstream ?u t)
-       (magit-define-popup-action 'magit-pull-popup
-         ?F 'magit-get-upstream-branch #'magit-pull-from-upstream ?u t)
-       (magit-define-popup-action 'magit-push-popup
-         ?P 'magit--push-current-to-upstream-desc
-         #'magit-push-current-to-upstream ?u t))))
-
-(use-package magit-popup
-  :defer t)
-
-(use-package magit-imerge
-  ;; jww (2017-12-10): Need to configure.
-  :disabled t
-  :after magit)
-
-(use-package magithub
-  :disabled t
-  :after magit
-  :config
-  (magithub-feature-autoinject t)
-
-  (require 'auth-source-pass)
-  (defvar my-ghub-token-cache nil)
-
-  (advice-add
-   'ghub--token :around
-   #'(lambda (orig-func host username package &optional nocreate forge)
-       (or my-ghub-token-cache
-           (setq my-ghub-token-cache
-                 (funcall orig-func host username package nocreate forge))))))
-
-(use-package magithub-completion
-  :commands magithub-completion-enable)
-
-(use-package projectile
-;;    :defer 5
-    :diminish
-    :bind* ("C-c TAB" . projectile-find-other-file)
-    :bind-keymap ("C-c p" . projectile-command-map)
-    :config
-    (projectile-global-mode))
-
-(use-package helm
-  :defer t
-  :bind (:map helm-map
-              ("<tab>" . helm-execute-persistent-action)
-              ("C-i"   . helm-execute-persistent-action)
-              ("C-z"   . helm-select-action)
-              ("A-v"   . helm-previous-page))
-  :config
-  (helm-autoresize-mode 1))
-(global-set-key (kbd "C-x b") 'helm-buffers-list)
-
-(use-package web-mode
-  :ensure t)
-(add-hook 'web-mode-hook
-          (lambda ()
-            (rainbow-mode)
-            (setq web-mode-markup-indent-offset 2)))
-(add-auto-mode
- 'web-mode
- "\\.blade$"
- "\\.phtml$"
- "\\.erb$"
- "\\.html$"
- "\\.php$"
- "\\.rhtml$")
-
-(use-package js2-mode
-    :ensure t
-    :config
-    (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode)))
-(add-hook 'j2-mode-hook (lambda () (setq js2-basic-offset 2)))
-
-(use-package json-mode
-  :ensure t)
-
-(use-package js2-refactor
-  :ensure t)
-(use-package xref-js2
-  :ensure t)
-(setq js2-highlight-level 3)
-(add-hook 'js2-mode-hook #'js2-refactor-mode)
-(js2r-add-keybindings-with-prefix "C-c C-r")
-(define-key js2-mode-map (kbd "C-k") #'js2r-kill)
-(add-hook 'js2-mode-hook
-  (lambda ()
-    (linum-mode 1)))
-
-;; js-mode (which js2 is based on) binds "M-." which conflicts with xref, so
-;; unbind it.
-(define-key js-mode-map (kbd "M-.") nil)
-
-(add-hook 'js2-mode-hook (lambda ()
-  (add-hook 'xref-backend-functions #'xref-js2-xref-backend nil t)))
-
-(use-package markdown-mode
-  :ensure t
-  :mode (("\\`README\\.md\\'" . gfm-mode)
-         ("\\.md\\'"          . markdown-mode)
-         ("\\.markdown\\'"    . markdown-mode))
-  :init (setq markdown-command "multimarkdown"))
-
-(use-package markdown-preview-mode
-  :after markdown-mode
-  :config
-  (setq markdown-preview-stylesheets
-        (list (concat "https://github.com/dmarcotte/github-markdown-preview/"
-                      "blob/master/data/css/github.css"))))
-
-(use-package company-restclient
-  :ensure t
-  :after (company restclient))
-
-(use-package restclient
-  :ensure t
-  :mode ("\\.rest\\'" . restclient-mode))
-
-(use-package css-mode
-  :ensure t
-  :config
-  :hook rainbow-mode
-  :config
-  (setq css-indent-offset 2))
-
-(use-package scss-mode
-  :ensure t
-  :config
-  (setq scss-compile-at-save nil))
-
-(use-package org-bullets
-  :ensure t
-  :config
-  (add-hook 'org-mode-hook (lambda() (org-bullets-mode 1))))
-
-;; Set default path
-(setq org-journal-dir (concat "~/Dropbox/org/journal/" (format-time-string "%Y/%m/")))
-;; Define naming convention
-(setq org-journal-file-format "%Y-%m-%d.org")
-;; Carry-over incomplete todos
-(setq org-journal-carryover-items "TODO=\"TODO\"|TODO=\"STARTED\"")
-
-(use-package org-journal
-  :ensure t)
-
-(setq org-ellipsis "⤵")
-(setq org-src-fontify-natively t)
-(setq org-src-tab-acts-natively t)
-(setq org-src-window-setup 'current-window)
-
-(setq org-directory "~/Dropbox/org")
-
-(defun org-file-path (filename)
-  "Return the absolute address of an org file, given its relative name."
-  (concat (file-name-as-directory org-directory) filename))
-
-;;(setq org-inbox-file "~/Dropbox/inbox.org")
-(setq org-index-file (org-file-path "index.org"))
-(setq org-archive-location
-      (concat (org-file-path "archive.org") "::* From %s"))
-
-(setq org-agenda-files (list org-index-file))
-
-(defun open-index-file ()
-  "Open the master org TODO list."
-  (interactive)
-  (find-file org-index-file)
-  (flycheck-mode -1)
-  (end-of-buffer))
-
-(global-set-key (kbd "C-c i") 'open-index-file)
-
-(defun mark-done-and-archive ()
-  "Mark the state of an org-mode item as DONE and archive it."
-  (interactive)
-  (org-todo 'done)
-  (org-archive-subtree))
-
-(define-key org-mode-map (kbd "C-c C-x C-s") 'mark-done-and-archive)
-
-(setq org-log-done 'time)
-
-(global-set-key (kbd "C-x 2") 'split-window-below-and-switch)
-(global-set-key (kbd "C-x 3") 'split-window-right-and-switch)
-(global-set-key (kbd "C-x C-t") 'iterm-goto-filedir-or-home)
-(global-set-key (kbd "C-x k") 'kill-current-buffer)
-
-(setq-default indent-tabs-mode nil)
-
-(setq-default tab-width 2)
-
-(setq global-hl-line-mode +1)
-
-(add-to-list 'exec-path "/usr/local/bin")
-(use-package exec-path-from-shell
-  :ensure t
-  :config (when (memq window-system '(mac ns))
-            (exec-path-from-shell-initialize)))
-
-;; I want an easy command for opening new shells:
-(defun new-shell (name)
-  "Opens a new shell buffer with the given name in
-asterisks (*name*) in the current directory and changes the
-prompt to 'name>'."
-  (interactive "sName: ")
-  (pop-to-buffer (concat "*" name "*"))
-  (unless (eq major-mode 'shell-mode)
-    (shell (current-buffer))
-    (sleep-for 0 200)
-    (delete-region (point-min) (point-max))
-    (comint-simple-send (get-buffer-process (current-buffer))
-                        (concat "export PS1=\"\033[33m" name "\033[0m:\033[35m\\W\033[0m>\""))))
-(global-set-key (kbd "C-c s") 'new-shell)
-
-;; Remove case sensitivity for auto-completion
-(setq pcomplete-ignore-case t)
-
-;; Load ansi colors
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-(setq ansi-color-names-vector ["white" "orange red" "green" "yellow" "pale blue" "magenta" "cyan" "tan"])
-
-(find-file "~/Dropbox/org/index.org")
+;; This is needed as of Org 9.2
+(require 'org-tempo)
+
+(add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+(add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
+(add-to-list 'org-structure-template-alist '("py" . "src python"))
+
+(add-to-list 'load-path
+              "~/.emacs.d/plugins/yasnippet")
+(require 'yasnippet)
+(yas-global-mode 1)
