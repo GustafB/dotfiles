@@ -1,9 +1,0 @@
-#!/bin/bash
-
-tkfile ()
-{
-  $(python ~/dotfiles/sneks/tkfile.py $1)
-  cd "${1%.*}"
-}
-
-$(tkfile $1)

@@ -230,3 +230,5 @@ export PATH="/usr/local/opt/ruby/bin:$PATH"
 
 autoload -U promptinit; promptinit
 prompt pure
+export PATH="/usr/local/opt/python@3.8/bin:$PATH"
+export PATH="/Users/gbrostedt1/Library/Python/3.8/bin:$PATH"

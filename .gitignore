@@ -25,6 +25,7 @@ projectile-bookmarks.eld
 recentf
 /backup/
 dotemacs.d/.tutor/
+dotemacs.d/var/
 dotemacs.d/bookmarks
 dotemacs.d/eshell/
 dotemacs.d/package-quickstart.el

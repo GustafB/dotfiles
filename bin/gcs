@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -u
+
+REPO=$1
+
+git clone "bbgithub:storagedistributed/${REPO}" --recurse-submodules
+
+cd "$REPO"
+
+git remote rename origin upstream
+git remote add origin "bbgithub:gbrostedt1/${REPO}"
