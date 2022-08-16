@@ -225,10 +225,7 @@ alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'
 alias klast="kill %1"
 
 alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
-export VAGRANT_DISABLE_RESOLV_REPLACE=1
-export PATH="/usr/local/opt/ruby/bin:$PATH"
 
+fpath+=($HOME/.zsh/pure)
 autoload -U promptinit; promptinit
 prompt pure
-export PATH="/usr/local/opt/python@3.8/bin:$PATH"
-export PATH="/Users/gbrostedt1/Library/Python/3.8/bin:$PATH"

@@ -90,7 +90,8 @@ Make sure use-package is installed
     (load-theme 'doom-palenight t)
     (doom-themes-visual-bell-config))
 
-  (use-package all-the-icons)
+  (use-package all-the-icons
+    :if (display-graphic-p))
 
   (use-package rainbow-delimiters
     :hook (prog-mode . rainbow-delimiters-mode))
@@ -258,7 +259,7 @@ Make sure use-package is installed
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
   (setq default-font "JetBrains Mono")
-  (setq default-font-size 14)
+  (setq default-font-size 11)
   (setq current-font-size default-font-size)
 
   (setq font-change-increment 1.1)
@@ -534,15 +535,18 @@ Make sure use-package is installed
     :hook (python-mode . (lambda ()
                             (require 'lsp-pyright)
                             (lsp))))
-  ;; (use-package lsp-ui
-  ;;   :hook (lsp-mode . lsp-ui-mode)
-  ;;   :custom
-  ;;   (lsp-ui-doc-position 'bottom))
+  (use-package lsp-ui
+    :hook (lsp-mode . lsp-ui-mode)
+    :custom
+    (lsp-ui-doc-position 'bottom))
+
+  (use-package treemacs)
 
   (use-package lsp-treemacs
-    :after lsp)
+    :after (lsp treemacs))
 
-  (use-package lsp-ivy)
+  (use-package lsp-ivy
+    :after lsp)
 
 #+end_src
 * company mode
@@ -924,8 +928,8 @@ CC mode
 #+end_src
 ** yasnippets
    #+begin_src emacs-lisp
-     (add-to-list 'load-path
-                   "~/.emacs.d/plugins/yasnippet")
-     (require 'yasnippet)
-     (yas-global-mode 1)
+     ;; (add-to-list 'load-path
+     ;;               "~/.emacs.d/plugins/yasnippet")
+     ;; (require 'yasnippet)
+     ;; (yas-global-mode 1)
    #+end_src

@@ -3,11 +3,13 @@ export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/llvm/bin:$PATH"
 export PATH="/Users/gbrostedt1/Documents/bbg-bde/bde-tools/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
-. "/usr/local/opt/nvm/nvm.sh"
+. "${NVM_DIR}/nvm.sh"
 export PATH="/usr/local/sbin:$PATH"
 export PATH="$PATH:/Users/gbrostedt1/workspace/mactoolkit/"
 export PATH="$PATH:/Users/gbrostedt1/workspace/tkdcopyrun/"
-export PATH="$PATH:$(pyenv root)/shims"
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
 export no_proxy=localhost,127.*,[::1],repo.dev.bloomberg.com,artifactory.bdns.bloomberg.com,artprod.dev.bloomberg.com,blp-dpkg.dev.bloomberg.com
 
 export dev_proxy='http_proxy=http://bproxy.tdmz1.bloomberg.com:85 https_proxy=http://bproxy.tdmz1.bloomberg.com:85'
@@ -23,10 +25,6 @@ alias unmount_mbig='diskutil unmount /users/gbrostedt1/Documents/bbg/mbig'
 alias mount_mbig='sshfs devsftp:/bb/mbig/mbig7278/ /Users/gbrostedt1/Documents/bbg/mbig -oauto_cache,reconnect,defer_permissions,negative_vncache,volname=mybig,allow_other,loglevel=DEBUG3'
 
 alias run_docker='docker run --rm -it -v $1 bash'
-
-alias g++="/usr/local/bin/g++-11"
-export CC="/usr/local/bin/gcc-11"
-export CXX="/usr/local/bin/g++-11"
 
 alias start_tinyproxy='launchctl load -w /usr/local/Cellar/tinyproxy/1.11.0/homebrew.mxcl.tinyproxy.plist'
 
@@ -54,5 +52,8 @@ function stoptinyproxy() {
     stop_tinyproxy
 }
 
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
+export GDK_SCALE=0.5
+export GDK_DPI_SCALE=2
 
 export PATH="/usr/local/opt/ruby/bin:$PATH"
