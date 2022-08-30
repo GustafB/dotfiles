@@ -1,3 +1,16 @@
+(when (not (string= system-type "darwin"))
+  (add-to-list 'exec-path "/home/cafebabe/.local/bin"))
+
+;; The default is 800 kilobytes.  Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s seconds with %d garbage collections."
+                     (emacs-init-time "%.2f")
+                     gcs-done)))
+
 (load-file "~/.emacs.d/sensible-defaults.el")
 (sensible-defaults/use-all-settings)
 (sensible-defaults/use-all-keybindings)
@@ -44,7 +57,7 @@
   :init
   (doom-modeline-mode 1)
   :config
-  (setq doom-modeline-height 15)
+  (setq doom-modeline-height 10)
   (setq doom-modeline-bar-width 6)
   (setq doom-modeline-lsp t)
   (setq doom-modeline-github t)
@@ -55,7 +68,10 @@
   (setq doom-modeline-unicode-fallback nil)
   (setq doom-modeline-buffer-file-name-style 'truncate-except-project)
   (setq doom-modeline-major-mode-icon nil)
-  :custom ((doom-modeline-height 1)))
+  :custom ((doom-modeline-height 1))
+  :custom-face
+  (mode-line ((t (:height 0.95))))
+  (mode-line-inactive ((t (:height 0.95)))))
 
 (use-package doom-themes
   :ensure t
@@ -63,7 +79,8 @@
   (load-theme 'doom-palenight t)
   (doom-themes-visual-bell-config))
 
-(use-package all-the-icons)
+(use-package all-the-icons
+  :if (display-graphic-p))
 
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
@@ -227,7 +244,7 @@
 (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (setq default-font "JetBrains Mono")
-(setq default-font-size 14)
+(setq default-font-size 11)
 (setq current-font-size default-font-size)
 
 (setq font-change-increment 1.1)
@@ -433,6 +450,9 @@ other, future frames."
                                   ;; Number of async workers used by clangd. Background index also uses this many workers.
                                   "-j=4"
                                   )))
+(use-package ccls
+  :hook ((c-mode c++-mode objc-mode cuda-mode) .
+         (lambda () (require 'ccls) (lsp))))
 
 (gb/leader-keys
   "tl" '(lsp-headerline-breadcrumb-mode :which-key "toggle lsp-headerline")
@@ -442,14 +462,65 @@ other, future frames."
   "c;" '(lsp-ui-peek-find-references :which-key "lsp peek references"))
 
 (use-package lsp-ui
+  :after lsp-mode
+  :custom
+  (lsp-ui-doc-show-with-cursor nil)
+  (lsp-ui-doc-show-with-mouse nil)
+  (lsp-ui-doc-position 'at-point)
+  (lsp-ui-sideline-delay 0.5)
+  (lsp-ui-peek-always-show t)
+  (lsp-ui-peek-fontify 'always)
+  :custom-face
+  (lsp-ui-peek-highlight ((t (:inherit nil :background nil :foreground nil :weight semi-bold :box (:line-width -1)))))
+  :bind
+  ( :map lsp-ui-mode-map
+    ([remap xref-find-references] . lsp-ui-peek-find-references)
+    ("C-M-l" . lsp-ui-peek-find-definitions)
+    ("C-c C-d" . lsp-ui-doc-show))
+  :config
+    ;;;; LSP UI posframe ;;;;
+  (defun lsp-ui-peek--peek-display (src1 src2)
+    (-let* ((win-width (frame-width))
+            (lsp-ui-peek-list-width (/ (frame-width) 2))
+            (string (-some--> (-zip-fill "" src1 src2)
+                      (--map (lsp-ui-peek--adjust win-width it) it)
+                      (-map-indexed 'lsp-ui-peek--make-line it)
+                      (-concat it (lsp-ui-peek--make-footer))))
+            )
+      (setq lsp-ui-peek--buffer (get-buffer-create " *lsp-peek--buffer*"))
+      (posframe-show lsp-ui-peek--buffer
+                     :string (mapconcat 'identity string "")
+                     :min-width (frame-width)
+                     :poshandler 'posframe-poshandler-frame-center)))
+
+  (defun lsp-ui-peek--peek-destroy ()
+    (when (bufferp lsp-ui-peek--buffer)
+      (posframe-delete lsp-ui-peek--buffer))
+    (setq lsp-ui-peek--buffer nil
+          lsp-ui-peek--last-xref nil)
+    (set-window-start (get-buffer-window) lsp-ui-peek--win-start))
+
+  (advice-add 'lsp-ui-peek--peek-new :override 'lsp-ui-peek--peek-display)
+  (advice-add 'lsp-ui-peek--peek-hide :override 'lsp-ui-peek--peek-destroy)
+    ;;;; LSP UI posframe ;;;;
+  )
+(use-package lsp-pyright
+  :ensure t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp))))
+(use-package lsp-ui
   :hook (lsp-mode . lsp-ui-mode)
   :custom
   (lsp-ui-doc-position 'bottom))
 
-(use-package lsp-treemacs
-  :after lsp)
+(use-package treemacs)
 
-(use-package lsp-ivy)
+(use-package lsp-treemacs
+  :after (lsp treemacs))
+
+(use-package lsp-ivy
+  :after lsp)
 
 (use-package company
   :after lsp-mode
@@ -463,6 +534,7 @@ other, future frames."
   (company-idle-delay 0.3))
 
 (use-package company-box
+  :after (company)
   :hook (company-mode . company-box-mode))
 
 (use-package company-c-headers
@@ -473,6 +545,7 @@ other, future frames."
 
 (use-package company-dabbrev
   :ensure nil
+  :after (company)
   :config (progn
     (setq company-dabbrev-ignore-case t)
     (setq company-dabbrev-downcase nil)))
@@ -564,10 +637,13 @@ other, future frames."
   :bind (("C-x C-j" . dired-jump))
   :custom ((dired-listing-switches "-agho --group-directories-first"))
   :config
+  (when (string= system-type "darwin")
+    (setq dired-use-ls-dired t
+          insert-directory-program "gls"))
   (setq dired-clean-up-buffers-too t)
   (setq dired-recursive-copies 'always)
   (setq dired-recursive-deletes 'top)
-  (setq insert-directory-program "gls" dired-use-ls-dired t)
+  ;; (setq insert-directory-program "gls" dired-use-ls-dired t)
   (setq dired-listing-switches "-al --group-directories-first")
   (evil-collection-define-key 'normal 'dired-mode-map
     "h" 'dired-single-up-directory
@@ -686,66 +762,24 @@ other, future frames."
 
 (add-to-list 'tramp-remote-path "/opt/bb/bin")
 
-;; (add-auto-mode
- ;; 'c++-mode
- ;; "\\.cpp"
- ;; "\\.h"
- ;; "\\.hpp")
-
-(font-lock-add-keywords 'c++-mode
-                        '(("\\<\\(thread_local\\)\\>" . font-lock-warning-face)
-                          ("\\<\\(constexpr\\)\\>" . font-lock-keyword-face)
-                          ))
-
-(setq-default c-default-style "linux"
-              c-basic-offset 4)
-
-(setq-default c-hungry-delete-key t)
-
-(defun gb/insert-h-guard ()
-  (interactive)
-  (cons "\\.\\([Hh]\\|hh\\|hpp\\)\\'" "My C/C++ header")
-  '(nil
-    (let* ((noext (substring buffer-file-name 0 (match-beginning 0)))
-           (nopath (file-name-nondirectory noext))
-           (ident (concat (upcase nopath) "_H_")))
-      (concat "#ifndef " ident "\n"
-              "#define " ident "\n\n\n"
-              "\n\n#endif // " ident "\n"))
-    ))
-
-(defconst my-cc-style
-  '("cc-mode"
-    (c-offsets-alist . ((innamespace . [0])))))
-
-(use-package cc-mode
-  :hook (cc-mode . modern-c++-font-lock--mode)
-  :config
-  (setq-default shell-dirtrackp nil)
-  (c-add-style "my-cc-mode" my-cc-style)
-  (setq c-default-style '(((c-mode . "my-cc-mode")
-                           (cc-mode . "my-cc-mode")))))
-
-(global-set-key (kbd "C-c TAB") 'ff-find-other-file)
-(add-hook 'prog-mode-hook 'lsp-deferred)
-
 (use-package dap-mode
   ;; Uncomment the config below if you want all UI panes to be hidden by default!
-  ;; :custom
-  ;; (lsp-enable-dap-auto-configure nil)
-  ;; :config
-  ;; (dap-ui-mode 1)
+  :custom
+  (lsp-enable-dap-auto-configure nil)
+  :config
+  (dap-ui-mode 1)
 
   :config
   ;; Set up Node debugging
   (require 'dap-node)
   (dap-node-setup) ;; Automatically installs Node debug adapter if needed
-
+  (require 'dap-cpptools)
+  (dap-cpptools-setup)
   ;; Bind `C-c l d` to `dap-hydra` for easy access
   (general-define-key
-    :keymaps 'lsp-mode-map
-    :prefix lsp-keymap-prefix
-    "d" '(dap-hydra t :wk "debugger")))
+   :keymaps 'lsp-mode-map
+   :prefix lsp-keymap-prefix
+   "d" '(dap-hydra t :wk "debugger")))
 
 (use-package python-mode
   :ensure t
@@ -757,6 +791,13 @@ other, future frames."
   (dap-python-debugger 'debugpy)
   :config
   (require 'dap-python))
+
+(use-package python-black
+  :demand t
+  :after python)
+
+(gb/leader-keys
+  "cp" '(python-black-buffer :which-key "run black on buffer"))
 
 (use-package ace-window
   :ensure t
@@ -775,7 +816,7 @@ other, future frames."
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
 (add-to-list 'org-structure-template-alist '("py" . "src python"))
 
-(add-to-list 'load-path
-              "~/.emacs.d/plugins/yasnippet")
-(require 'yasnippet)
-(yas-global-mode 1)
+;; (add-to-list 'load-path
+;;               "~/.emacs.d/plugins/yasnippet")
+;; (require 'yasnippet)
+;; (yas-global-mode 1)

@@ -71,7 +71,7 @@ Make sure use-package is installed
     :init
     (doom-modeline-mode 1)
     :config
-    (setq doom-modeline-height 15)
+    (setq doom-modeline-height 10)
     (setq doom-modeline-bar-width 6)
     (setq doom-modeline-lsp t)
     (setq doom-modeline-github t)
@@ -82,7 +82,10 @@ Make sure use-package is installed
     (setq doom-modeline-unicode-fallback nil)
     (setq doom-modeline-buffer-file-name-style 'truncate-except-project)
     (setq doom-modeline-major-mode-icon nil)
-    :custom ((doom-modeline-height 1)))
+    :custom ((doom-modeline-height 1))
+    :custom-face
+    (mode-line ((t (:height 0.95))))
+    (mode-line-inactive ((t (:height 0.95)))))
 
   (use-package doom-themes
     :ensure t
@@ -479,6 +482,9 @@ Make sure use-package is installed
                                     ;; Number of async workers used by clangd. Background index also uses this many workers.
                                     "-j=4"
                                     )))
+  (use-package ccls
+    :hook ((c-mode c++-mode objc-mode cuda-mode) .
+           (lambda () (require 'ccls) (lsp))))
 
   (gb/leader-keys
     "tl" '(lsp-headerline-breadcrumb-mode :which-key "toggle lsp-headerline")
@@ -500,11 +506,11 @@ Make sure use-package is installed
     (lsp-ui-peek-highlight ((t (:inherit nil :background nil :foreground nil :weight semi-bold :box (:line-width -1)))))
     :bind
     ( :map lsp-ui-mode-map
-           ([remap xref-find-references] . lsp-ui-peek-find-references)
-           ("C-M-l" . lsp-ui-peek-find-definitions)
-           ("C-c C-d" . lsp-ui-doc-show))
+      ([remap xref-find-references] . lsp-ui-peek-find-references)
+      ("C-M-l" . lsp-ui-peek-find-definitions)
+      ("C-c C-d" . lsp-ui-doc-show))
     :config
-    ;;;; LSP UI posframe ;;;;
+      ;;;; LSP UI posframe ;;;;
     (defun lsp-ui-peek--peek-display (src1 src2)
       (-let* ((win-width (frame-width))
               (lsp-ui-peek-list-width (/ (frame-width) 2))
@@ -528,13 +534,13 @@ Make sure use-package is installed
 
     (advice-add 'lsp-ui-peek--peek-new :override 'lsp-ui-peek--peek-display)
     (advice-add 'lsp-ui-peek--peek-hide :override 'lsp-ui-peek--peek-destroy)
-    ;;;; LSP UI posframe ;;;;
+      ;;;; LSP UI posframe ;;;;
     )
   (use-package lsp-pyright
     :ensure t
     :hook (python-mode . (lambda ()
-                            (require 'lsp-pyright)
-                            (lsp))))
+                           (require 'lsp-pyright)
+                           (lsp))))
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
     :custom
@@ -806,83 +812,27 @@ Make sure use-package is installed
   (add-to-list 'tramp-remote-path "/opt/bb/bin")
 
 #+end_src
-
 * Development & Major Modes
-** c & c++
-** c/c++
-#+BEGIN_SRC emacs-lisp
-      ;; (add-auto-mode
-       ;; 'c++-mode
-       ;; "\\.cpp"
-       ;; "\\.h"
-       ;; "\\.hpp")
-#+END_SRC
-Add c++11 keywords
-#+BEGIN_SRC emacs-lisp
-  (font-lock-add-keywords 'c++-mode
-                          '(("\\<\\(thread_local\\)\\>" . font-lock-warning-face)
-                            ("\\<\\(constexpr\\)\\>" . font-lock-keyword-face)
-                            ))
-#+END_SRC
-Always indent with 4 spaces, in the Linux kernel style.
-#+BEGIN_SRC emacs-lisp
-(setq-default c-default-style "linux"
-              c-basic-offset 4)
-#+END_SRC
-Enable hungry delete in C
-#+BEGIN_SRC emacs-lisp
-(setq-default c-hungry-delete-key t)
-#+END_SRC
-Auto-insert include guards in .h files
-#+BEGIN_SRC emacs-lisp
-  (defun gb/insert-h-guard ()
-    (interactive)
-    (cons "\\.\\([Hh]\\|hh\\|hpp\\)\\'" "My C/C++ header")
-    '(nil
-      (let* ((noext (substring buffer-file-name 0 (match-beginning 0)))
-             (nopath (file-name-nondirectory noext))
-             (ident (concat (upcase nopath) "_H_")))
-        (concat "#ifndef " ident "\n"
-                "#define " ident "\n\n\n"
-                "\n\n#endif // " ident "\n"))
-      ))
-#+END_SRC
-CC mode
-#+BEGIN_SRC emacs-lisp
-  (defconst my-cc-style
-    '("cc-mode"
-      (c-offsets-alist . ((innamespace . [0])))))
-
-  (use-package cc-mode
-    :hook (cc-mode . modern-c++-font-lock--mode)
-    :config
-    (setq-default shell-dirtrackp nil)
-    (c-add-style "my-cc-mode" my-cc-style)
-    (setq c-default-style '(((c-mode . "my-cc-mode")
-                             (cc-mode . "my-cc-mode")))))
-
-  (global-set-key (kbd "C-c TAB") 'ff-find-other-file)
-  (add-hook 'prog-mode-hook 'lsp-deferred)
-#+END_SRC
 ** dap-mode
 #+begin_src emacs-lisp
-;;  (use-package dap-mode
+  (use-package dap-mode
     ;; Uncomment the config below if you want all UI panes to be hidden by default!
-    ;; :custom
-    ;; (lsp-enable-dap-auto-configure nil)
-    ;; :config
-    ;; (dap-ui-mode 1)
+    :custom
+    (lsp-enable-dap-auto-configure nil)
+    :config
+    (dap-ui-mode 1)
 
     :config
     ;; Set up Node debugging
-;;    (require 'dap-node)
-;;    (dap-node-setup) ;; Automatically installs Node debug adapter if needed
-
+    (require 'dap-node)
+    (dap-node-setup) ;; Automatically installs Node debug adapter if needed
+    (require 'dap-cpptools)
+    (dap-cpptools-setup)
     ;; Bind `C-c l d` to `dap-hydra` for easy access
-;;    (general-define-key
-;;      :keymaps 'lsp-mode-map
-;;      :prefix lsp-keymap-prefix
-;;      "d" '(dap-hydra t :wk "debugger")))
+    (general-define-key
+     :keymaps 'lsp-mode-map
+     :prefix lsp-keymap-prefix
+     "d" '(dap-hydra t :wk "debugger")))
 
 #+end_src
 ** python

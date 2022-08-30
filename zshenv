@@ -52,7 +52,7 @@ function stoptinyproxy() {
     stop_tinyproxy
 }
 
-export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0.0
+export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
 export GDK_SCALE=0.5
 export GDK_DPI_SCALE=2
 
