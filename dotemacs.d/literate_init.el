@@ -244,7 +244,7 @@
 (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
 (setq default-font "JetBrains Mono")
-(setq default-font-size 11)
+(setq default-font-size 9)
 (setq current-font-size default-font-size)
 
 (setq font-change-increment 1.1)
