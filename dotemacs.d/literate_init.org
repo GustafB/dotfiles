@@ -366,8 +366,6 @@ Make sure use-package is installed
   (use-package evil-nerd-commenter
     :bind ("M-;" . evilnc-comment-or-uncomment-lines))
 
-  (add-hook 'c++-mode-hook (lambda ()
-                             (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
 
   ;; (evil-set-undo-system 'undo-tree)
   (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
@@ -838,26 +836,6 @@ Make sure use-package is installed
      "d" '(dap-hydra t :wk "debugger")))
 
 #+end_src
-** python
-#+begin_src emacs-lisp
-  (use-package python-mode
-    :ensure t
-    :hook (python-mode . lsp-deferred)
-    :custom
-    ;; NOTE: Set these if Python 3 is called "python3" on your system!
-    ;; (python-shell-interpreter "python3")
-    ;; (dap-python-executable "python3")
-    (dap-python-debugger 'debugpy)
-    :config
-    (require 'dap-python))
-
-  (use-package python-black
-    :demand t
-    :after python)
-
-  (gb/leader-keys
-    "cp" '(python-black-buffer :which-key "run black on buffer"))
-#+end_src
 * ace-window
 #+begin_src emacs-lisp
   (use-package ace-window
@@ -886,3 +864,45 @@ Make sure use-package is installed
      ;; (require 'yasnippet)
      ;; (yas-global-mode 1)
    #+end_src
+* languages
+** c++/c
+#+begin_src emacs-lisp
+  (add-hook 'c++-mode-hook (lambda ()
+                             (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
+  (defun my-c-mode-common-hook ()
+   ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
+   (c-set-offset 'substatement-open 0)
+   ;; other customizations can go here
+
+   (setq c++-tab-always-indent t)
+   (setq c-basic-offset 2)                  ;; Default is 2
+   (setq c-indent-level 2)                  ;; Default is 2
+   (c-set-offset 'access-label -4)
+   (c-set-offset 'inclass 0)
+   (setq tab-stop-list '(2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40))
+   (setq tab-width 2)
+   (setq indent-tabs-mode t)  ; use spaces only if nil
+   )
+
+  (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+#+end_src
+** python
+#+begin_src emacs-lisp
+  (use-package python-mode
+    :ensure t
+    :hook (python-mode . lsp-deferred)
+    :custom
+    ;; NOTE: Set these if Python 3 is called "python3" on your system!
+    ;; (python-shell-interpreter "python3")
+    ;; (dap-python-executable "python3")
+    (dap-python-debugger 'debugpy)
+    :config
+    (require 'dap-python))
+
+  (use-package python-black
+    :demand t
+    :after python)
+
+  (gb/leader-keys
+    "cp" '(python-black-buffer :which-key "run black on buffer"))
+#+end_src
