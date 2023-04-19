@@ -32,24 +32,6 @@ myegrep()
     $(which -p egrep) --color=auto "$@"
 }
 
-_ssh()
-{
-    ARCH=$1
-    MACH=$2
-    echo $MACH
-    dev "${ARCH}${MACH}"
-}
-
-ssh_sd()
-{
-    _ssh "sundev" $1
-}
-
-ssh_lx()
-{
-    _ssh "nylxdev" $1
-}
-
 # =============================================================================
 #                                   Variables
 # =============================================================================
@@ -88,26 +70,33 @@ KEYTIMEOUT=1
 WORDCHARS='*?_-[]~=./&;!#$%^(){}<>'
 
 # History
-HISTFILE=~/.zsh_history
-HISTSIZE=100000
-SAVEHIST=$HISTSIZE
+export HISTFILE="/home/cafebabe/.zsh_history"
+export HISTSIZE=1000000
+export SAVEHIST=$HISTSIZE
+export HISTIGNORE="pwd:ls:cd"
+alias hist="history 1"
+setopt BANG_HIST                 # Treat the '!' character specially during expansion.
+setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
+setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
+setopt SHARE_HISTORY             # Share history between all sessions.
+setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
+setopt HIST_IGNORE_DUPS          # Don't record an entry that was just recorded again.
+setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
+setopt HIST_FIND_NO_DUPS         # Do not display a line previously found.
+setopt HIST_IGNORE_SPACE         # Don't record an entry starting with a space.
+setopt HIST_SAVE_NO_DUPS         # Don't write duplicate entries in the history file.
+setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
+setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
+setopt HIST_BEEP                 # Beep when accessing nonexistent history.
 
-setopt autocd                   # Allow changing directories without `cd`
-setopt append_history           # Dont overwrite history
-setopt extended_history         # Also record time and duration of commands.
-setopt share_history            # Share history between multiple shells
-setopt hist_expire_dups_first   # Clear duplicates when trimming internal hist.
-setopt hist_find_no_dups        # Dont display duplicates during searches.
-setopt hist_ignore_dups         # Ignore consecutive duplicates.
-setopt hist_ignore_all_dups     # Remember only one unique copy of the command.
-setopt hist_reduce_blanks       # Remove superfluous blanks.
-setopt hist_save_no_dups        # Omit older commands in favor of newer ones.
-setopt hist_ignore_space        # Ignore commands that start with space.
+
+bindkey "^R" history-incremental-search-backward
 
 # Changing directories
 #setopt auto_pushd
 setopt pushd_ignore_dups        # Dont push copies of the same dir on stack.
 setopt pushd_minus              # Reference stack entries with "-".
+setopt autocd                   # Allow changing directories without `cd`
 
 setopt extended_glob
 CASE_SENSITIVE="true"
@@ -194,6 +183,11 @@ alias gog="git log  --abbrev-commit --name-status --color --graph --pretty=forma
 alias gml="git log --stat --color --decorate --all --oneline"
 alias gdw="git diff --word-diff=color"
 alias gds="git diff --word-diff=color --staged"
+alias gs="git status"
+alias gau="git add -u"
+alias gaa="git add ."
+alias gc="git commit"
+alias ggr="git log --graph --full-history --all --pretty=format:\"%h%x09%d%x20%s\""
 
 # Navigation
 alias ..='cd ..'
@@ -203,10 +197,6 @@ alias ..4='cd ../../../..'
 alias ..5='cd ../../../../..'
 alias ..6='cd ../../../../../..'
 alias ..7='cd ../../../../../../..'
-
-# Networking
-alias sd="ssh_sd $1"
-alias lin="ssh_lx $1"
 
 # Generic command adaptions
 alias ll="ls -lh"
@@ -223,9 +213,35 @@ alias egrep="myegrep $@"
 # Housekeeping
 alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'
 alias klast="kill %1"
+alias dk="kill -9 $(docker ps -q)"
 
 alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
+
+# sql
+alias dsql='docker exec $(docker ps -q -f "name=psql") psql -U postgres main -c ${1}'
+alias mg='docker exec -it $(docker ps -q -f "name=mg") mgconsole'
+
+# start app
+alias runsap="VERSION=develop docker compose -f /home/cafebabe/saporo/on-prem/devops/run/dev-compose.yaml up"
+alias runback="cd /home/cafebabe/saporo/on-prem/backend && make run && cd -"
+alias rootsap="ssh -i ~/.ssh/id_rsa root@45.79.106.70"
 
 fpath+=($HOME/.zsh/pure)
 autoload -U promptinit; promptinit
 prompt pure
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/cafebabe/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/cafebabe/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/cafebabe/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/cafebabe/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+

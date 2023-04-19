@@ -4,7 +4,7 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 [user]
-  email = gbrostedt1@bloomberg.net
+	email = gustaf@saporo.io
   name = gbrostedt1
 [core]
   autocrlf = false
@@ -30,12 +30,4 @@
   dbr = branch -d
 	root = rev-parse --show-toplevel
 [credential]
-  helper = cache
-[credential "https://bbgithub.dev.bloomberg.com"]
-  username = a637bc246ecb89ff38f2a88259fa494a40ce7eca
-[http "https://bbgithub.dev.bloomberg.com"]
-	proxy = http://devproxy.bloomberg.com:82
-[github]
-	user = gustafb
-[bbgithub "dev.bloomberg.com"]
-	user = gbrostedt1
+	helper = store
