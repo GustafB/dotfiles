@@ -45,24 +45,69 @@ Make sure use-package is installed
 * UI Tweaks
 ** Ivy/counsel/visual
 #+BEGIN_SRC emacs-lisp
-  (use-package ivy
-    :ensure t
-    :diminish
-    :bind (("C-s" . swiper)
-           :map ivy-minibuffer-map
-           ("TAB" . ivy-alt-done)
-           ("C-l" . ivy-alt-done)
-           ("C-j" . ivy-next-line)
-           ("C-k" . ivy-previous-line)
-           :map ivy-switch-buffer-map
-           ("C-k" . ivy-previous-line)
-           ("C-l" . ivy-done)
-           ("C-d" . ivy-switch-buffer-kill)
-           :map ivy-reverse-i-search-map
-           ("C-k" . ivy-previous-line)
-           ("C-d" . ivy-reverse-i-search-kill))
+  (use-package helm
+    ;; :init
+    ;; :bind (;("M-x" . helm-M-x)
+    ;;        ("M-y" . helm-show-kill-ring)
+    ;;        ("C-x b" . helm-mini)
+    ;;        ("M-/" . helm-dabbrev))
     :config
-    (ivy-mode 1))
+    (setq
+     helm-scroll-amount 4 ; scroll 4 lines other window using M-<next>/M-<prior>
+     helm-quick-update t ; do not display invisible candidates
+     helm-idle-delay 0.01 ; be idle for this many seconds, before updating in delayed sources.
+     helm-input-idle-delay 0.01 ; be idle for this many seconds, before updating candidate buffer
+     helm-split-window-default-side 'other ;; open helm buffer in another window
+     helm-split-window-in-side-p t ;; open helm buffer inside current window, not occupy whole other window
+     helm-candidate-number-limit 200 ; limit the number of displayed canidates
+     helm-move-to-line-cycle-in-source nil ; move to end or beginning of source when reaching top or bottom of source.
+     ;; helm-command
+     helm-M-x-requires-pattern 0     ; show all candidates when set to 0
+     )
+    (bind-keys ("M-x" . helm-M-x)
+               ("M-y" . helm-show-kill-ring)
+               ("C-x b" . helm-mini))
+    (bind-keys :map helm-map
+               ("C-o" . nil)
+               ("TAB" . helm-execute-persistent-action)
+               ("C-i" . helm-execute-persistent-action)
+               ("C-z" . helm-select-action)
+               ("C-h" . delete-backward-char)))
+
+  (use-package helm-projectile :ensure t :defer t
+    :bind
+    ("C-x C-t" . helm-projectile-switch-project)
+    ("C-x C-r" . helm-projectile-find-file-dwim))
+
+  (use-package helm-top-elscreen :disabled
+    :config
+    (bind-keys :map helm-command-map
+               ("t" . nil)
+               ("t" . helm-elscreen)))
+
+  (use-package helm-ag
+    :defer t
+    :bind
+    ("C-x C-g" . helm-ag))
+
+  (use-package helm-swoop
+    :bind
+    (("C-s" . helm-swoop)
+     ("M-O" . helm-swoop-back-to-last-point)
+     ("C-c C-o" . helm-multi-swoop))
+    :config
+    ;; Save buffer when helm-multi-swoop-edit complete
+    (setq helm-multi-swoop-edit-save t)
+    ;; If this value is t, split window inside the current window
+    (setq helm-swoop-split-with-multiple-windows nil)
+    ;; Split direcion. 'split-window-vertically or 'split-window-horizontally
+    (setq helm-swoop-split-direction 'split-window-horizontally)
+    ;; If nil, you can slightly boost invoke speed in exchange for text color
+    (setq helm-swoop-speed-or-color t)
+    (bind-keys :map isearch-mode-map
+               ("M-o" . helm-swoop-from-isearch))
+    (bind-keys :map helm-swoop-map
+               ("M-o" . helm-multi-swoop-all-from-helm-swoop)))
 
   (use-package diminish)
 
@@ -108,25 +153,14 @@ Make sure use-package is installed
     :config
     (setq which-key-idle-delay 1))
 
-  (use-package ivy-rich
-    :init
-    (ivy-rich-mode 1))
-
-  (use-package counsel
-    :bind (("M-x" . counsel-M-x)
-           ("C-x b" . counsel-ibuffer)
-           ("C-x C-f" . counsel-find-file)
-           :map minibuffer-local-map
-           ("C-r" . 'counsel-minibuffer-history)))
-
   (use-package helpful
-    :custom
-    (counsel-describe-function-function #'helpful-callable)
-    (counsel-describe-variable-function #'helpful-variable)
+    ;; :custom
+    ;; (counsel-describe-function-function #'helpful-callable)
+    ;; (counsel-describe-variable-function #'helpful-variable)
     :bind
-    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-function] . describe-function)
     ([remap describe-command] . helpful-command)
-    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-variable] . describe-variable)
     ([remap describe-key] . helpful-key))
 
   (use-package drag-stuff
@@ -410,7 +444,6 @@ Make sure use-package is installed
       "ec" '(projectile-invalidate-cache :which-key "invalidate projectile cache")
       "ev" '(set-variable :which-key "set variable")
       "t"  '(:ignore t :which-key "toggles")
-      "tt" '(counsel-load-theme :which-key "choose theme")
       "s"  '(:ignore t :which-key "smartparens")
       "s<" '(sp-backward-barf-sexp :wk "Barf backward")
       "s>" '(sp-forward-barf-sexp :wk "Barf forward")
@@ -449,7 +482,7 @@ Make sure use-package is installed
   (use-package projectile
     :diminish projectile-mode
     :config (projectile-mode)
-    :custom ((projectile-completion-system 'ivy))
+    ;; :custom ((projectile-completion-system 'ivy))
     :bind-keymap
     ("C-c p" . projectile-command-map)
     :init
@@ -458,13 +491,10 @@ Make sure use-package is installed
     (setq projectile-enable-caching t)
     (projectile-global-mode))
 
-  (global-set-key (kbd "C-x C-r") 'counsel-projectile-find-file)
-  (global-set-key (kbd "C-x C-d") 'counsel-projectile-find-dir)
-  (global-set-key (kbd "C-x C-g") 'projectile-grep)
+  (global-set-key (kbd "C-x C-r") 'projectile-find-file)
+  (global-set-key (kbd "C-x C-d") 'projectile-find-dir)
   (global-set-key (kbd "C-x C-t") 'projectile-switch-project)
 
-  (use-package counsel-projectile
-    :config (counsel-projectile-mode))
 #+end_src
 * Magit
   #+begin_src emacs-lisp
@@ -709,7 +739,7 @@ Make sure use-package is installed
     (add-to-list 'eshell-output-filter-functions 'eshell-truncate-buffer)
 
     ;; Bind some useful keys for evil-mode
-    (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+    ;; (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
     (evil-define-key '(normal insert visual) eshell-mode-map (kbd "<home>") 'eshell-bol)
     (evil-normalize-keymaps)
 
