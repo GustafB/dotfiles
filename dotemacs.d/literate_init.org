@@ -75,9 +75,12 @@ Make sure use-package is installed
                ("C-h" . delete-backward-char)))
 
   (use-package helm-projectile :ensure t :defer t
+    :config
+    (helm-projectile-on)
     :bind
     ("C-x C-t" . helm-projectile-switch-project)
-    ("C-x C-r" . helm-projectile-find-file-dwim))
+    ("C-x C-r" . helm-projectile-find-file)
+    ("C-x C-f" . helm-find-files))
 
   (use-package helm-top-elscreen :disabled
     :config
@@ -183,30 +186,6 @@ Make sure use-package is installed
     (interactive)
     (kill-buffer (current-buffer)))
 
-  (defun gb/iterm-goto-filedir-or-home ()
-    "Go to present working dir and focus iterm"
-    (interactive)
-    (do-applescript
-     (concat
-      " tell application \"iTerm2\"\n"
-      "   tell the current session of current window\n"
-      (format "     write text \"cd %s\" \n"
-              ;; string escaping madness for applescript
-              (replace-regexp-in-string "\\\\" "\\\\\\\\"
-                                        (shell-quote-argument (or default-directory "~"))))
-      "   end tell\n"
-      " end tell\n"
-      " do shell script \"open -a iTerm\"\n"
-      ))
-    )
-  ;; Opens iterm
-  (defun gb/iterm-focus ()
-    (interactive)
-    (do-applescript
-     " do shell script \"open -a iTerm\"\n"
-     ))
-
-
   (defun gb/split-window-below-and-switch ()
     "Split the window horizontally, then switch to the new pane."
     (interactive)
@@ -262,13 +241,10 @@ Make sure use-package is installed
   (global-set-key (kbd "s-[") #'gb/prev-window)
   (global-set-key (kbd "C-x o") #'gb/other-window)(gb/toggle-normal))
 
-  (global-set-key (kbd "s-]") #'gb/next-window)
-  (global-set-key (kbd "s-[") #'gb/prev-window)
   (global-set-key (kbd "C-x o") #'gb/other-window)
 
   (global-set-key (kbd "C-x 2") 'gb/split-window-below-and-switch)
   (global-set-key (kbd "C-x 3") 'gb/split-window-right-and-switch)
-  (global-set-key (kbd "C-x C-t") 'gb/iterm-goto-filedir-or-home)
   (global-set-key (kbd "C-x k") 'gb/kill-current-buffer)
   (global-set-key (kbd "C-x C-b") 'ibuffer)
   (global-set-key (kbd "C-c g") 'gb/generate-scratch-buffer)
@@ -491,22 +467,13 @@ Make sure use-package is installed
     (setq projectile-enable-caching t)
     (projectile-global-mode))
 
-  (global-set-key (kbd "C-x C-r") 'projectile-find-file)
-  (global-set-key (kbd "C-x C-d") 'projectile-find-dir)
-  (global-set-key (kbd "C-x C-t") 'projectile-switch-project)
-
 #+end_src
 * Magit
   #+begin_src emacs-lisp
     (use-package magit
-      :custom
-      (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
+      ;; :custom
+      ;; (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1)
       :bind ("C-x g" . magit-status))
-
-    ;; (use-package forge)
-
-    ;; (use-package evil-magit
-      ;; :after magit)
   #+end_src
 * lsp mode
 #+begin_src emacs-lisp
