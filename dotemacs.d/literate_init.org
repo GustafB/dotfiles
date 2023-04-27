@@ -416,6 +416,7 @@ Make sure use-package is installed
     (gb/leader-keys
       "c"  '(:ignore t :which-key "compilation")
       "cc" '(compile :which-key "compile project")
+      "cf" '(flymake-show-buffer-diagnostics :which-key "buffer diagnostics")
       "e"  '(:ignore t :which-key "emacs commands")
       "ei" '(package-install :which-key "package-install")
       "el" '(list-packages :which-key "list-packages")
@@ -832,44 +833,10 @@ Make sure use-package is installed
   (use-package tramp
     :ensure nil
     :config
-    (setq tramp-default-method "toolkit")
-    (tramp-set-completion-function "toolkit"
-                                   '((tramp-parse-sconfig "~/.ssh/config")))
     (setq tramp-terminal-type "dumb")
     (setq tramp-inline-compress-start-size 10000000)
     (setq tramp-debug-buffer t)
     (setq tramp-verbose 10))
-
-  ;; (setf tramp-ssh-controlmaster-options (concat "-o SendEnv TRAMP=yes " tramp-ssh-controlmaster-options))
-
-  (add-to-list 'tramp-methods  '("toolkit"
-                                 (tramp-login-program "ssh")
-                                 (tramp-login-args
-                                  (("-p" "%p")
-                                   ("-t")
-                                   ("-t")
-                                   ("-o" "ControlPath=~/.ssh/%%u@v5devgateway.bdns.bloomberg.com:%%p")
-                                   ("-o" "ControlMaster=auto")
-                                   ("-o" "ControlPersist=yes")
-                                   ;; ("-o" "SendEnv TRAMP=yes")
-                                   ("-e" "none")
-                                   ("v5devgateway.bdns.bloomberg.com")
-                                   ("inline")
-                                   ("%h")))
-                                 (tramp-async-args
-                                  (("-q")))
-                                 (tramp-remote-shell "/bin/sh")
-                                 (tramp-remote-shell-args
-                                  ("-c"))
-                                 (tramp-gw-args
-                                  (("-o" "GlobalKnownHostsFile=/dev/null")
-                                   ("-o" "UserKnownHostsFile=/dev/null")
-                                   ("-o" "StrictHostKeyChecking=no")
-                                   ))
-                                 (tramp-default-port 22)))
-
-  (add-to-list 'tramp-remote-path "/opt/bb/bin")
-
 #+end_src
 * Development & Major Modes
 ** dap-mode
