@@ -51,6 +51,7 @@ Make sure use-package is installed
     ;;        ("M-y" . helm-show-kill-ring)
     ;;        ("C-x b" . helm-mini)
     ;;        ("M-/" . helm-dabbrev))
+    :hook (prog-mode . helm-mode)
     :config
     (setq
      helm-scroll-amount 4 ; scroll 4 lines other window using M-<next>/M-<prior>
@@ -63,7 +64,9 @@ Make sure use-package is installed
      helm-move-to-line-cycle-in-source nil ; move to end or beginning of source when reaching top or bottom of source.
      ;; helm-command
      helm-M-x-requires-pattern 0     ; show all candidates when set to 0
-     )
+     helm-M-x-fuzzy-match t
+     helm-buffers-fuzzy-matching t
+     helm-recentf-fuzzy-match t)
     (bind-keys ("M-x" . helm-M-x)
                ("M-y" . helm-show-kill-ring)
                ("C-x b" . helm-mini))
