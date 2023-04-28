@@ -493,7 +493,7 @@ Make sure use-package is installed
     :config
     (lsp-enable-which-key-integration t)
     (add-hook 'lsp-mode-hook #'lsp-headerline-breadcrumb-mode)
-    (setq lsp-headerline-breadcrumb-enable nil)
+    (setq lsp-headerline-breadcrumb-enable t)
     (setq lsp-clients-clangd-args '(
                                     ;; If set to true, code completion will include index symbols that are not defined in the scopes
                                     ;; (e.g. namespaces) visible from the code completion point. Such completions can insert scope qualifiers
@@ -540,6 +540,7 @@ Make sure use-package is installed
     "cf" '(lsp-format-buffer :which-key "lsp-format buffer")
     "cl" '(lsp-find-definition :which-key "lsp find definition")
     "ck" '(lsp-find-references :which-key "lsp find references")
+    "cr" '(lsp-rename :wk "rename symbol")
     "c;" '(lsp-ui-peek-find-references :which-key "lsp peek references"))
 
   (use-package lsp-ui

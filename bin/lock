@@ -1,4 +1,0 @@
-#!/bin/bash
-# script to lock computer
-cgsession=/System/Library/CoreServices/"Menu Extras"/User.menu/Contents/Resources/CGSession
-"$cgsession" -suspend

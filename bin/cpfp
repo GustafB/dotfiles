@@ -1,7 +1,0 @@
-#!/bin/bash
-
-copyFilePath ()
-{
-  $(python ~/dotfiles/sneks/copyFilePath.py $1)
-}
-$(copyFilePath $1)
