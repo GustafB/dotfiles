@@ -5,11 +5,11 @@
 	process = git-lfs filter-process
 [user]
 	email = gustaf@saporo.io
-  name = gbrostedt1
+  name = Gustaf Brostedt
 [core]
   autocrlf = false
   safecrlf = false
-	editor = emacs -nw -q
+	editor = vim
 	excludesfile = /Users/gustafbrostedt/.gitignore_global
 	pager = diff-so-fancy | less --tabs=4 -RFX
 [alias]

@@ -94,11 +94,11 @@ Make sure use-package is installed
   (use-package helm-ag
     :defer t
     :bind
-    ("C-x C-g" . helm-ag))
+    ("C-x C-g" . helm-do-grep-ag))
 
   (use-package helm-swoop
     :bind
-    (("C-s" . helm-swoop)
+    (("C-s" . helm-swoop-without-pre-input)
      ("M-O" . helm-swoop-back-to-last-point)
      ("C-c C-o" . helm-multi-swoop))
     :config
@@ -113,6 +113,8 @@ Make sure use-package is installed
     (bind-keys :map isearch-mode-map
                ("M-o" . helm-swoop-from-isearch))
     (bind-keys :map helm-swoop-map
+               ("C-p" . helm-previous-line)
+               ("C-n" . helm-next-line)
                ("M-o" . helm-multi-swoop-all-from-helm-swoop)))
 
   (use-package diminish)
@@ -462,7 +464,6 @@ Make sure use-package is installed
   (use-package projectile
     :diminish projectile-mode
     :config (projectile-mode)
-    ;; :custom ((projectile-completion-system 'ivy))
     :bind-keymap
     ("C-c p" . projectile-command-map)
     :init
@@ -538,7 +539,7 @@ Make sure use-package is installed
   (gb/leader-keys
     "tl" '(lsp-headerline-breadcrumb-mode :which-key "toggle lsp-headerline")
     "cf" '(lsp-format-buffer :which-key "lsp-format buffer")
-    "cl" '(lsp-find-definition :which-key "lsp find definition")
+    "cl" '(xref-find-definitions-other-window :which-key "lsp find definition")
     "ck" '(lsp-find-references :which-key "lsp find references")
     "cr" '(lsp-rename :wk "rename symbol")
     "c;" '(lsp-ui-peek-find-references :which-key "lsp peek references"))
@@ -600,9 +601,6 @@ Make sure use-package is installed
 
   (use-package lsp-treemacs
     :after (lsp treemacs))
-
-  (use-package lsp-ivy
-    :after lsp)
 
 #+end_src
 * company mode
