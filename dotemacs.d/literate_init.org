@@ -341,69 +341,70 @@ Make sure use-package is installed
 #+end_src
 * Evil Mode
 #+BEGIN_SRC emacs-lisp
-      (use-package evil
-        :init
-        (setq evil-want-abbrev-expand-on-insert-exit nil
-              evil-want-keybinding nil)
-        (setq evil-want-integration t)
-        (setq evil-want-keybinding nil)
-        (setq evil-want-C-u-scroll t)
-        (setq evil-want-C-i-jump nil)
-        :config
-        (add-hook 'after-save-hook #'evil-normal-state)
-        (evil-mode 1)
-        (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-        (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-        ;; Use visual line motions even outside of visual-line-mode buffers
-        (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-        (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-        (evil-set-initial-state 'messages-buffer-mode 'normal)
-        (evil-set-initial-state 'dashboard-mode 'normal))
+  (use-package evil
+    :init
+    (setq evil-want-abbrev-expand-on-insert-exit nil
+          evil-want-keybinding nil)
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-want-C-u-scroll t)
+    (setq evil-want-C-i-jump nil)
+    :config
+    (add-hook 'after-save-hook #'evil-normal-state)
+    (evil-mode 1)
+    (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+    (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+    (evil-set-initial-state 'messages-buffer-mode 'normal)
+    (evil-set-initial-state 'dashboard-mode 'normal))
 
-      (use-package evil-collection
-        :after evil
-        :config
-        (evil-collection-init))
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init))
 
-      (use-package evil-surround
-        :config
-        (global-evil-surround-mode 1))
+  (use-package evil-surround
+    :config
+    (global-evil-surround-mode 1))
 
-      (use-package evil-org
-        :after org
-        :config
-        (add-hook 'org-mode-hook 'evil-org-mode)
-        (add-hook 'evil-org-mode-hook
-                  (lambda () (evil-org-set-key-theme)))
-        (require 'evil-org-agenda)
-        (evil-org-agenda-set-keys))
+  (use-package evil-org
+    :after org
+    :config
+    (add-hook 'org-mode-hook 'evil-org-mode)
+    (add-hook 'evil-org-mode-hook
+              (lambda () (evil-org-set-key-theme)))
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 
-      (use-package evil-nerd-commenter
-        :bind ("M-;" . evilnc-comment-or-uncomment-lines))
+  (use-package evil-nerd-commenter
+    :bind ("M-;" . evilnc-comment-or-uncomment-lines))
+
+  (use-package origami :ensure t
+    :hook (prog-mode . origami-mode))
+
+  (use-package undo-tree :ensure t
+    :config
+    (evil-set-undo-system 'undo-tree)
+    (global-undo-tree-mode))
+
+  (use-package evil-smartparens :ensure t
+    :config
+    (smartparens-global-mode))
+
+  (defun indent-between-pair (&rest _ignored)
+    (newline)
+    (indent-according-to-mode)
+    (forward-line -1)
+    (indent-according-to-mode))
+
+  (sp-local-pair 'prog-mode "{" nil :post-handlers '((indent-between-pair "RET")))
+  (sp-local-pair 'prog-mode "[" nil :post-handlers '((indent-between-pair "RET")))
+  (sp-local-pair 'prog-mode "(" nil :post-handlers '((indent-between-pair "RET")))
 
 
-
-      (use-package undo-tree :ensure t
-        :config
-        (evil-set-undo-system 'undo-tree)
-        (global-undo-tree-mode))
-
-      (use-package evil-smartparens :ensure t
-        :config
-        (smartparens-global-mode))
-
-      (defun indent-between-pair (&rest _ignored)
-        (newline)
-        (indent-according-to-mode)
-        (forward-line -1)
-        (indent-according-to-mode))
-
-      (sp-local-pair 'prog-mode "{" nil :post-handlers '((indent-between-pair "RET")))
-      (sp-local-pair 'prog-mode "[" nil :post-handlers '((indent-between-pair "RET")))
-      (sp-local-pair 'prog-mode "(" nil :post-handlers '((indent-between-pair "RET")))
-
-
-      (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 #+END_SRC
 * General.el Leader Key
 #+begin_src emacs-lisp
@@ -889,6 +890,42 @@ Make sure use-package is installed
      ;; (yas-global-mode 1)
    #+end_src
 * languages
+** typescript / javascript
+#+begin_src emacs-lisp
+    (use-package flymake-eslint :ensure t :defer 10
+      :custom ;; add glasses-mode to bolden capitals in CamelCase here. Could also be done elsewhere.
+      (glasses-face (quote bold))
+      (glasses-original-separator "")
+      (glasses-separate-capital-groups t)
+      (glasses-separate-parentheses-p nil)
+      (glasses-separator "")
+      :config
+      (add-hook 'js-mode-hook (lambda () (flymake-eslint-enable)(flymake-mode -1)(flycheck-mode 1)(glasses-mode 1)))
+      (add-hook 'js2-mode-hook (lambda () (flymake-eslint-enable)(flymake-mode -1)(flycheck-mode 1)(glasses-mode 1)))
+      (custom-set-variables
+       '(help-at-pt-timer-delay 0.3)
+       '(help-at-pt-display-when-idle '(flymake-overlay))))
+
+    (use-package web-mode :ensure t)
+
+    (use-package typescript-mode :ensure t
+      :config
+      (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
+      (add-to-list 'auto-mode-alist '("\\.svelte\\'" . typescript-mode)))
+
+    (use-package tide :ensure t
+      :after (typescript-mode company flycheck)
+      :hook ((typescript-mode . tide-setup)
+             (typescript-mode . tide-hl-identifier-mode)
+             ;; (before-save . tide-format-before-save)
+             )
+      :config
+      (flycheck-add-next-checker 'typescript-tide 'javascript-eslint))
+
+    (use-package add-node-modules-path
+      :ensure t
+      :hook ((typescript-mode . add-node-modules-path)))
+#+end_src
 ** golang
 #+begin_src emacs-lisp
   (defun lsp-go-install-save-hooks ()
@@ -945,43 +982,6 @@ Make sure use-package is installed
 
   (gb/leader-keys
     "cp" '(python-black-buffer :which-key "run black on buffer"))
-#+end_src
-** javascript
-#+begin_src emacs-lisp
-  (use-package js2-mode :ensure t :defer 20
-    :mode
-    (("\\.js\\'" . js2-mode))
-    (("\\.ts\\'" . js2-mode))
-    :custom
-    (js2-include-node-externs t)
-    (js2-global-externs '("customElements"))
-    (js2-highlight-level 3)
-    (js2r-prefer-let-over-var t)
-    (js2r-prefered-quote-type 2)
-    (js-indent-align-list-continuation t)
-    (global-auto-highlight-symbol-mode t)
-    :config
-    (setq js-indent-level 2)
-    ;; patch in basic private field support
-    (advice-add #'js2-identifier-start-p
-                :after-until
-                (lambda (c) (eq c ?#))))
-
-  (use-package svelte-mode :ensure t :defer 10)
-
-  (use-package flymake-eslint :ensure t :defer 10
-    :custom ;; add glasses-mode to bolden capitals in CamelCase here. Could also be done elsewhere.
-    (glasses-face (quote bold))
-    (glasses-original-separator "")
-    (glasses-separate-capital-groups t)
-    (glasses-separate-parentheses-p nil)
-    (glasses-separator "")
-    :config
-    (add-hook 'js-mode-hook (lambda () (flymake-eslint-enable)(flymake-mode -1)(flycheck-mode 1)(glasses-mode 1)))
-    (add-hook 'js2-mode-hook (lambda () (flymake-eslint-enable)(flymake-mode -1)(flycheck-mode 1)(glasses-mode 1)))
-    (custom-set-variables
-       '(help-at-pt-timer-delay 0.3)
-       '(help-at-pt-display-when-idle '(flymake-overlay))))
 #+end_src
 ** json
 #+begin_src emacs-lisp
