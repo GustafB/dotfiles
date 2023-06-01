@@ -94,7 +94,7 @@ Make sure use-package is installed
   (use-package helm-ag
     :defer t
     :bind
-    ("C-x C-g" . helm-do-grep-ag))
+    ("C-x C-g" . helm-do-ag-project-root))
 
   (use-package helm-swoop
     :bind
@@ -255,72 +255,81 @@ Make sure use-package is installed
   (global-set-key (kbd "C-c g") 'gb/generate-scratch-buffer)
 #+end_src
 ** UI Config
+
+
+
+
 #+begin_src emacs-lisp
-  (setq-default indent-tabs-mode nil)
-  (setq vc-follow-symlinks t)
-  (setq-default tab-width 2)
-  (tool-bar-mode 0)
-  (menu-bar-mode 0)
-  (scroll-bar-mode -1)
-  (setq inhibit-startup-message t)
-  (setq ring-bell-function 'ignore)
-  (setq scroll-conservatively 100)
-  (progn (global-hl-line-mode)
-      (set-face-background 'hl-line "#2e3544"))
-  (global-display-line-numbers-mode t)
+          (setq-default indent-tabs-mode nil)
+          (setq vc-follow-symlinks t)
+          (setq-default tab-width 2)
+          (tool-bar-mode 0)
+          (menu-bar-mode 0)
+          (scroll-bar-mode -1)
+          (setq inhibit-startup-message t)
+          (setq ring-bell-function 'ignore)
+          (setq scroll-conservatively 100)
+          (progn (global-hl-line-mode)
+              (set-face-background 'hl-line "#2e3544"))
+          (global-display-line-numbers-mode t)
 
-  (dolist (mode '(org-mode-hook
-              term-mode-hook
-              shell-mode-hook
-              treemacs-mode-hook
-              eshell-mode-hook))
-  (add-hook mode (lambda () (display-line-numbers-mode 0))))
+          (dolist (mode '(org-mode-hook
+                      term-mode-hook
+                      shell-mode-hook
+                      treemacs-mode-hook
+                      eshell-mode-hook))
+          (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-  (setq default-font "JetBrains Mono")
-  (setq default-font-size 14)
-  (setq current-font-size default-font-size)
+          (setq default-font "JetBrains Mono")
+          (setq default-font-size 14)
+          (setq current-font-size default-font-size)
 
-  (setq font-change-increment 1.1)
+          (setq font-change-increment 1.1)
 
-  (defun font-code ()
-  (concat default-font "-" (number-to-string current-font-size)))
+          (defun font-code ()
+          (concat default-font "-" (number-to-string current-font-size)))
 
-  (defun gb/set-font-size ()
-    "Set the font to `default-font' at `current-font-size'.
-  Set that for the current frame, and also make it the default for
-  other, future frames."
-    (let ((font-code (font-code)))
-      (add-to-list 'default-frame-alist (cons 'font font-code))
-      (set-frame-font font-code)))
+          (defun gb/set-font-size ()
+            "Set the font to `default-font' at `current-font-size'.
+          Set that for the current frame, and also make it the default for
+          other, future frames."
+            (let ((font-code (font-code)))
+              (add-to-list 'default-frame-alist (cons 'font font-code))
+              (set-frame-font font-code)))
 
-  (defun gb/reset-font-size ()
-    "Change font size back to `default-font-size'."
-    (interactive)
-    (setq current-font-size default-font-size)
-    (gb/set-font-size))
+          (defun gb/reset-font-size ()
+            "Change font size back to `default-font-size'."
+            (interactive)
+            (setq current-font-size default-font-size)
+            (gb/set-font-size))
 
-  (defun gb/increase-font-size ()
-    "Gb/Increase current font size by a factor of `font-change-increment'."
-    (interactive)
-    (setq current-font-size
-          (ceiling (* current-font-size font-change-increment)))
-    (gb/set-font-size))
+          (defun gb/increase-font-size ()
+            "Gb/Increase current font size by a factor of `font-change-increment'."
+            (interactive)
+            (setq current-font-size
+                  (ceiling (* current-font-size font-change-increment)))
+            (gb/set-font-size))
 
-  (defun gb/decrease-font-size ()
-    "Gb/Decrease current font size by a factor of `font-change-increment', down to a minimum size of 1."
-    (interactive)
-    (setq current-font-size
-          (max 1
-               (floor (/ current-font-size font-change-increment))))
-    (gb/set-font-size))
+          (defun gb/decrease-font-size ()
+            "gb/decrease current font size by a factor of `font-change-increment', down to a minimum size of 1."
+            (interactive)
+            (setq current-font-size
+                  (max 1
+                       (floor (/ current-font-size font-change-increment))))
+            (gb/set-font-size))
 
-  (define-key global-map (kbd "C-)") 'gb/reset-font-size)
-  (define-key global-map (kbd "C-+") 'gb/increase-font-size)
-  (define-key global-map (kbd "C-=") 'gb/increase-font-size)
-  (define-key global-map (kbd "C-_") 'gb/decrease-font-size)
-  (define-key global-map (kbd "C--") 'gb/decrease-font-size)
+          (use-package transpose-frame :ensure t
+            :bind ("C-t" . transpose-frame))
 
-  (gb/reset-font-size)
+
+
+          (define-key global-map (kbd "C-)") 'gb/reset-font-size)
+          (define-key global-map (kbd "C-+") 'gb/increase-font-size)
+          (define-key global-map (kbd "C-=") 'gb/increase-font-size)
+          (define-key global-map (kbd "C-_") 'gb/decrease-font-size)
+          (define-key global-map (kbd "C--") 'gb/decrease-font-size)
+
+          (gb/reset-font-size)
 #+end_src
 ** no-littering
 #+begin_src emacs-lisp
@@ -426,6 +435,7 @@ Make sure use-package is installed
       "eu" '(gb/package-upgrade-all :which-key "upgrade all packages")
       "ec" '(projectile-invalidate-cache :which-key "invalidate projectile cache")
       "ev" '(set-variable :which-key "set variable")
+      "et" '(transpose-frame :wk "transpose frame")
       "t"  '(:ignore t :which-key "toggles")
       "s"  '(:ignore t :which-key "smartparens")
       "s<" '(sp-backward-barf-sexp :wk "Barf backward")
@@ -911,7 +921,8 @@ Make sure use-package is installed
     (use-package typescript-mode :ensure t
       :config
       (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
-      (add-to-list 'auto-mode-alist '("\\.svelte\\'" . typescript-mode)))
+      (add-to-list 'auto-mode-alist '("\\.svelte\\'" . typescript-mode))
+      (setq-default typescript-ident-level 2))
 
     (use-package tide :ensure t
       :after (typescript-mode company flycheck)
