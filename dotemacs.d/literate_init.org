@@ -955,24 +955,30 @@ Make sure use-package is installed
 #+end_src
 ** c++/c
 #+begin_src emacs-lisp
-  (add-hook 'c++-mode-hook (lambda ()
-                             (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
-  (defun my-c-mode-common-hook ()
-   ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
-   (c-set-offset 'substatement-open 0)
-   ;; other customizations can go here
+    (add-hook 'c++-mode-hook (lambda ()
+                               (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
+    (defun my-c-mode-common-hook ()
+      ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
+      (c-set-offset 'substatement-open 0)
+      ;; other customizations can go here
 
-   (setq c++-tab-always-indent t)
-   (setq c-basic-offset 2)                  ;; Default is 2
-   (setq c-indent-level 2)                  ;; Default is 2
-   (c-set-offset 'access-label -4)
-   (c-set-offset 'inclass 0)
-   (setq tab-stop-list '(2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40))
-   (setq tab-width 2)
-   (setq indent-tabs-mode t)  ; use spaces only if nil
-   )
+      (setq c++-tab-always-indent t)
+      (setq c-basic-offset 2)                  ;; Default is 2
+      (setq c-indent-level 2)                  ;; Default is 2
+      (c-set-offset 'access-label -4)
+      (c-set-offset 'inclass 0)
+      (setq tab-stop-list '(2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40))
+      (setq tab-width 2)
+      (setq indent-tabs-mode t)  ; use spaces only if nil
+      )
 
-  (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+    (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+    (add-hook 'c-mode-hook 'lsp)
+    (add-hook 'c++-mode-hook 'lsp)
+
+    (use-package modern-cpp-font-lock :ensure t
+      :hook (c++-mode-hook . 'modern-c++-font-lock-mode))
+    (use-package cpp-auto-include :ensure t)
 #+end_src
 ** python
 #+begin_src emacs-lisp
