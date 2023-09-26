@@ -32,6 +32,44 @@ myegrep()
     $(which -p egrep) --color=auto "$@"
 }
 
+ssh_into() {
+    local env="$1"
+    local PEM_PATH="~/.ssh/gustaf_dev.pem"
+    local USER="gustaf"
+
+    if [ "$env" = "-h" ] || [ -z "$env" ]; then
+        echo "Available environments to SSH into:"
+        echo "v211 		->	https://v211-testing.saporo.net/ 	->	10.20.20.11"
+        echo "v21		->	https://v21.saporo.net/ 		->	10.20.20.12"
+        echo "dev		->	https://dev.saporo.net/ 		->	10.20.20.13"
+        echo "ad1 		->	https://bigad1.saporo.net/ 		->	192.168.51.5"
+        echo "ad2 		->	https://bigad2.saporo.net/ 		->	192.168.51.1"
+        return
+    fi
+
+    case $env in
+        "v211")
+            ssh -i $PEM_PATH $USER@10.20.20.11
+            ;;
+        "v21")
+            ssh -i $PEM_PATH $USER@10.20.20.12
+            ;;
+        "dev")
+            ssh -i $PEM_PATH $USER@10.20.20.13
+            ;;
+        "BIG AD #1" | "ad1")
+            ssh -i $PEM_PATH $USER@192.168.51.5
+            ;;
+        "BIG AD #2" | "ad2")
+            ssh -i $PEM_PATH $USER@192.168.51.1
+            ;;
+        *)
+            echo "Environment not recognized. Use -h for available environments."
+            ;;
+    esac
+}
+
+
 # =============================================================================
 #                                   Variables
 # =============================================================================
@@ -245,3 +283,5 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
+
+  export PATH="${PATH}:/home/cafebabe/.cargo/bin"
