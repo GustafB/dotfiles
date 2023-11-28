@@ -554,7 +554,7 @@ Make sure use-package is installed
   (gb/leader-keys
     "tl" '(lsp-headerline-breadcrumb-mode :which-key "toggle lsp-headerline")
     "cf" '(lsp-format-buffer :which-key "lsp-format buffer")
-    "cl" '(xref-find-definitions-other-window :which-key "lsp find definition")
+    "cl" '(xref-find-definitions :which-key "lsp find definition")
     "ck" '(lsp-find-references :which-key "lsp find references")
     "cr" '(lsp-rename :wk "rename symbol")
     "c;" '(lsp-ui-peek-find-references :which-key "lsp peek references"))
