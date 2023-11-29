@@ -891,6 +891,16 @@ Make sure use-package is installed
          ((t (:inherit ace-jump-face-foreground :height 3.0)))))
       ))
 #+end_src
+* git-link
+#+begin_src emacs-lisp
+  (use-package git-link :ensure t
+    :config
+    (setq git-link-open-in-browser nil
+          git-link-use-commit t))
+
+  (gb/leader-keys
+    "cg" '(git-link :which-key "git link to clipboard"))
+#+end_src
 ** org mode
 #+begin_src emacs-lisp
   ;; This is needed as of Org 9.2
