@@ -16,6 +16,11 @@ pps()
     ps aux | grep --color=auto "$@" | grep -v 'grep';
 }
 
+fd() {
+  preview="git diff $@ --color=always -- {-1}"
+  git diff $@ --name-only | fzf -m --ansi --preview $preview
+}
+
 # Returns the current git branch
 parse_git_branch()
 {
@@ -258,6 +263,7 @@ alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
 
 # sql
 alias dsql='docker exec $(docker ps -q -f "name=psql") psql -U postgres main -c ${1}'
+alias isql='docker exec -it $(docker ps -q -f "name=psql") psql -U postgres main'
 alias mg='docker exec -it $(docker ps -q -f "name=mg") mgconsole'
 
 # start app
@@ -295,6 +301,7 @@ if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
         print -P "%F{33} %F{34}Installation successful.%f%b" || \
         print -P "%F{160} The clone has failed.%f%b"
 fi
+
 
 source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
 autoload -Uz _zinit

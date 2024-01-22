@@ -1,6 +1,9 @@
 #export NVM_DIR="$HOME/.nvm"
 #. "${NVM_DIR}/nvm.sh"
 export PATH="/usr/local/sbin:$PATH"
+export PATH="~/.local/bin:$PATH"
+export PATH="/usr/bin:$PATH"
+export PATH="$HOME/.npm/bin:$PATH"
 export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
 export GDK_SCALE=0.5
 export GDK_DPI_SCALE=2
@@ -12,4 +15,13 @@ export PATH="/home/cafebabe/go/bin:$PATH"
 export PATH="/snap/bin:$PATH"
 export PATH="/home/cafebabe/.cargo/bin/navi:$PATH"
 export PATH="$PYENV_ROOT/bin:$PATH"
+export ZPLUG_HOME=/home/cafebabe/.zplug
 . "$HOME/.cargo/env"
+
+# Initialize plugins
+source ~/.zplug/init.zsh
+#zplug "woefe/wbase.zsh"
+#zplug "zsh-users/zsh-completions"
+#zplug "zsh-users/zsh-autosuggestions"
+zplug "z-shell/zsh-diff-so-fancy", as:command, use:"bin/"
+zplug load
