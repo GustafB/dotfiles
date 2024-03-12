@@ -22,6 +22,9 @@ This is a straight clone of [[https://github.com/hrs/sensible-defaults.el][HRS]]
   (sensible-defaults/use-all-keybindings)
   (sensible-defaults/backup-to-temp-directory)
   (setq image-types '(svg png gif tiff jpeg xpm xbm pbm))
+  (winner-mode 1)
+  ;; don't display native compilation warnings
+  (setq native-comp-async-report-warnings-errors nil)
 #+END_SRC
 * Configure =use-package=
 Add MELPA to package-list
@@ -29,8 +32,17 @@ Add MELPA to package-list
   (require 'package)
   (add-to-list 'package-archives
                '("melpa" . "http://melpa.org/packages/") t)
-  (add-to-list 'package-archives
-               '("org" . "https://orgmode.org/elpa") t)
+  ;; (add-to-list 'package-archives
+  ;;              '("org" . "https://orgmode.org/elpa") t)
+
+  (use-package auto-package-update
+    :custom
+    (auto-package-update-interval 7)
+    (auto-package-update-prompt-before-update t)
+    (auto-package-update-hide-results t)
+    :config
+    (auto-package-update-maybe)
+    (auto-package-update-at-time "09:00"))
 #+END_SRC
 Make sure use-package is installed
 #+BEGIN_SRC emacs-lisp
@@ -283,7 +295,7 @@ Make sure use-package is installed
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
   (setq default-font "JetBrains Mono")
-  (setq default-font-size 14)
+  (setq default-font-size 9)
   (setq current-font-size default-font-size)
 
   (setq font-change-increment 1.1)
@@ -352,10 +364,11 @@ Make sure use-package is installed
 #+end_src
 * Evil Mode
 #+BEGIN_SRC emacs-lisp
+  (setq evil-want-keybinding nil)
   (use-package evil
     :init
-    (setq evil-want-abbrev-expand-on-insert-exit nil
-          evil-want-keybinding nil)
+    (setq evil-want-abbrev-expand-on-insert-exit nil)
+          ;; evil-want-keybinding nil)
     (setq evil-want-integration t)
     (setq evil-want-keybinding nil)
     (setq evil-want-C-u-scroll t)
@@ -604,7 +617,7 @@ Make sure use-package is installed
     )
   (use-package lsp-pyright
     :ensure t
-    :hook (python-mode . (lambda ()
+    :hook (python-ts-mode . (lambda ()
                            (require 'lsp-pyright)
                            (lsp))))
   (use-package lsp-ui
@@ -961,11 +974,12 @@ Make sure use-package is installed
     (add-hook 'before-save-hook #'lsp-format-buffer t t)
     (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
-  (use-package go-mode
+  (use-package go-ts-mode
+    :after lsp-mode
     :defer t
     :config
-    (add-hook 'go-mode-hook 'lsp-deferred)
-    (add-hook 'go-mode-hook
+    (add-hook 'go-ts-mode-hook 'lsp-deferred)
+    (add-hook 'go-ts-mode-hook
               (lambda ()
                 (add-hook 'before-save-hook 'lsp-go-install-save-hooks))))
   (require 'dap-dlv-go)
@@ -991,18 +1005,18 @@ Make sure use-package is installed
       )
 
     (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
-    (add-hook 'c-mode-hook 'lsp)
-    (add-hook 'c++-mode-hook 'lsp)
+    (add-hook 'c-ts-mode-hook 'lsp)
+    (add-hook 'c++-ts-mode-hook 'lsp)
 
     (use-package modern-cpp-font-lock :ensure t
-      :hook (c++-mode-hook . 'modern-c++-font-lock-mode))
+      :hook (c++-ts-mode-hook . 'modern-c++-font-lock-mode))
     (use-package cpp-auto-include :ensure t)
 #+end_src
 ** python
 #+begin_src emacs-lisp
   (use-package python-mode
     :ensure t
-    :hook (python-mode . lsp-deferred)
+    :hook (python-ts-mode . lsp-deferred)
     :custom
     ;; NOTE: Set these if Python 3 is called "python3" on your system!
     ;; (python-shell-interpreter "python3")
@@ -1030,4 +1044,55 @@ Make sure use-package is installed
     :bind (:package json-mode-map
            :map json-mode-map
            ("C-c <tab>" . json-mode-beautify)))
+#+end_src
+** docker
+#+begin_src emacs-lisp
+
+#+end_src
+** treesitter
+#+begin_src emacs-lisp
+  (use-package tree-sitter
+    :ensure t
+    :config
+    ;; activate tree-sitter on any buffer containing code for which it has a parser available
+    (global-tree-sitter-mode)
+    ;; you can easily see the difference tree-sitter-hl-mode makes for python, ts or tsx
+    ;; by switching on and off
+    (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+  (use-package tree-sitter-langs
+    :ensure t
+    :after tree-sitter)
+
+  (use-package treesit-auto
+    :after (lsp-mode)
+    :ensure t
+    :demand t
+    :config
+    (global-treesit-auto-mode))
+
+  (setq treesit-language-source-alist
+    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+      (c "https://github.com/tree-sitter/tree-sitter-c")
+      (cmake "https://github.com/uyha/tree-sitter-cmake")
+      (common-lisp "https://github.com/theHamsta/tree-sitter-commonlisp")
+      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+      (css "https://github.com/tree-sitter/tree-sitter-css")
+      (csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
+      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+      (go "https://github.com/tree-sitter/tree-sitter-go")
+      (go-mod "https://github.com/camdencheek/tree-sitter-go-mod")
+      (html "https://github.com/tree-sitter/tree-sitter-html")
+      (js . ("https://github.com/tree-sitter/tree-sitter-javascript" "master" "src"))
+      (json "https://github.com/tree-sitter/tree-sitter-json")
+      (lua "https://github.com/Azganoth/tree-sitter-lua")
+      (make "https://github.com/alemuller/tree-sitter-make")
+      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+      (python "https://github.com/tree-sitter/tree-sitter-python")
+      (r "https://github.com/r-lib/tree-sitter-r")
+      (rust "https://github.com/tree-sitter/tree-sitter-rust")
+      (toml "https://github.com/tree-sitter/tree-sitter-toml")
+      (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
+      (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
+      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 #+end_src
