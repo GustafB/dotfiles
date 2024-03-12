@@ -17,11 +17,3 @@ export PATH="/home/cafebabe/.cargo/bin/navi:$PATH"
 export PATH="$PYENV_ROOT/bin:$PATH"
 export ZPLUG_HOME=/home/cafebabe/.zplug
 . "$HOME/.cargo/env"
-
-# Initialize plugins
-source ~/.zplug/init.zsh
-#zplug "woefe/wbase.zsh"
-#zplug "zsh-users/zsh-completions"
-#zplug "zsh-users/zsh-autosuggestions"
-zplug "z-shell/zsh-diff-so-fancy", as:command, use:"bin/"
-zplug load

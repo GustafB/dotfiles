@@ -10,6 +10,15 @@ powerlevel9k_random_color(){
 	printf "%03d" $code
 }
 
+si()
+{
+    user="gustaf"
+    pem="/home/cafebabe/.ssh/gustaf_dev.pem"
+    choice=$(tailscale status --json | jq -r '.Peer[] | .HostName' | fzf --preview 'tailscale status --json | jq -r \".Peer[] | select(.HostName == \"{}\") | .\"')
+    echo "$pem $user@$choice"
+    ssh -i $pem $user@$choice
+}
+
 # Greps process list for some string
 pps()
 {
@@ -35,43 +44,6 @@ mygrep()
 myegrep()
 {
     $(which -p egrep) --color=auto "$@"
-}
-
-ssh_into() {
-    local env="$1"
-    local PEM_PATH="~/.ssh/gustaf_dev.pem"
-    local USER="gustaf"
-
-    if [ "$env" = "-h" ] || [ -z "$env" ]; then
-        echo "Available environments to SSH into:"
-        echo "v211 		->	https://v211-testing.saporo.net/ 	->	10.20.20.11"
-        echo "v21		->	https://v21.saporo.net/ 		->	10.20.20.12"
-        echo "dev		->	https://dev.saporo.net/ 		->	10.20.20.13"
-        echo "ad1 		->	https://bigad1.saporo.net/ 		->	192.168.51.5"
-        echo "ad2 		->	https://bigad2.saporo.net/ 		->	192.168.51.1"
-        return
-    fi
-
-    case $env in
-        "v211")
-            ssh -i $PEM_PATH $USER@10.20.20.11
-            ;;
-        "v21")
-            ssh -i $PEM_PATH $USER@10.20.20.12
-            ;;
-        "dev")
-            ssh -i $PEM_PATH $USER@10.20.20.13
-            ;;
-        "BIG AD #1" | "ad1")
-            ssh -i $PEM_PATH $USER@192.168.51.5
-            ;;
-        "BIG AD #2" | "ad2")
-            ssh -i $PEM_PATH $USER@192.168.51.1
-            ;;
-        *)
-            echo "Environment not recognized. Use -h for available environments."
-            ;;
-    esac
 }
 
 
@@ -320,3 +292,24 @@ zinit light-mode for \
 zinit ice lucid wait'0'
 zinit light joshskidmore/zsh-fzf-history-search
 plugins=(… zsh-fzf-history-search)
+
+# # check if zplug is installed
+if [[ ! -d ~/.zplug ]]; then
+curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
+else
+    source ~/.zplug/init.zsh
+fi
+
+# # Self-manage
+zplug "zplug/zplug", hook-build:"zplug --self-manage"
+
+zplug check || zplug install
+zplug clean --force
+
+# Initialize plugins
+zplug "woefe/wbase.zsh"
+zplug "zsh-users/zsh-completions"
+zplug "zsh-users/zsh-autosuggestions"
+
+zplug "z-shell/zsh-diff-so-fancy", as:command, use:"bin/"
+zplug load
