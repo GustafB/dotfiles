@@ -57,8 +57,8 @@ export FZF_DEFAULT_OPTS='--height 40% --reverse --border --inline-info --color=d
 
 export ENHANCD_FILTER="fzf:peco:percol"
 export ENHANCD_COMMAND='c'
-export EDITOR="emacs -nw -q"
-export VISUAL="emacs -nw -q"
+export EDITOR="emacs -nw"
+export VISUAL="emacs -nw"
 
 if [ -n "$INSIDE_EMACS" ]; then
   chpwd() { print -P "\033AnSiTc %d" }
@@ -243,6 +243,7 @@ alias runsap="VERSION=develop docker compose -f /home/cafebabe/saporo/on-prem/de
 alias runback="cd /home/cafebabe/saporo/on-prem/backend && make run && cd -"
 alias runf="cd /home/cafebabe/saporo/frontend && npm run dev"
 alias rootsap="ssh -i ~/.ssh/id_rsa root@45.79.106.70"
+alias eg="setsid emacs"
 
 fpath+=($HOME/.zsh/pure)
 autoload -U promptinit; promptinit
