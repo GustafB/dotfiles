@@ -295,7 +295,7 @@ Make sure use-package is installed
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
   (setq default-font "JetBrains Mono")
-  (setq default-font-size 9)
+  (setq default-font-size 7)
   (setq current-font-size default-font-size)
 
   (setq font-change-increment 1.1)
@@ -977,12 +977,19 @@ Make sure use-package is installed
   (use-package go-ts-mode
     :after lsp-mode
     :defer t
+    :hook
+    (go-ts-mode . lsp-deferred)
+    (go-ts-mode . go-format-on-save-mode)
+    :init
+    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+    (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
     :config
-    (add-hook 'go-ts-mode-hook (lambda ()
-                                 (add-hook 'before-save-hook 'lsp-go-install-save-hooks)
-    (add-hook 'go-ts-mode-hook 'lsp-deferred)))
-    :custom
-    (go-ts-mode-indent-offset-4))
+    (setq go-ts-mode-indent-offset 2)
+    :config
+    (reformatter-define go-format
+      :program "goimports"
+      :args '("/dev/stdin")))
+
   (require 'dap-dlv-go)
 
 #+end_src
