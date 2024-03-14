@@ -983,12 +983,40 @@ Make sure use-package is installed
     :init
     (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
     (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
-    :config
-    (setq go-ts-mode-indent-offset 2)
+    :custom
+    (go-ts-mode-indent-offset 2)
     :config
     (reformatter-define go-format
       :program "goimports"
-      :args '("/dev/stdin")))
+      :args '("/dev/stdin"))
+    (setq lsp-go-codelenses '(
+                              (test . t)
+                              (tidy . t)
+                              (vendor . t)
+                              (run_govulncheck . t))
+          lsp-go-analyses '(
+                            (nilness . t)
+                            (shadow . t)
+                            (unusedwrite . t)
+                            (fieldalignment . t)
+                            )
+          )
+    )
+
+  (use-package go-tag :ensure t)
+
+  (use-package go-doctor :ensure t)
+
+  (defhydra go-refactor (:timeout 4)
+    "go refactor"
+    ("ta" go-tag-add "add tag")
+    ("tr" go-tag-remove "remove tag")
+    ("fr" godoctor-extract "extract body")
+    ("fd" godoctor-godoc "make docstring")
+    )
+
+  (gb/leader-keys
+    "g" '(go-refactor/body :which-key "go refactor commands"))
 
   (require 'dap-dlv-go)
 
