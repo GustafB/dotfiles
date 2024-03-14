@@ -1,7 +1,7 @@
 #export NVM_DIR="$HOME/.nvm"
 #. "${NVM_DIR}/nvm.sh"
 export PATH="/usr/local/sbin:$PATH"
-export PATH="~/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 export PATH="/usr/bin:$PATH"
 export PATH="$HOME/.npm/bin:$PATH"
 export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
