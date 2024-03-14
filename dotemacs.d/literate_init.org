@@ -1005,7 +1005,7 @@ Make sure use-package is installed
 
   (use-package go-tag :ensure t)
 
-  (use-package go-doctor :ensure t)
+  (use-package godoctor :ensure t)
 
   (defhydra go-refactor (:timeout 4)
     "go refactor"
