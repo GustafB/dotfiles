@@ -239,11 +239,7 @@ alias isql='docker exec -it $(docker ps -q -f "name=psql") psql -U postgres main
 alias mg='docker exec -it $(docker ps -q -f "name=mg") mgconsole'
 
 # start app
-alias runsap="VERSION=develop docker compose -f /home/cafebabe/saporo/on-prem/devops/run/dev-compose.yaml up"
-alias runback="cd /home/cafebabe/saporo/on-prem/backend && make run && cd -"
-alias runf="cd /home/cafebabe/saporo/frontend && npm run dev"
-alias rootsap="ssh -i ~/.ssh/id_rsa root@45.79.106.70"
-alias eg="setsid emacs"
+alias eg="setsid emacs &"
 
 fpath+=($HOME/.zsh/pure)
 autoload -U promptinit; promptinit
