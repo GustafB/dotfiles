@@ -294,7 +294,7 @@ Make sure use-package is installed
               eshell-mode-hook))
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
-  (setq default-font "JetBrains Mono")
+  (setq default-font "JetBrainsMono Nerd Font Mono")
   (setq default-font-size 7)
   (setq current-font-size default-font-size)
 

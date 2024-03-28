@@ -11,6 +11,7 @@ export PATH="$HOME/go/bin:$PATH"
 export PATH="/snap/bin:$PATH"
 export PATH="/home/cafebabe/.cargo/bin/navi:$PATH"
 export PATH="$PYENV_ROOT/bin:$PATH"
+export FPATH="$HOME/install/eza/completions/zsh:$FPATH"
 
 export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
 
