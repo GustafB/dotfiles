@@ -519,6 +519,36 @@ Make sure use-package is installed
   #+end_src
 * lsp mode
 #+begin_src emacs-lisp
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or
+     (when (equal (following-char) ?#)
+       (let ((bytecode (read (current-buffer))))
+         (when (byte-code-function-p bytecode)
+           (funcall bytecode))))
+     (apply old-fn args)))
+  (advice-add (if (progn (require 'json)
+                         (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+                'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+               lsp-use-plists
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
+               (executable-find "emacs-lsp-booster"))
+          (progn
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
+
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+
   (defun gb/lsp-mode-setup ()
     (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
     (lsp-headerline-breadcrumb-mode))
@@ -625,11 +655,17 @@ Make sure use-package is installed
     (advice-add 'lsp-ui-peek--peek-hide :override 'lsp-ui-peek--peek-destroy)
       ;;;; LSP UI posframe ;;;;
     )
+
   (use-package lsp-pyright
     :ensure t
-    :hook (python-ts-mode . (lambda ()
-                           (require 'lsp-pyright)
-                           (lsp))))
+    ;; :hook (python-ts-mode . (lambda ()
+    ;;                           (require 'lsp-pyright)
+    ;;                           (lsp)))
+    :hook (python-mode . (lambda ()
+                              (require 'lsp-pyright)
+                              (lsp)))
+  )
+
   (use-package lsp-ui
     :hook (lsp-mode . lsp-ui-mode)
     :custom
@@ -1062,11 +1098,11 @@ Make sure use-package is installed
 #+begin_src emacs-lisp
   (use-package python-mode
     :ensure t
-    :hook (python-ts-mode . lsp-deferred)
+    :hook (python-mode . lsp-deferred)
     :custom
     ;; NOTE: Set these if Python 3 is called "python3" on your system!
-    ;; (python-shell-interpreter "python3")
-    ;; (dap-python-executable "python3")
+    (python-shell-interpreter "python3")
+    (dap-python-executable "python3")
     (dap-python-debugger 'debugpy)
     :config
     (require 'dap-python))
@@ -1097,8 +1133,23 @@ Make sure use-package is installed
 #+end_src
 ** treesitter
 #+begin_src emacs-lisp
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name
+          "straight/repos/straight.el/bootstrap.el"
+          (or (bound-and-true-p straight-base-dir)
+              user-emacs-directory)))
+        (bootstrap-version 7))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+
   (use-package tree-sitter
-    :ensure t
     :config
     ;; activate tree-sitter on any buffer containing code for which it has a parser available
     (global-tree-sitter-mode)
@@ -1110,35 +1161,116 @@ Make sure use-package is installed
     :ensure t
     :after tree-sitter)
 
-  (use-package treesit-auto
-    :after (lsp-mode)
-    :ensure t
-    :demand t
-    :config
-    (global-treesit-auto-mode))
+  ;; (use-package treesit-auto
+  ;;   :after (lsp-mode)
+  ;;   :ensure t
+  ;;   :demand t
+  ;;   :config
+  ;;   (global-treesit-auto-mode))
 
-  (setq treesit-language-source-alist
-    '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-      (c "https://github.com/tree-sitter/tree-sitter-c")
-      (cmake "https://github.com/uyha/tree-sitter-cmake")
-      (common-lisp "https://github.com/theHamsta/tree-sitter-commonlisp")
-      (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-      (css "https://github.com/tree-sitter/tree-sitter-css")
-      (csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
-      (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-      (go "https://github.com/tree-sitter/tree-sitter-go")
-      (go-mod "https://github.com/camdencheek/tree-sitter-go-mod")
-      (html "https://github.com/tree-sitter/tree-sitter-html")
-      (js . ("https://github.com/tree-sitter/tree-sitter-javascript" "master" "src"))
-      (json "https://github.com/tree-sitter/tree-sitter-json")
-      (lua "https://github.com/Azganoth/tree-sitter-lua")
-      (make "https://github.com/alemuller/tree-sitter-make")
-      (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-      (python "https://github.com/tree-sitter/tree-sitter-python")
-      (r "https://github.com/r-lib/tree-sitter-r")
-      (rust "https://github.com/tree-sitter/tree-sitter-rust")
-      (toml "https://github.com/tree-sitter/tree-sitter-toml")
-      (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
-      (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
-      (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+  ;; (setq treesit-language-source-alist
+  ;;   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+  ;;     (c "https://github.com/tree-sitter/tree-sitter-c")
+  ;;     (cmake "https://github.com/uyha/tree-sitter-cmake")
+  ;;     (common-lisp "https://github.com/theHamsta/tree-sitter-commonlisp")
+  ;;     (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
+  ;;     (css "https://github.com/tree-sitter/tree-sitter-css")
+  ;;     (csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
+  ;;     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+  ;;     (go "https://github.com/tree-sitter/tree-sitter-go")
+  ;;     (go-mod "https://github.com/camdencheek/tree-sitter-go-mod")
+  ;;     (html "https://github.com/tree-sitter/tree-sitter-html")
+  ;;     (js . ("https://github.com/tree-sitter/tree-sitter-javascript" "master" "src"))
+  ;;     (json "https://github.com/tree-sitter/tree-sitter-json")
+  ;;     (lua "https://github.com/Azganoth/tree-sitter-lua")
+  ;;     (make "https://github.com/alemuller/tree-sitter-make")
+  ;;     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+  ;;     (python "https://github.com/tree-sitter/tree-sitter-python")
+  ;;     (r "https://github.com/r-lib/tree-sitter-r")
+  ;;     (rust "https://github.com/tree-sitter/tree-sitter-rust")
+  ;;     (toml "https://github.com/tree-sitter/tree-sitter-toml")
+  ;;     (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
+  ;;     (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
+  ;;     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+  (use-package treesit-parser-manager
+    :straight (treesit-parser-manager :host codeberg :repo "ckruse/treesit-parser-manager" :files ("*.el"))
+    :commands (treesit-parser-manager-install-grammars
+               treesit-parser-manager-update-grammars
+               treesit-parser-manager-install-or-update-grammars
+               treesit-parser-manager-remove-grammar)
+    :custom
+    (setq treesit-parser-manager-grammars
+        '(
+          ("https://github.com/tree-sitter/tree-sitter-bash"
+           ("tree-sitter-bash"))
+
+          ("https://github.com/tree-sitter/tree-sitter-c"
+           ("tree-sitter-c"))
+
+          ("https://github.com/uyha/tree-sitter-cmake"
+           ("tree-sitter-cmake"))
+
+          ("https://github.com/theHamsta/tree-sitter-commonlisp"
+           ("tree-sitter-commonlisp"))
+
+          ("https://github.com/tree-sitter/tree-sitter-cpp"
+           ("tree-sitter-cpp"))
+
+          ("https://github.com/tree-sitter/tree-sitter-css"
+           ("tree-sitter-css"))
+
+          ("https://github.com/tree-sitter/tree-sitter-c-sharp"
+           ("tree-sitter-c-sharp"))
+
+          ("https://github.com/Wilfred/tree-sitter-elisp"
+           ("tree-sitter-elisp"))
+
+          ("https://github.com/tree-sitter/tree-sitter-go"
+           ("tree-sitter-go"))
+
+          ("https://github.com/camdencheek/tree-sitter-go-mod"
+           ("tree-sitter-go-mod"))
+
+          ("https://github.com/tree-sitter/tree-sitter-html"
+           ("tree-sitter-html"))
+
+          ("https://github.com/tree-sitter/tree-sitter-javascript"
+           ("tree-sitter-javascript"))
+
+          ("https://github.com/tree-sitter/tree-sitter-json"
+           ("tree-sitter-json"))
+
+          ("https://github.com/Azganoth/tree-sitter-lua"
+           ("tree-sitter-lua"))
+
+          ("https://github.com/alemuller/tree-sitter-make"
+           ("tree-sitter-make"))
+
+          ("https://github.com/ikatyang/tree-sitter-markdown"
+           ("tree-sitter-markdown"))
+
+          ("https://github.com/tree-sitter/tree-sitter-python"
+           ("tree-sitter-python"))
+
+          ("https://github.com/r-lib/tree-sitter-r"
+           ("tree-sitter-r"))
+
+          ("https://github.com/tree-sitter/tree-sitter-rust"
+           ("tree-sitter-rust"))
+
+          ("https://github.com/ikatyang/tree-sitter-toml"
+           ("tree-sitter-toml"))
+
+          ("https://github.com/tree-sitter/tree-sitter-typescript"
+           ("tree-sitter-typescript/tsx" "tree-sitter-typescript/typescript"))
+
+          ("https://github.com/ikatyang/tree-sitter-yaml"
+           ("tree-sitter-yaml"))
+         ))
+    :config
+    (setq treesit-extra-load-path (list (expand-file-name "tree-sit" user-emacs-directory)))
+    :hook (emacs-startup . treesit-parser-manager-install-grammars))
+
+
 #+end_src
