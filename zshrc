@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 export TERM="xterm-256color"
 # =============================================================================
 #                                   Functions
@@ -236,9 +238,17 @@ alias dk="kill -9 $(docker ps -q)"
 alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
 
 # sql
-alias dsql='docker exec $(docker ps -q -f "name=psql") psql -U postgres main -c ${1}'
-alias isql='docker exec -it $(docker ps -q -f "name=psql") psql -U postgres main'
-alias mg='docker exec -it $(docker ps -q -f "name=mg") mgconsole'
+dsql() {
+    docker exec $(docker ps -q -f "name=psql") psql -U postgres main -c "${1}"
+}
+
+isql() {
+    docker exec -it $(docker ps -q -f "name=psql") psql -U postgres main
+}
+
+ mg() {
+    docker exec -it $(docker ps -q -f "name=mg") mgconsole
+}
 
 # start app
 alias eg="setsid emacs &"

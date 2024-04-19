@@ -1020,17 +1020,17 @@ Make sure use-package is installed
     (add-hook 'before-save-hook #'lsp-format-buffer t t)
     (add-hook 'before-save-hook #'lsp-organize-imports t t))
 
-  (use-package go-ts-mode
+  (use-package go-mode
     :after lsp-mode
     :defer t
     :hook
-    (go-ts-mode . lsp-deferred)
-    (go-ts-mode . lsp-go-install-save-hooks)
+    (go-mode . lsp-deferred)
+    (go-mode . lsp-go-install-save-hooks)
     :init
-    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
     (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
     :custom
-    (go-ts-mode-indent-offset 2)
+    (go-mode-indent-offset 2)
     :config
     (reformatter-define go-format
       :program "goimports"
