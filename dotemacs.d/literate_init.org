@@ -768,9 +768,10 @@ Make sure use-package is installed
 * avy nav
 #+begin_src emacs-lisp
   (use-package avy
-    :config
-    (global-set-key (kbd "C-x f") 'avy-goto-char-timer))
+    :ensure t)
 
+    (gb/leader-keys
+    "f" '(avy-goto-char-timer :which-key "go to char"))
 
   (defun gb/pop-local-mark-ring ()
     (interactive)
