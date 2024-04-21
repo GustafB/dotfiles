@@ -141,6 +141,13 @@ Make sure use-package is installed
                ("C-n" . helm-next-line)
                ("M-o" . helm-multi-swoop-all-from-helm-swoop)))
 
+  ;; (use-package helm-posframe
+  ;;   :ensure t
+  ;;   :hook
+  ;;   (after-init . helm-posframe-enable))
+
+
+
   (use-package diminish)
 
   (use-package doom-modeline
@@ -246,7 +253,7 @@ Make sure use-package is installed
 
   (defun gb/next-window ()
     (interactive)
-    (other-window 1)
+    (other-window 1))
 
   (defun gb/toggle-normal (&optional arg)
     (evil-normal-state))
@@ -266,9 +273,8 @@ Make sure use-package is installed
     (other-window 1)
     (gb/toggle-normal))
 
-  (global-set-key (kbd "s-]") #'gb/next-window)
-  (global-set-key (kbd "s-[") #'gb/prev-window)
-  (global-set-key (kbd "C-x o") #'gb/other-window)(gb/toggle-normal))
+  (global-set-key (kbd "C-}") 'gb/next-window)
+  (global-set-key (kbd "C-{") 'gb/prev-window)
 
   (global-set-key (kbd "C-x o") #'gb/other-window)
 
@@ -279,10 +285,6 @@ Make sure use-package is installed
   (global-set-key (kbd "C-c g") 'gb/generate-scratch-buffer)
 #+end_src
 ** UI Config
-
-
-
-
 #+begin_src emacs-lisp
   (setq-default indent-tabs-mode nil)
   (setq vc-follow-symlinks t)
@@ -371,6 +373,60 @@ Make sure use-package is installed
             (expand-file-name "custom.el" server-socket-dir)
           (expand-file-name (format "emacs-custom-%s.el" (user-uid)) temporary-file-directory)))
   (load custom-file t)
+#+end_src
+** solair
+#+begin_src emacs-lisp
+  (use-package solaire-mode
+    :ensure t
+    :hook (after-init . solaire-global-mode)
+    :config
+    (push '(treemacs-window-background-face . solaire-default-face) solaire-mode-remap-alist)
+    (push '(treemacs-hl-line-face . solaire-hl-line-face) solaire-mode-remap-alist))
+#+end_src
+** treemacs
+#+begin_src emacs-lisp
+  (use-package treemacs
+    :ensure t
+    :bind ("<f3>" . treemacs)
+    :custom
+    (treemacs-is-never-other-window t)
+    :hook
+    (treemacs-mode . treemacs-follow-mode))
+#+end_src
+** golden ratio
+#+begin_src emacs-lisp
+  (use-package golden-ratio
+    :ensure t
+    :hook (after-init . golden-ratio-mode))
+#+end_src
+** auto revert
+#+begin_src emacs-lisp
+  (use-package autorevert
+    :ensure nil
+    :custom
+    ;; auto refresh files when changed from disk
+    (global-auto-revert-mode t))
+#+end_src
+** Corral
+#+begin_src emacs-lisp
+  (use-package corral
+    :ensure t
+    :defer
+    :bind (("M-9" . corral-parentheses-backward)
+           ("M-0" . corral-parentheses-forward)
+           ("M-[" . corral-brackets-backward)
+           ("M-]" . corral-brackets-forward)
+           ("M-\"" . corral-single-quotes-backward)
+           ("M-'" . corral-single-quotes-forward)))
+#+end_src
+** Marginalia
+#+begin_src emacs-lisp
+(use-package marginalia
+  :ensure
+  :init
+  ;; Must be in the :init section of use-package such that the mode gets
+  ;; enabled right away. Note that this forces loading the package.
+  (marginalia-mode))
 #+end_src
 * Evil Mode
 #+BEGIN_SRC emacs-lisp
@@ -671,7 +727,6 @@ Make sure use-package is installed
     :custom
     (lsp-ui-doc-position 'bottom))
 
-  (use-package treemacs)
 
   (use-package lsp-treemacs
     :after (lsp treemacs))
@@ -960,7 +1015,7 @@ Make sure use-package is installed
   (gb/leader-keys
     "cg" '(git-link :which-key "git link to clipboard"))
 #+end_src
-** org mode
+* org mode
 #+begin_src emacs-lisp
   ;; This is needed as of Org 9.2
   (require 'org-tempo)
@@ -969,7 +1024,7 @@ Make sure use-package is installed
   (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp"))
   (add-to-list 'org-structure-template-alist '("py" . "src python"))
 #+end_src
-** yasnippets
+* yasnippets
    #+begin_src emacs-lisp
      ;; (add-to-list 'load-path
      ;;               "~/.emacs.d/plugins/yasnippet")
