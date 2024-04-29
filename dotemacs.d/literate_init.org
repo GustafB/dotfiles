@@ -276,8 +276,6 @@ Make sure use-package is installed
   (global-set-key (kbd "C-}") 'gb/next-window)
   (global-set-key (kbd "C-{") 'gb/prev-window)
 
-  (global-set-key (kbd "C-x o") #'gb/other-window)
-
   (global-set-key (kbd "C-x 2") 'gb/split-window-below-and-switch)
   (global-set-key (kbd "C-x 3") 'gb/split-window-right-and-switch)
   (global-set-key (kbd "C-x k") 'gb/kill-current-buffer)
@@ -397,7 +395,9 @@ Make sure use-package is installed
 #+begin_src emacs-lisp
   (use-package golden-ratio
     :ensure t
-    :hook (after-init . golden-ratio-mode))
+    :hook (after-init . golden-ratio-mode)
+    :config
+    (add-to-list 'golden-ratio-extra-commands 'ace-window))
 #+end_src
 ** auto revert
 #+begin_src emacs-lisp
