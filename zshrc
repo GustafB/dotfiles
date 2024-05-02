@@ -246,7 +246,7 @@ isql() {
     docker exec -it $(docker ps -q -f "name=psql") psql -U postgres main
 }
 
- mg() {
+mg() {
     docker exec -it $(docker ps -q -f "name=mg") mgconsole
 }
 
