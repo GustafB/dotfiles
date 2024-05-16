@@ -1,5 +1,6 @@
 #+TITLE:Emacs Config
 ; -*- lexical-binding: t; -*-
+* Load speed
 #+BEGIN_SRC emacs-lisp
   (when (not (string= system-type "darwin"))
     (add-to-list 'exec-path "/home/cafebabe/.local/bin"))
@@ -1080,7 +1081,7 @@ Make sure use-package is installed
 
     (use-package web-mode :ensure t)
 
-    (use-package typescript-mode :ensure t
+    (use-package typescript-ts-mode :ensure t
       :config
       (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-mode))
       (add-to-list 'auto-mode-alist '("\\.svelte\\'" . typescript-mode))
@@ -1111,7 +1112,8 @@ Make sure use-package is installed
     :hook
     (go-mode . lsp-deferred)
     (go-mode . lsp-go-install-save-hooks)
-    (go-mode . c-block-info-inline-mode)
+    (go-ts-mode . lsp-deferred)
+    (go-ts-mode . lsp-go-install-save-hooks)
     :init
     (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
     (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
@@ -1156,7 +1158,6 @@ Make sure use-package is installed
 ** c++/c
 #+begin_src emacs-lisp
   (use-package c-ts-mode)
-  (use-package c++-ts-mode)
 
   (add-hook 'c++-ts-mode-hook (lambda ()
                              (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
@@ -1232,12 +1233,12 @@ Make sure use-package is installed
     :ensure t
     :after tree-sitter)
 
-  (use-package treesit-auto
-    :after (lsp-mode)
-    :ensure t
-    :demand t
-    :config
-    (global-treesit-auto-mode))
+  ;; (use-package treesit-auto
+  ;;   :after (lsp-mode)
+  ;;   :ensure t
+  ;;   :demand t
+  ;;   :config
+  ;;   (global-treesit-auto-mode))
 
   (use-package treesit-parser-manager
     :straight (treesit-parser-manager :host codeberg :repo "ckruse/treesit-parser-manager" :files ("*.el"))
