@@ -35,6 +35,29 @@ This is a straight clone of [[https://github.com/hrs/sensible-defaults.el][HRS]]
         browse-url-generic-args     cmd-args
         browse-url-browser-function 'browse-url-generic
         search-web-default-browser 'browse-url-generic))))
+
+  (defun gb/delete-this-file ()
+    "Delete the current file, and kill the buffer."
+    (interactive)
+    (unless (buffer-file-name)
+      (error "No file is currently being edited"))
+    (when (yes-or-no-p (format "Really delete '%s'?"
+                               (file-name-nondirectory buffer-file-name)))
+      (delete-file (buffer-file-name))
+      (kill-this-buffer)))
+
+  (defun gb/rename-this-file (new-name)
+    "Renames both current buffer and file it's visiting to NEW-NAME."
+    (interactive "sNew name: ")
+    (let ((name (buffer-name))
+          (filename (buffer-file-name)))
+      (unless filename
+        (error "Buffer '%s' is not visiting a file!" name))
+      (progn
+        (when (file-exists-p filename)
+          (rename-file filename new-name 1))
+        (set-visited-file-name new-name)
+        (rename-buffer new-name))))
 #+END_SRC
 * Configure =use-package=
 Add MELPA to package-list
@@ -508,18 +531,18 @@ Make sure use-package is installed
       :global-prefix "C-SPC")
 
     (gb/leader-keys
-      "c"  '(:ignore t :which-key "compilation")
+      "c"  '(:ignore t :which-key "Compilation")
       "cc" '(compile :which-key "compile project")
       "cf" '(flymake-show-buffer-diagnostics :which-key "buffer diagnostics")
-      "e"  '(:ignore t :which-key "emacs commands")
+      "e"  '(:ignore t :which-key "Emacs Commands")
       "ei" '(package-install :which-key "package-install")
       "el" '(list-packages :which-key "list-packages")
       "eu" '(gb/package-upgrade-all :which-key "upgrade all packages")
       "ec" '(projectile-invalidate-cache :which-key "invalidate projectile cache")
       "ev" '(set-variable :which-key "set variable")
       "et" '(transpose-frame :wk "transpose frame")
-      "t"  '(:ignore t :which-key "toggles")
-      "s"  '(:ignore t :which-key "smartparens")
+      "t"  '(:ignore t :which-key "Toggles")
+      "s"  '(:ignore t :which-key "Smartparens")
       "s<" '(sp-backward-barf-sexp :wk "Barf backward")
       "s>" '(sp-forward-barf-sexp :wk "Barf forward")
       "s(" '(sp-backward-slurp-sexp :wk "Slurp backward")
@@ -536,7 +559,13 @@ Make sure use-package is installed
       "st" '(sp-transpose-sexp :wk "Transpose")
       "sT" '(sp-transpose-hybrid-sexp :wk "Transpose (hybrid)")
       ;; Narrow and Widen, use default emacs for widening
-      "sn" '(sp-narrow-to-sexp :wk "Narrow"))
+      "sn" '(sp-narrow-to-sexp :wk "Narrow")
+      "d" '(:ignore t :which-key "File Management")
+      "dd" '(gb/delete-this-file :wk "Delete this file")
+      "dr" '(gb/rename-this-file :wk "Rename this file")
+      "o" '(ace-window :wk "Switch window")
+      "k" '(ace-delete-window :wk "Kill buffer")
+      "m" '(magit-status :wk "Magit"))
     )
 #+end_src
 * Add Hydra keymap
@@ -658,7 +687,7 @@ Make sure use-package is installed
    ;;          (lambda () (require 'ccls) (lsp))))
 
   (use-package google-c-style
-    :hook ((c-mode c++-mode) . google-set-c-style))
+    :hook ((cc-mode c++-mode) . google-set-c-style))
 
   (gb/leader-keys
     "tl" '(lsp-headerline-breadcrumb-mode :which-key "toggle lsp-headerline")
@@ -1082,6 +1111,7 @@ Make sure use-package is installed
     :hook
     (go-mode . lsp-deferred)
     (go-mode . lsp-go-install-save-hooks)
+    (go-mode . c-block-info-inline-mode)
     :init
     (add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
     (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
@@ -1125,30 +1155,15 @@ Make sure use-package is installed
 #+end_src
 ** c++/c
 #+begin_src emacs-lisp
-    (add-hook 'c++-ts-mode-hook (lambda ()
-                               (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
-    (defun my-c-mode-common-hook ()
-      ;; my customizations for all of c-mode, c++-mode, objc-mode, java-mode
-      (c-set-offset 'substatement-open 0)
-      ;; other customizations can go here
+  (use-package c-ts-mode)
+  (use-package c++-ts-mode)
 
-      (setq c++-tab-always-indent t)
-      (setq c-basic-offset 2)                  ;; Default is 2
-      (setq c-indent-level 2)                  ;; Default is 2
-      (c-set-offset 'access-label -4)
-      (c-set-offset 'inclass 0)
-      (setq tab-stop-list '(2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40))
-      (setq tab-width 2)
-      (setq indent-tabs-mode t)  ; use spaces only if nil
-      )
+  (add-hook 'c++-ts-mode-hook (lambda ()
+                             (push '(?< . ("< " . " >")) evil-surround-pairs-alist)))
 
-    (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
-    (add-hook 'c-ts-mode-hook 'lsp)
-    (add-hook 'c++-ts-mode-hook 'lsp)
-
-    (use-package modern-cpp-font-lock :ensure t
-      :hook (c++-ts-mode-hook . 'modern-c++-font-lock-mode))
-    (use-package cpp-auto-include :ensure t)
+  (use-package modern-cpp-font-lock :ensure t
+    :hook (c++-ts-mode-hook . 'modern-c++-font-lock-mode))
+  (use-package cpp-auto-include :ensure t)
 #+end_src
 ** python
 #+begin_src emacs-lisp
@@ -1172,7 +1187,7 @@ Make sure use-package is installed
 #+end_src
 ** json
 #+begin_src emacs-lisp
-  (use-package json-mode :ensure t :defer 20
+  (use-package json-ts-mode :ensure t :defer 20
     :custom
     (json-reformat:indent-width 2)
     :mode (("\\.bowerrc$"     . json-mode)
@@ -1217,37 +1232,12 @@ Make sure use-package is installed
     :ensure t
     :after tree-sitter)
 
-  ;; (use-package treesit-auto
-  ;;   :after (lsp-mode)
-  ;;   :ensure t
-  ;;   :demand t
-  ;;   :config
-  ;;   (global-treesit-auto-mode))
-
-  ;; (setq treesit-language-source-alist
-  ;;   '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-  ;;     (c "https://github.com/tree-sitter/tree-sitter-c")
-  ;;     (cmake "https://github.com/uyha/tree-sitter-cmake")
-  ;;     (common-lisp "https://github.com/theHamsta/tree-sitter-commonlisp")
-  ;;     (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-  ;;     (css "https://github.com/tree-sitter/tree-sitter-css")
-  ;;     (csharp "https://github.com/tree-sitter/tree-sitter-c-sharp")
-  ;;     (elisp "https://github.com/Wilfred/tree-sitter-elisp")
-  ;;     (go "https://github.com/tree-sitter/tree-sitter-go")
-  ;;     (go-mod "https://github.com/camdencheek/tree-sitter-go-mod")
-  ;;     (html "https://github.com/tree-sitter/tree-sitter-html")
-  ;;     (js . ("https://github.com/tree-sitter/tree-sitter-javascript" "master" "src"))
-  ;;     (json "https://github.com/tree-sitter/tree-sitter-json")
-  ;;     (lua "https://github.com/Azganoth/tree-sitter-lua")
-  ;;     (make "https://github.com/alemuller/tree-sitter-make")
-  ;;     (markdown "https://github.com/ikatyang/tree-sitter-markdown")
-  ;;     (python "https://github.com/tree-sitter/tree-sitter-python")
-  ;;     (r "https://github.com/r-lib/tree-sitter-r")
-  ;;     (rust "https://github.com/tree-sitter/tree-sitter-rust")
-  ;;     (toml "https://github.com/tree-sitter/tree-sitter-toml")
-  ;;     (tsx . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
-  ;;     (typescript . ("https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
-  ;;     (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+  (use-package treesit-auto
+    :after (lsp-mode)
+    :ensure t
+    :demand t
+    :config
+    (global-treesit-auto-mode))
 
   (use-package treesit-parser-manager
     :straight (treesit-parser-manager :host codeberg :repo "ckruse/treesit-parser-manager" :files ("*.el"))
@@ -1327,6 +1317,4 @@ Make sure use-package is installed
     :config
     (setq treesit-extra-load-path (list (expand-file-name "tree-sit" user-emacs-directory)))
     :hook (emacs-startup . treesit-parser-manager-install-grammars))
-
-
 #+end_src

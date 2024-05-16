@@ -217,6 +217,7 @@ alias ..4='cd ../../../..'
 alias ..5='cd ../../../../..'
 alias ..6='cd ../../../../../..'
 alias ..7='cd ../../../../../../..'
+alias win='explorer.exe .'
 
 # Generic command adaptions
 alias ll="ls -lh"
