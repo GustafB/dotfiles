@@ -8,6 +8,13 @@ function M.setup()
 			enable = true,
 			update_root = true,
 		},
+		exclude_dirs = {
+			"!.git/worktrees",
+			"!=extras",
+			"!^fixtures",
+			"!build",
+			"!venv",
+		},
 	})
 end
 

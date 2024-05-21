@@ -320,6 +320,5 @@ zplug clean --force
 zplug "woefe/wbase.zsh"
 zplug "zsh-users/zsh-completions"
 zplug "zsh-users/zsh-autosuggestions"
-
-zplug "z-shell/zsh-diff-so-fancy", as:command, use:"bin/"
+zplug "so-fancy/diff-so-fancy", as:command, use:bin/git-dsf
 zplug load
