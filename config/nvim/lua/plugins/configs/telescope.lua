@@ -27,7 +27,14 @@ function M.setup()
 		--     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
 		--   },
 		-- },
-		-- pickers = {}
+		-- pickers = {
+		--     ['pickers'] = {
+		--         ['find_files'] = {
+		--             'rg',
+		--             ''
+		--         }
+		--     }
+		-- },
 		extensions = {
 			["ui-select"] = {
 				require("telescope.themes").get_dropdown(),

@@ -17,7 +17,7 @@ setup_file_link() {
     local source="$1"
     local destination="$2"
     if [ ! -e "${destination}" ]; then
-        ln -s "${source}" "${destination}" &&  echo "Linked file ${source} to ${destination}"
+        ln -nfs "${source}" "${destination}" &&  echo "Linked file ${source} to ${destination}"
     else
         echo "ERROR: File ${source} already exists"
     fi
@@ -46,6 +46,7 @@ setup_file_link "${CODE_HOME}/gitconfig" "${HOME}/.gitconfig"
 setup_file_link "${CODE_HOME}/gitignore_global" "${HOME}/.gitignore_global"
 setup_dir_link "${CODE_HOME}/dotemacs.d" "${HOME}/.emacs.d"
 setup_dir_link "${CODE_HOME}/bin" "${HOME}/bin"
+setup_dir_link "${CODE_HOME}/config" "${HOME}/.config"
 
 
 if [ "$(uname)" == "Darwin" ]; then

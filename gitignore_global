@@ -47,3 +47,30 @@ Thumbs.db
 # golang #
 ##########
 go.work.sum
+
+# conda & venvs #
+miniconda3
+.npm
+.nvm
+go
+venv
+anaconda3
+.node_repl_history
+.zsh_history
+.cargo
+.oh-my-zsh
+.wget-hsts
+privatekey
+.zplug
+.cache
+.clangd
+.rustup
+.local
+.semgrep
+.vite-plugin-mkcert
+.zsh
+.docker
+.dbus
+.conda
+.gnupg
+.git

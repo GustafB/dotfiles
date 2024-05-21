@@ -329,7 +329,7 @@ Make sure use-package is installed
   (add-hook mode (lambda () (display-line-numbers-mode 0))))
 
   (setq default-font "JetBrainsMono Nerd Font Mono")
-  (setq default-font-size 7)
+  (setq default-font-size 12)
   (setq current-font-size default-font-size)
 
   (setq font-change-increment 1.1)
