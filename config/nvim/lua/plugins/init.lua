@@ -8,6 +8,44 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Lazy load plugins
 require("lazy").setup({
+	{
+		"ahmedkhalf/project.nvim",
+		config = function()
+			require("plugins.configs.project").setup()
+		end,
+	},
+	{
+		"code-biscuits/nvim-biscuits",
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+		},
+		config = function()
+			require("plugins.configs.biscuits").setup()
+		end,
+	},
+	-- Inline lsp context
+	{
+		"utilyre/barbecue.nvim",
+		name = "barbecue",
+		version = "*",
+		dependencies = {
+			"SmiteshP/nvim-navic",
+			"nvim-tree/nvim-web-devicons", -- optional dependency
+		},
+	},
+	-- List errors in quickfix window
+	{
+		"folke/trouble.nvim",
+		dependencies = { "nvim-tree/nvim-web-devicons" },
+	},
+	-- Virtual annotation at the end of line for closing brackets
+	-- Render inline diagnostics for lsp
+	{
+		"https://git.sr.ht/~whynothugo/lsp_lines.nvim",
+		config = function()
+			require("lsp_lines").setup()
+		end,
+	},
 	-- Highlight todo, notes, etc in comments
 	{
 		"folke/todo-comments.nvim",
@@ -123,8 +161,9 @@ require("lazy").setup({
 		"folke/which-key.nvim",
 		event = "VimEnter", -- Sets the loading event to 'VimEnter'
 		config = function() -- This is the function that runs, AFTER loading
+			vim.o.timeout = true
+			vim.o.timeoutlen = 500
 			require("which-key").setup()
-
 			-- Document existing key chains
 			require("which-key").register({
 				["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
@@ -132,6 +171,21 @@ require("lazy").setup({
 				["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
 				["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
 				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
+				["<leader>o"] = {
+					name = "Wind[o]w Management",
+					_ = "which_key_ignore",
+					h = { "<cmd>vsplit<CR>", "split left" },
+					j = { "<cmd>split<bar>wincmd j<CR>", "split down" },
+					k = { "<cmd>split<CR>", "split up" },
+					l = { "<cmd>vsplit<bar>wincmd l<CR>", "split right" },
+					p = { "<cmd>lua require('nvim-window').pick()<CR>", "pick window" },
+					r = { "<cmd>WinResizerStartResize<CR>", "resize mode" },
+					e = { "<cmd>wincmd =<CR>", "equalize size" },
+					m = { "<cmd>WinShift<CR>", "toggle window move mode" },
+					s = { "<cmd>WinShift swap<CR>", "toggle window swap mode" },
+					z = { "<cmd>ZenMode<CR>", "toggle zen mode" },
+					t = { "<cmd>wincmd T<CR>", "breakout into new tab" },
+				},
 			})
 		end,
 	},

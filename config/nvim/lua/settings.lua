@@ -6,9 +6,6 @@ vim.g.have_nerd_font = true
 vim.opt.guicursor = "n-v-i-c:block-Cursor"
 -- [[ Setting options ]]
 -- See `:help vim.opt`
--- NOTE: You can change these options as you wish!
---  For more options, you can see `:help option-list`
--- Set the number of spaces that a <Tab> in the file counts for.
 vim.opt.tabstop = 4
 -- Set the number of spaces to use for each step of (auto)indent.
 vim.opt.shiftwidth = 4

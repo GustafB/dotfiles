@@ -86,4 +86,7 @@ if [ "$(uname)" == "Linux" ]; then
     run_script "${CODE_HOME}/install/nvim.sh"
 fi
 
+sudo chsh -s $(which zsh)
+
 echo "Installation completed at $(date)" >> "$LOG_FILE"
+

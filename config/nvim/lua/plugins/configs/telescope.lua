@@ -46,6 +46,7 @@ function M.setup()
 	})
 
 	require("telescope").load_extension("file_browser")
+	require("telescope").load_extension("projects")
 
 	-- Enable telescope extensions, if they are installed
 	pcall(require("telescope").load_extension, "fzf")
@@ -68,7 +69,11 @@ function M.setup()
 	vim.keymap.set("n", "<leader>sb", function()
 		require("telescope").extensions.file_browser.file_browser()
 	end, { desc = "[S]earch [F]iles" })
-
+	vim.keymap.set("n", "<leader>sp", function()
+		--require("telescope").extensions.projects({})
+		-- return require("project_nvim").get_recent_projects()
+		require("telescope").extensions.projects.projects({})
+	end, { desc = "[S]earch [P]rojects" })
 	-- Slightly advanced example of overriding default behavior and theme
 	vim.keymap.set("n", "<leader>/", function()
 		-- You can pass additional configuration to telescope to change theme, layout, etc.
