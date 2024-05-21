@@ -14,7 +14,8 @@ DEV_TOOLS=(
     lldb
     libssl-dev
     ripgrep
-    fd
+    fzf
+    unzip
 )
 
 # Function to update the package list
