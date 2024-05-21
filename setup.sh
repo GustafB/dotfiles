@@ -75,6 +75,7 @@ if [ "$(uname)" == "Linux" ]; then
     run_script "${CODE_HOME}/install/clangd.sh"
     run_script "${CODE_HOME}/install/cmake.sh"
     run_script "${CODE_HOME}/install/golang.sh"
+    run_script "${CODE_HOME}/install/rust.sh"
     run_script "${CODE_HOME}/install/zsh.sh"
     run_script "${CODE_HOME}/install/ohmyzsh.sh"
     run_script "${CODE_HOME}/install/pure.sh"

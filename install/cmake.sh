@@ -40,13 +40,13 @@ install_dependencies() {
     sudo apt update -y
 
     echo "Installing required dependencies..."
-    sudo apt install -y wget build-essential libssl-dev
+    sudo apt install -y wget
 }
 
 # Function to download and install the latest version of CMake
 install_cmake() {
     latest_version=$(curl -s https://api.github.com/repos/Kitware/CMake/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")' | sed 's/^v//')
-    cmake_tarball="cmake-${latest_version}-${OS}-${ARCH}.tar.gz"
+    cmake_tarball="cmake-${latest_version}-linux-${ARCH}.tar.gz"
     download_url="https://github.com/Kitware/CMake/releases/download/v${latest_version}/${cmake_tarball}"
 
     echo "Fetching the latest version of CMake..."
@@ -54,19 +54,17 @@ install_cmake() {
 
     echo "Extracting CMake ${latest_version}..."
     tar -zxvf ${cmake_tarball}
-    cd cmake-${latest_version}-${OS}-${ARCH}
+    cd cmake-${latest_version}-linux-${ARCH}
 
-    echo "Building and installing CMake ${latest_version}..."
-    ./bootstrap
-    make -j$(nproc)
-    sudo make install
+    echo "Installing CMake ${latest_version}..."
+    sudo cp -r . /usr/local/
 
     echo "Verifying the installation..."
     cmake --version
 
     echo "Cleaning up..."
     cd ..
-    rm -rf cmake-${latest_version}-${OS}-${ARCH} ${cmake_tarball}
+    rm -rf cmake-${latest_version}-linux-${ARCH} ${cmake_tarball}
 
     echo "CMake ${latest_version} installation completed successfully."
 }
@@ -74,8 +72,8 @@ install_cmake() {
 # Main script
 main() {
     detect_os_arch
+    install_dependencies
     if ! check_cmake_version; then
-        install_dependencies
         install_cmake
     fi
 }
