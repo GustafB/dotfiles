@@ -13,6 +13,8 @@ DEV_TOOLS=(
     ninja-build
     lldb
     libssl-dev
+    ripgrep
+    fd
 )
 
 # Function to update the package list

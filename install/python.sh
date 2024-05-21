@@ -38,6 +38,16 @@ get_latest_python_version() {
     echo "Latest Python version is ${latest_version}"
 }
 
+check_python_version() {
+    if command -v python3 &> /dev/null; then
+        installed_version=$(python3 --version | awk '{print $2}')
+        if [ "$installed_version" == "$latest_version" ]; then
+            echo "Python $installed_version is already the latest version."
+            exit 0
+        fi
+    fi
+}
+
 # Function to download and install the latest version of Python
 install_python() {
     python_tarball="Python-${latest_version}.tgz"
@@ -72,6 +82,7 @@ main() {
     detect_os_arch
     install_dependencies
     get_latest_python_version
+    check_python_version
     install_python
 }
 

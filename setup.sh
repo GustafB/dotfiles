@@ -55,6 +55,7 @@ if [ "$(uname)" == "Linux" ]; then
     . "${CODE_HOME}/install/python.sh"
     . "${CODE_HOME}/install/clang17.sh"
     . "${CODE_HOME}/install/clangd.sh"
+    . "${CODE_HOME}/install/cmake.sh"
     . "${CODE_HOME}/install/golang.sh"
     . "${CODE_HOME}/install/zsh.sh"
     . "${CODE_HOME}/install/ohmyzsh.sh"
@@ -62,5 +63,6 @@ if [ "$(uname)" == "Linux" ]; then
     . "${CODE_HOME}/install/gtk-3.sh"
     . "${CODE_HOME}/install/ranger.sh"
     . "${CODE_HOME}/install/nvm.sh"
+    . "${CODE_HOME}/install/lua.sh"
     . "${CODE_HOME}/install/nvim.sh"
 fi
