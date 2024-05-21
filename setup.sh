@@ -32,6 +32,7 @@ setup_dir_link() {
         echo "ERROR: Directory ${source} already exists"
     fi
 }
+
 # create backup dir if it doesn't exist
 if [ ! -d "${HOME}/.backup" ]; then
   echo "Creating ~/.backup directory"
@@ -49,13 +50,17 @@ setup_dir_link "${CODE_HOME}/bin" "${HOME}/bin"
 setup_dir_link "${CODE_HOME}/config" "${HOME}/.config"
 
 
-if [ "$(uname)" == "Darwin" ]; then
-    . "${CODE_HOME}/install/brew.sh"
-    . "${CODE_HOME}/install/bash.sh"
-    . "${CODE_HOME}/install/cask.sh"
+if [ "$(uname)" == "Linux" ]; then
+    . "${CODE_HOME}/install/dev-tools.sh"
+    . "${CODE_HOME}/install/python.sh"
+    . "${CODE_HOME}/install/clang17.sh"
+    . "${CODE_HOME}/install/clangd.sh"
+    . "${CODE_HOME}/install/golang.sh"
+    . "${CODE_HOME}/install/zsh.sh"
     . "${CODE_HOME}/install/ohmyzsh.sh"
+    . "${CODE_HOME}/install/pure.sh"
+    . "${CODE_HOME}/install/gtk-3.sh"
+    . "${CODE_HOME}/install/ranger.sh"
+    . "${CODE_HOME}/install/nvm.sh"
+    . "${CODE_HOME}/install/nvim.sh"
 fi
-
-
-# to remove everything, run the following.  Not going to automate this, because it is too destructive
-# rm "${HOME}/.bashrc" "${HOME}/.bash_profile" "${HOME}/.gitconfig" "${HOME}/.screenrc" "${HOME}/.vim" "${HOME}/.emacs.d" "${HOME}/bin" "${HOME}/.bash_completion.d" "${HOME}/.vimrc" "${HOME}/.tmux.conf"
