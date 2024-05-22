@@ -9,11 +9,34 @@ vim.opt.rtp:prepend(lazypath)
 -- Lazy load plugins
 require("lazy").setup({
 	{
+		"nvim-treesitter/nvim-treesitter-context",
+		dependencies = { "nvim-treesitter/nvim-treesitter" },
+	},
+	-- golang specific tools
+	{
+		"ray-x/go.nvim",
+		dependencies = { -- optional packages
+			"ray-x/guihua.lua",
+			"neovim/nvim-lspconfig",
+			"nvim-treesitter/nvim-treesitter",
+		},
+		config = function()
+			require("go").setup()
+		end,
+		event = { "CmdlineEnter" },
+		ft = { "go", "gomod" },
+		build = ':lua require("go.install").update_all_sync()', -- if you need to install/update all binaries
+	},
+	--
+	-- project management
+	{
 		"ahmedkhalf/project.nvim",
 		config = function()
 			require("plugins.configs.project").setup()
 		end,
 	},
+	--
+	-- inline biscuits
 	{
 		"code-biscuits/nvim-biscuits",
 		dependencies = {
@@ -23,6 +46,7 @@ require("lazy").setup({
 			require("plugins.configs.biscuits").setup()
 		end,
 	},
+	--
 	-- Inline lsp context
 	{
 		"utilyre/barbecue.nvim",
@@ -33,11 +57,13 @@ require("lazy").setup({
 			"nvim-tree/nvim-web-devicons", -- optional dependency
 		},
 	},
+	--
 	-- List errors in quickfix window
 	{
 		"folke/trouble.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 	},
+	--
 	-- Virtual annotation at the end of line for closing brackets
 	-- Render inline diagnostics for lsp
 	{
@@ -46,6 +72,7 @@ require("lazy").setup({
 			require("lsp_lines").setup()
 		end,
 	},
+	--
 	-- Highlight todo, notes, etc in comments
 	{
 		"folke/todo-comments.nvim",
@@ -98,19 +125,19 @@ require("lazy").setup({
 		},
 	},
 
-	{
-		"github/copilot.vim",
-		config = function()
-			vim.keymap.set("i", "<M-j>", 'copilot#Accept("<CR>")', { expr = true, replace_keycodes = false })
-			vim.keymap.del("i", "<Tab>")
-			vim.g.copilot_no_tab_map = true
-			vim.g.copilot_assume_mapped = true
-			vim.keymap.set("i", "<M-w>", "<Plug>(copilot-accept-word)")
-			vim.keymap.set("i", "<M-n>", "<Plug>(copilot-next)")
-			vim.keymap.set("i", "<M-p>", "<Plug>(copilot-previous)")
-		end,
-	},
-
+	-- {
+	-- 	"github/copilot.vim",
+	-- 	config = function()
+	-- 		vim.keymap.set("i", "<M-j>", 'copilot#Accept("<CR>")', { expr = true, replace_keycodes = false })
+	-- 		vim.keymap.del("i", "<Tab>")
+	-- 		vim.g.copilot_no_tab_map = true
+	-- 		vim.g.copilot_assume_mapped = true
+	-- 		vim.keymap.set("i", "<M-w>", "<Plug>(copilot-accept-word)")
+	-- 		vim.keymap.set("i", "<M-n>", "<Plug>(copilot-next)")
+	-- 		vim.keymap.set("i", "<M-p>", "<Plug>(copilot-previous)")
+	-- 	end,
+	-- },
+	--
 	{
 		"akinsho/bufferline.nvim",
 		requires = "kyazdani42/nvim-web-devicons",

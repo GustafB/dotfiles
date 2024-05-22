@@ -1,7 +1,7 @@
 #!/bin/bash
 
-#export NVM_DIR="$HOME/.nvm"
-#. "${NVM_DIR}/nvm.sh"
+export NVM_DIR="$HOME/.nvm"
+. "${NVM_DIR}/nvm.sh"
 
 export PATH="/usr/local/sbin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"

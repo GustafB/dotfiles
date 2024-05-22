@@ -108,6 +108,7 @@ function M.setup()
 		--rust_analyzer = {}, -- Rust
 		html = {}, -- HTML
 		tailwindcss = {}, -- TailwindCSS
+		svelte = {},
 		-- cmd = {},
 		-- filetypes { ...},
 		-- capabilities = {},
@@ -144,6 +145,7 @@ function M.setup()
 		"stylua", -- Used to format lua code
 		"clang-format",
 	})
+
 	require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 	local cmp_nvim_lsp = require("cmp_nvim_lsp")
@@ -169,6 +171,13 @@ function M.setup()
 			end,
 		},
 	})
+
+	require("go").setup({
+		lsp_cfg = false,
+	})
+
+	local gocfg = require("go.lsp").config()
+	require("lspconfig").gopls.setup(gocfg)
 end
 
 return M

@@ -43,9 +43,9 @@ install_node() {
 
 # Main script
 main() {
-    if ! check_nvm_installed; then
+    # if ! check_nvm_installed; then
         install_nvm
-    fi
+    # fi
 
     install_node
 }
