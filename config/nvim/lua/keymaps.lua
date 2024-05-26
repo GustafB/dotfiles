@@ -55,3 +55,12 @@ vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
+
+local scratch = require("utils.cmd_functions")
+
+vim.keymap.set(
+	"n",
+	"<leader>dc",
+	":lua require('utils.cmd_functions').open_scratch_buffer()<CR>",
+	{ noremap = true, silent = true }
+)

@@ -157,7 +157,6 @@ return {
 		build = ":TSUpdate",
 		opts = {
 			ensure_installed = {
-				"help",
 				"bash",
 				"c",
 				"html",

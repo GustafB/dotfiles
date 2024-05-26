@@ -8,10 +8,12 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Lazy load plugins
 require("lazy").setup({
+	-- display current function context
 	{
 		"nvim-treesitter/nvim-treesitter-context",
 		dependencies = { "nvim-treesitter/nvim-treesitter" },
 	},
+	--
 	-- golang specific tools
 	{
 		"ray-x/go.nvim",
@@ -21,7 +23,7 @@ require("lazy").setup({
 			"nvim-treesitter/nvim-treesitter",
 		},
 		config = function()
-			require("go").setup()
+			require("go").setup({ lsp_keymaps = false })
 		end,
 		event = { "CmdlineEnter" },
 		ft = { "go", "gomod" },
