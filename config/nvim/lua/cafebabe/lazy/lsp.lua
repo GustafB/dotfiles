@@ -1,7 +1,7 @@
 vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("cafebabe-lsp-auto", { clear = true }),
     callback = function(event)
-        require("utils.shared").cafebabe_lsp_auto(event)
+        require("cafebabe.utils.shared").cafebabe_lsp_auto(event)
     end,
 })
 
@@ -55,7 +55,7 @@ return {
                 ["lua_ls"] = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.lua_ls.setup {
-                        on_attach = require("utils.shared").on_attach,
+                        on_attach = require("cafebabe.utils.shared").on_attach,
                         capabilities = capabilities,
                         settings = {
                             Lua = {
@@ -70,7 +70,7 @@ return {
                 ["clangd"] = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.clangd.setup {
-                        on_attach = require("utils.shared").on_attach,
+                        on_attach = require("cafebabe.utils.shared").on_attach,
                         cmd = { "clangd", "--background-index", "--clang-tidy" },
                         filetypes = { "c", "cpp", "objc", "objcpp", "hpp", "h" },
                         capabilities = capabilities,
@@ -81,7 +81,7 @@ return {
                 ["gopls"] = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.gopls.setup {
-                        on_attach = require("utils.shared").on_attach,
+                        on_attach = require("cafebabe.utils.shared").on_attach,
                         capabilities = capabilities,
                         cmd = { "gopls" },
                         filetypes = { "go", "gomod", "gowork", "gotmpl" },
