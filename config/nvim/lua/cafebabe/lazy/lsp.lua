@@ -32,6 +32,7 @@ return {
             "pyright",
             "html",
             "gofumpt",
+            "svelte",
         }
         local cmp = require('cmp')
         local cmp_lsp = require("cmp_nvim_lsp")
@@ -125,6 +126,22 @@ return {
                 ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
                 ['<C-y>'] = cmp.mapping.confirm({ select = true }),
                 ["<C-Space>"] = cmp.mapping.complete(),
+                ["<Tab>"] = cmp.mapping(function(fallback)
+                    local status_ok, luasnip = pcall(require, "luasnip")
+                    if status_ok and luasnip.expand_or_jumpable() then
+                        luasnip.expand_or_jump()
+                    else
+                        fallback()
+                    end
+                end, { "i", "s" }),
+                ["<S-Tab>"] = cmp.mapping(function(fallback)
+                    local status_ok, luasnip = pcall(require, "luasnip")
+                    if status_ok and luasnip.jumpable(-1) then
+                        luasnip.jump(-1)
+                    else
+                        fallback()
+                    end
+                end, { "i", "s" })
             }),
             sources = cmp.config.sources({
                 { name = 'nvim_lsp' },
