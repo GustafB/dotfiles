@@ -8,6 +8,7 @@ require("cafebabe.init_lazy")
 
 -- initialize utility functions
 require("cafebabe.utils.scratch_buffer")
+require("cafebabe.utils.autocommands")
 
 -- load plugins
 require("cafebabe.lazy.dashboard")
@@ -20,5 +21,8 @@ require("cafebabe.lazy.fugitive")
 require("cafebabe.lazy.lsp")
 require("cafebabe.lazy.autopairs")
 require("cafebabe.lazy.toggleterm")
-require("cafebabe.lazy.trouble")
+require("cafebabe.lazy.troubleconf")
 require("cafebabe.lazy.whichkey")
+require("cafebabe.lazy.biscuits")
+require("cafebabe.lazy.gitsigns")
+require("cafebabe.lazy.windows")

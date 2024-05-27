@@ -20,9 +20,9 @@ end
 
 vim.keymap.set(
     "n",
-    "<leader>dc",
+    "<leader>fs",
     ":lua require('cafebabe.utils.scratch_buffer').open_scratch_buffer()<CR>",
-    { noremap = true, silent = true }
+    { noremap = true, silent = true, desc = "Create scratch buffer" }
 )
 
 return M

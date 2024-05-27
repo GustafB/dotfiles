@@ -1,35 +1,39 @@
 return {
-	"tpope/vim-fugitive",
-	config = function()
-		vim.keymap.set("n", "<leader>gg", vim.cmd.Git)
+    "tpope/vim-fugitive",
+    config = function()
+        local opts = function(desc, bufnr, remap)
+            local opts = { buffer = bufnr, remap = false, desc = desc }
+            return opts
+        end
 
-		local cafebabe_fugitive = vim.api.nvim_create_augroup("cafebabe_fugitive", {})
+        vim.keymap.set("n", "<leader>gs", vim.cmd.Git, opts("[G]it [S]tatus"))
 
-		local autocmd = vim.api.nvim_create_autocmd
-		autocmd("BufWinEnter", {
-			group = cafebabe_fugitive,
-			pattern = "*",
-			callback = function() 
-				if vim.bo.ft ~= "fugitive" then
-					return
-				end
+        local cafebabe_fugitive = vim.api.nvim_create_augroup("cafebabe_fugitive", {})
 
-				local bufnr = vim.api.nvim_get_current_buf()
-				local opts = {buffer = bufnr, remap = false}
-				vim.keymap.set("n", "<leader>gp", function()
-					vim.cmd.Git("push")
-				end, opts)
+        local autocmd = vim.api.nvim_create_autocmd
+        autocmd("BufWinEnter", {
+            group = cafebabe_fugitive,
+            pattern = "*",
+            callback = function()
+                if vim.bo.ft ~= "fugitive" then
+                    return
+                end
 
-				vim.keymap.set("n", "<leader>gf", function()
-					vim.cmd.Git({"pull", "--rebase"})
-				end, opts)
+                local bufnr = vim.api.nvim_get_current_buf()
+                vim.keymap.set("n", "gp", function()
+                    vim.cmd.Git("push")
+                end, opts("[G]it [P]ush", bufnr, false))
 
-				vim.keymap.set("n", "<leader>gt", ":Git push -u origin ", opts)
-			end,
+                vim.keymap.set("n", "gf", function()
+                    vim.cmd.Git({ "pull", "--rebase" })
+                end, opts("[G]it Pull Rebase", bufnr, false))
 
-		})
+                vim.keymap.set("n", "gt", ":Git push --set-upstream ", opts("[G]it Push Origin"))
+            end,
 
-		vim.keymap.set("n", "gl", "<cmd>diffget //2<CR>")
-		vim.keymap.set("n", "gh", "<cmd>diffget //3<CR>")
-	end
+        })
+
+        vim.keymap.set("n", "gl", "<cmd>diffget //2<CR>")
+        vim.keymap.set("n", "gh", "<cmd>diffget //3<CR>")
+    end
 }

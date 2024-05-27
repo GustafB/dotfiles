@@ -55,7 +55,7 @@ return {
                 ["lua_ls"] = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.lua_ls.setup {
-                        on_attach = require("cafebabe.utils.shared").on_attach,
+                        on_attach = require("cafebabe.utils.shared").lsp_on_attach,
                         capabilities = capabilities,
                         settings = {
                             Lua = {
@@ -70,7 +70,7 @@ return {
                 ["clangd"] = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.clangd.setup {
-                        on_attach = require("cafebabe.utils.shared").on_attach,
+                        on_attach = require("cafebabe.utils.shared").lsp_on_attach,
                         cmd = { "clangd", "--background-index", "--clang-tidy" },
                         filetypes = { "c", "cpp", "objc", "objcpp", "hpp", "h" },
                         capabilities = capabilities,
@@ -81,7 +81,7 @@ return {
                 ["gopls"] = function()
                     local lspconfig = require("lspconfig")
                     lspconfig.gopls.setup {
-                        on_attach = require("cafebabe.utils.shared").on_attach,
+                        on_attach = require("cafebabe.utils.shared").lsp_on_attach,
                         capabilities = capabilities,
                         cmd = { "gopls" },
                         filetypes = { "go", "gomod", "gowork", "gotmpl" },

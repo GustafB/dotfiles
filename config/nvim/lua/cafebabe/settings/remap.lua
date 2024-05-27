@@ -1,13 +1,13 @@
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 
-vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+vim.keymap.set("n", "<leader>fv", vim.cmd.Ex, { desc = "Open NetRW" })
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+-- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
+-- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
@@ -32,8 +32,8 @@ vim.keymap.set("n", "<leader>xd", function()
 end)
 
 -- insert empty lines
-vim.keymap.set("n", "] ", "m`o<Esc>``")
-vim.keymap.set("n", "[ ", "m`O<Esc>``")
+vim.keymap.set("n", "] ", "m`o<Esc>``", { desc = "Insert empty line before" })
+vim.keymap.set("n", "[ ", "m`O<Esc>``", { desc = "Insert empty line after" })
 
 -- move lines around in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -51,4 +51,4 @@ vim.keymap.set("n", "Q", "<nop>")
 vim.keymap.set("n", "C-g", "<Esc>")
 
 -- format buffer
-vim.keymap.set("n", "<leader>f", vim.lsp.buf.format)
+vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, { desc = "[L]SP [F]ormat Buffer" })

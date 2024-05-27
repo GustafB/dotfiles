@@ -1,4 +1,3 @@
-vim.opt.cursorline = true
 vim.g.have_nerd_font = true
 --  Set cursor to fat cursor
 vim.opt.guicursor = "n-v-i-c:block-Cursor"
@@ -43,7 +42,7 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 -- Preview substitutions live, as you type!
 vim.opt.inccommand = "split"
 -- Show which line your cursor is on
--- vim.opt.cursorline = true
+vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 8
 
