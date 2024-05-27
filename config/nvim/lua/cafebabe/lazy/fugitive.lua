@@ -2,7 +2,7 @@ return {
     "tpope/vim-fugitive",
     config = function()
         local opts = function(desc, bufnr, remap)
-            local opts = { buffer = bufnr, remap = false, desc = desc }
+            local opts = { buffer = bufnr, remap = remap, desc = desc }
             return opts
         end
 
