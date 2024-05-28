@@ -24,7 +24,7 @@ return {
                     vim.cmd.Git("push")
                 end, opts("[G]it [P]ush", bufnr, false))
 
-                vim.keymap.set("n", "gf", function()
+                vim.keymap.set("n", "gF", function()
                     vim.cmd.Git({ "pull", "--rebase" })
                 end, opts("[G]it Pull Rebase", bufnr, false))
 
