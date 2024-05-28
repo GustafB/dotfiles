@@ -52,3 +52,8 @@ vim.keymap.set("n", "C-g", "<Esc>")
 
 -- format buffer
 vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, { desc = "[L]SP [F]ormat Buffer" })
+
+-- use system clipboard
+vim.keymap.set("n", "<leader>y", "\"+y", { desc = "yank to system clipboard" })
+vim.keymap.set("n", "<leader>p", "\"+p", { desc = "paste from system clipboard" })
+vim.keymap.set("n", "<leader>d", "\"+d", { desc = "delete to system clipboard" })
