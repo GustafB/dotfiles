@@ -28,12 +28,14 @@ vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower win
 --
 -- workspace diagnostics
 vim.keymap.set("n", "<leader>xd", function()
-    require("trouble").toggle("workspace_diagnostics")
+	require("trouble").toggle("workspace_diagnostics")
 end)
 
 -- insert empty lines
-vim.keymap.set("n", "] ", "m`o<Esc>``", { desc = "Insert empty line before" })
-vim.keymap.set("n", "[ ", "m`O<Esc>``", { desc = "Insert empty line after" })
+vim.api.nvim_set_keymap("n", "<C-j>", [[:silent +g/\m^\s*$/d<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<C-k>", [[:silent -g/\m^\s*$/d<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<A-j>", [[:set paste<CR>m`o<Esc>``:set nopaste<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<A-k>", [[:set paste<CR>m`O<Esc>``:set nopaste<CR>]], { noremap = true, silent = true })
 
 -- move lines around in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -53,6 +55,6 @@ vim.keymap.set("n", "C-g", "<Esc>")
 -- format buffer
 
 -- use system clipboard
-vim.keymap.set("n", "<leader>y", "\"+y", { desc = "yank to system clipboard" })
-vim.keymap.set("n", "<leader>p", "\"+p", { desc = "paste from system clipboard" })
-vim.keymap.set("n", "<leader>d", "\"+d", { desc = "delete to system clipboard" })
+vim.keymap.set("n", "<leader>y", '"+y', { desc = "yank to system clipboard" })
+vim.keymap.set("n", "<leader>p", '"+p', { desc = "paste from system clipboard" })
+vim.keymap.set("n", "<leader>d", '"+d', { desc = "delete to system clipboard" })
