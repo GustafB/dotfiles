@@ -1,22 +1,12 @@
--- [[ Basic Keymaps ]]
---  See `:help vim.keymap.set()`
-
--- Set highlight on search, but clear on pressing <Esc> in normal mode
-vim.opt.hlsearch = true
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 
 -- Diagnostic keymaps
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Go to previous [D]iagnostic message" })
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagnostic message" })
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
+-- vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic [E]rror messages" })
+-- vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Open diagnostic [Q]uickfix list" })
 
--- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
--- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
--- is not what someone will guess without a bit more experience.
---
--- NOTE: This won't work in all terminal emulators/tmux/etc. Try your own mapping
--- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- TIP: Disable arrow keys in normal mode
@@ -34,18 +24,16 @@ vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right win
 vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the lower window" })
 vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
 --
--- enable/disable copilot
-vim.keymap.set("n", "<leader>ce", "<cmd>Copilot enable<CR>", { desc = "Enable Copilot" })
-vim.keymap.set("n", "<leader>cd", "<cmd>Copilot disable<CR>", { desc = "Disable Copilot" })
---
 -- workspace diagnostics
 vim.keymap.set("n", "<leader>xd", function()
 	require("trouble").toggle("workspace_diagnostics")
 end)
 
 -- insert empty lines
-vim.keymap.set("n", "] ", "m`o<Esc>``")
-vim.keymap.set("n", "[ ", "m`O<Esc>``")
+vim.api.nvim_set_keymap("n", "<C-j>", [[:silent +g/\m^\s*$/d<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<C-k>", [[:silent -g/\m^\s*$/d<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<A-j>", [[:set paste<CR>m`o<Esc>``:set nopaste<CR>]], { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<A-k>", [[:set paste<CR>m`O<Esc>``:set nopaste<CR>]], { noremap = true, silent = true })
 
 -- move lines around in visual mode
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -56,11 +44,15 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
-local scratch = require("utils.cmd_functions")
+-- disable Q
+vim.keymap.set("n", "Q", "<nop>")
 
-vim.keymap.set(
-	"n",
-	"<leader>dc",
-	":lua require('utils.cmd_functions').open_scratch_buffer()<CR>",
-	{ noremap = true, silent = true }
-)
+-- cancel on C-g
+vim.keymap.set("n", "C-g", "<Esc>")
+
+-- format buffer
+
+-- use system clipboard
+vim.keymap.set("n", "<leader>y", '"+y', { desc = "yank to system clipboard" })
+vim.keymap.set("n", "<leader>p", '"+p', { desc = "paste from system clipboard" })
+vim.keymap.set("n", "<leader>d", '"+d', { desc = "delete to system clipboard" })

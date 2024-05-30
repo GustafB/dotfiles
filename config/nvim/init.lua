@@ -1,5 +1,1 @@
-require 'settings'
-require 'keymaps'
-require 'plugins.init'
-require 'autocommands'
-require 'options'
+require("cafebabe")

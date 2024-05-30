@@ -301,7 +301,7 @@ zinit light-mode for \
 # zsh-fzf-history-search
 zinit ice lucid wait'0'
 zinit light joshskidmore/zsh-fzf-history-search
-plugins=(… zsh-fzf-history-search)
+plugins=(… zsh-fzf-history-search docker)
 
 # # check if zplug is installed
 if [[ ! -d ~/.zplug ]]; then
