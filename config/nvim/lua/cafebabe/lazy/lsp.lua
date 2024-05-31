@@ -142,7 +142,7 @@ local function cafebabe_lsp_on_attach(client, bufnr)
 		vim.lsp.handlers[methods.textDocument_signatureHelp] = enhanced_float_handler(vim.lsp.handlers.signature_help)
 	end
 
-	if client.supports_method(methods.documentHighlight) then
+	if client.supports_method(methods.textDocument_documentHighlight) then
 		local under_cursor_highlights_group =
 			vim.api.nvim_create_augroup("cafebabe/cursor_highlights", { clear = false })
 		vim.api.nvim_create_autocmd({ "CursorHold", "InsertLeave", "BufEnter" }, {
@@ -206,6 +206,7 @@ return {
 			"html",
 			"gofumpt",
 			"svelte",
+			"cypher",
 		}
 		local cmp = require("cmp")
 		local cmp_lsp = require("cmp_nvim_lsp")
