@@ -10,7 +10,6 @@ local function SetupTelescope()
 		end
 	end)
 
-	-- local builtin = require("telescope.builtin")
 	vim.keymap.set("n", "<leader>ss", builtin.git_files, { desc = "[S]earch [S]GitFiles" })
 	vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
 	vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
@@ -21,6 +20,11 @@ local function SetupTelescope()
 	vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
 	vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
 	vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
+
+	-- git commands
+	vim.keymap.set("n", "<leader>gS", builtin.git_status, { desc = "[G]it [S]tatus Telescope" })
+	vim.keymap.set("n", "<leader>gb", builtin.git_branches, { desc = "[G]it B[r]anch" })
+	vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "[G]it [C]omits" })
 
 	vim.keymap.set("n", "<leader>sb", function()
 		require("telescope").extensions.file_browser.file_browser()
