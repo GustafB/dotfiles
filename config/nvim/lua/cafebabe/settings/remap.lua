@@ -9,7 +9,6 @@ vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Go to next [D]iagn
 
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
--- TIP: Disable arrow keys in normal mode
 vim.keymap.set("n", "<left>", '<cmd>echo "Use h to move!!"<CR>')
 vim.keymap.set("n", "<right>", '<cmd>echo "Use l to move!!"<CR>')
 vim.keymap.set("n", "<up>", '<cmd>echo "Use k to move!!"<CR>')
@@ -30,14 +29,14 @@ vim.keymap.set("n", "<leader>xd", function()
 end)
 
 -- insert empty lines
-vim.api.nvim_set_keymap("n", "<C-j>", [[:silent +g/\m^\s*$/d<CR>]], { noremap = true, silent = true })
-vim.api.nvim_set_keymap("n", "<C-k>", [[:silent -g/\m^\s*$/d<CR>]], { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<C-j>", [[:silent +g/\m^\s*$/d<CR>]], { noremap = true, silent = true })
+-- vim.api.nvim_set_keymap("n", "<C-k>", [[:silent -g/\m^\s*$/d<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<A-j>", [[:set paste<CR>m`o<Esc>``:set nopaste<CR>]], { noremap = true, silent = true })
 vim.api.nvim_set_keymap("n", "<A-k>", [[:set paste<CR>m`O<Esc>``:set nopaste<CR>]], { noremap = true, silent = true })
 
 -- move lines around in visual mode
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { noremap = true, silent = true })
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { noremap = true, silent = true })
 vim.keymap.set("n", "J", "mzJ`z")
 vim.keymap.set("n", "<C-d>", "<C-d>zz")
 vim.keymap.set("n", "<C-u>", "<C-u>zz")
