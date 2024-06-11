@@ -3,9 +3,9 @@ vim.g.have_nerd_font = true
 vim.opt.guicursor = "n-v-i-c:block-Cursor"
 -- [[ Setting options ]]
 -- See `:help vim.opt`
-vim.opt.tabstop = 4
+vim.opt.tabstop = 2
 -- Set the number of spaces to use for each step of (auto)indent.
-vim.opt.shiftwidth = 4
+vim.opt.shiftwidth = 2
 -- Convert tabs to spaces.
 vim.opt.expandtab = true
 -- Make line numbers default
@@ -55,3 +55,6 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
+
+-- turn off smartindent
+-- vim.opt.smartindent = false

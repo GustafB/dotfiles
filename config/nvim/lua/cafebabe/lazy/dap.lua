@@ -14,41 +14,63 @@ return {
 			require("dapui").setup()
 			require("dap-go").setup()
 
-			-- dap.configurations.go = {
-			-- 	{
-			--
-			-- 		type = "go",
-			-- 		name = "Debug",
-			-- 		request = "launch",
-			-- 		showLog = false,
-			-- 		program = "${workspaceFolder}",
-			-- 	},
-			-- 	{
-			-- 		name = "Run Backend",
-			-- 		type = "go",
-			-- 		request = "launch",
-			-- 		mode = "debug",
-			-- 		program = "backend/cmd/gin/main.go",
-			-- 		cwd = "${workspaceFolder}/backend",
-			-- 		args = { "--debug331122", "--no-init", "--allowedorigins=https://localhost:5555" },
-			-- 		buildFlags = "-tags DEBUG -race",
-			-- 		preLaunchTask = "debug",
-			-- 		env = {
-			-- 			ELASTIC_HOST = "localhost",
-			-- 		},
-			-- 		exitAfterTaskReturns = false,
-			-- 		debugAutoInterpretAllModules = false,
-			-- 	},
-			-- }
-			--
-			-- --
-			-- local go_ls_debugger = vim.fn.exepath("dlv")
-			-- if go_ls_debugger ~= "" then
-			-- 	dap.adapters.go = {
-			-- 		type = "executable",
-			-- 		command = go_ls_debugger,
-			-- 	}
-			-- end
+			dap.configurations.go = {
+				{
+
+					type = "go",
+					name = "Debug",
+					request = "launch",
+					showLog = false,
+					program = "${workspaceFolder}",
+				},
+				{
+					name = "Run Backend",
+					type = "go",
+					request = "launch",
+					mode = "debug",
+					program = "backend/cmd/gin/main.go",
+					cwd = "${workspaceFolder}/backend",
+					args = { "--debug331122", "--no-init", "--allowedorigins=https://localhost:5555" },
+					buildFlags = "-tags DEBUG -race",
+					preLaunchTask = "debug",
+					env = {
+						ELASTIC_HOST = "localhost",
+					},
+					exitAfterTaskReturns = false,
+					debugAutoInterpretAllModules = false,
+				},
+			}
+
+			dap.configurations.cpp = {
+				{
+					name = "Launch",
+					type = "gdb",
+					request = "launch",
+					program = function()
+						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+					end,
+					cwd = "${workspaceFolder}",
+					stopAtBeginningOfMainSubprogram = false,
+				},
+			}
+
+			local go_ls_debugger = vim.fn.exepath("dlv")
+			if go_ls_debugger ~= "" then
+				dap.adapters.go = {
+					type = "executable",
+					command = go_ls_debugger,
+				}
+			end
+
+			local gdb_ls_debugger = "/usr/local/bin/gdb"
+			if gdb_ls_debugger ~= "" then
+				dap.adapters.gdb = {
+					type = "executable",
+					command = gdb_ls_debugger,
+					args = { "-i", "dap" },
+				}
+			end
+
 			--
 			-- Eval var under cursor
 			vim.keymap.set("n", "<space>?", function()
