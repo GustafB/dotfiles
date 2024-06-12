@@ -49,4 +49,16 @@ return {
 			},
 		},
 	},
+	{
+		"FabijanZulj/blame.nvim",
+		config = function()
+			require("blame").setup()
+			vim.keymap.set(
+				"n",
+				"<leader>gl",
+				":BlameToggle virtual<CR>",
+				{ desc = "Toggle [G]it B[l]ame Pane", remap = false }
+			)
+		end,
+	},
 }

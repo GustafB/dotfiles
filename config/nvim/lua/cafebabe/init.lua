@@ -11,8 +11,8 @@ require("cafebabe.utils.scratch_buffer")
 require("cafebabe.utils.autocommands")
 
 -- load plugins
-require("cafebabe.lazy.dashboard")
 require("cafebabe.lazy.colors")
+require("cafebabe.lazy.dashboard")
 require("cafebabe.lazy.telescope")
 require("cafebabe.lazy.treesitter")
 require("cafebabe.lazy.harpoon")
