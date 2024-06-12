@@ -53,6 +53,24 @@ return {
 	config = function()
 		SetupTelescope()
 		require("telescope").setup({
+			file_ignore_patterns = { "node_modules", "build", "venv" },
+			pickers = {
+				find_files = {
+					find_command = { "fdfind", "--strip-cwd-prefix", "--type", "f" },
+					mappings = {
+						n = {
+							["cd"] = function(prompt_bufnr)
+								local selection = require("telescope.actions.state").get_selected_entry()
+								local dir = vim.fn.fnamemodify(selection.path, ":p:h")
+								print(dir)
+								require("telescope.actions").close(prompt_bufnr)
+								-- Depending on what you want put `cd`, `lcd`, `tcd`
+								vim.cmd(string.format("silent lcd %s", dir))
+							end,
+						},
+					},
+				},
+			},
 			vimgrep_arguments = {
 				"rg",
 				"--color=never",
@@ -61,6 +79,7 @@ return {
 				"--line-number",
 				"--column",
 				"--smart-case",
+				"--trim",
 			},
 			extensions = {
 				["file_browser"] = {
@@ -68,7 +87,7 @@ return {
 				},
 				["fzf"] = {
 					fuzzy = true, -- false will only do exact matching
-					override_generic_sorter = false, -- override the generic sorter
+					override_generic_sorter = true, -- override the generic sorter
 					override_file_sorter = true, -- override the file sorter
 					case_mode = "smart_case", -- or "ignore_case" or "respect_case"
 				},
