@@ -1,6 +1,20 @@
 local methods = vim.lsp.protocol.Methods
 local cafe_namespace = vim.api.nvim_create_namespace("cafebabe/lsp_float")
 
+local function setup_cypher_syntax()
+	vim.cmd([[
+        syntax keyword cypherCustomKeyword BFS bfs allshortest wallshortest ALLSHORTEST WALLSHORTEST
+
+        highlight link cypherCustomKeyword Keyword
+    ]])
+end
+
+-- Ensure the setup function is called for Cypher files
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "cypher",
+	callback = setup_cypher_syntax,
+})
+
 ---LSP handler that adds extra inline highlights, keymaps, and window options.
 ---Code inspired from `https://github.com/MariaSolOs/dotfiles`.
 ---@param handler fun(err: any, result: any, ctx: any, config: any): integer, integer
@@ -206,7 +220,7 @@ return {
 			"html",
 			"gofumpt",
 			"svelte",
-			"cypher",
+			"cypher_ls",
 		}
 		local cmp = require("cmp")
 		local cmp_lsp = require("cmp_nvim_lsp")
@@ -281,6 +295,13 @@ return {
 							},
 						},
 					})
+				end,
+				["cypher_ls"] = function()
+					local lspconfig = require("lspconfig")
+					lspconfig.cypher.setup({
+						capabilities = capabilities,
+					})
+					setup_cypher_syntax()
 				end,
 			},
 		})
