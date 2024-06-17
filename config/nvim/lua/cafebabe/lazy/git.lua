@@ -1,5 +1,5 @@
 return {
-	{
+	--[[ 	{
 		"tpope/vim-fugitive",
 		config = function()
 			local opts = function(desc, bufnr, remap)
@@ -34,6 +34,19 @@ return {
 				end,
 			})
 		end,
+	}, ]]
+	{
+		"NeogitOrg/neogit",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"sindrets/diffview.nvim",
+			"nvim-telescope/telescope.nvim",
+		},
+		config = true,
+		lazy = true,
+		keys = {
+			{ "<leader>gs", "<cmd>Neogit<cr>", "[G]it [S]tatus" },
+		},
 	},
 	{
 		"lewis6991/gitsigns.nvim",

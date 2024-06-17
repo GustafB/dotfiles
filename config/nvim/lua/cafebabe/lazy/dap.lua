@@ -11,6 +11,9 @@ return {
 			local dap = require("dap")
 			local ui = require("dapui")
 
+			vim.fn.sign_define("DapBreakpoint", { text = "🟥", texthl = "", linehl = "", numhl = "" })
+			vim.fn.sign_define("DapStopped", { text = "▶️", texthl = "", linehl = "", numhl = "" })
+
 			require("dapui").setup()
 			require("dap-go").setup()
 
@@ -49,6 +52,7 @@ return {
 					program = function()
 						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
 					end,
+					args = { "${workspaceFolder}/test/factorial.pl0" },
 					cwd = "${workspaceFolder}",
 					stopAtBeginningOfMainSubprogram = false,
 				},
@@ -74,36 +78,35 @@ return {
 			--
 			-- Eval var under cursor
 			vim.keymap.set("n", "<space>?", function()
-				require("dapui").eval(nil, { enter = true })
+				ui.eval(nil, { enter = true })
 			end)
 
 			vim.keymap.set("n", "<leader>dc", function()
 				dap.continue()
-			end)
-			-- vim.keymap.set("n", "<leader>d", function()
-			-- 	dap.step_over()
-			-- end)
-			-- vim.keymap.set("n", "<F11>", function()
-			-- 	dap.step_into()
-			-- end)
-			-- vim.keymap.set("n", "<F12>", function()
-			-- 	dap.step_out()
-			-- end)
+			end, { desc = "Run" })
+
+			vim.keymap.set("n", "<leader>dn", function()
+				dap.step_into()
+			end, { desc = "Step Into" })
+
+			vim.keymap.set("n", "<leader>do", function()
+				dap.step_out()
+			end, { desc = "Step Out" })
+
 			vim.keymap.set("n", "<Leader>dt", function()
 				dap.toggle_breakpoint()
-			end)
+			end, { desc = "Toggle breakpoint" })
+
 			vim.keymap.set("n", "<Leader>dB", function()
 				dap.set_breakpoint()
-			end)
-			-- vim.keymap.set("n", "<Leader>lp", function()
-			-- 	dap.set_breakpoint(nil, nil, vim.fn.input("Log point message: "))
-			-- end)
+			end, { desc = "Set breakpoint" })
+
 			vim.keymap.set("n", "<Leader>dr", function()
 				dap.repl.open()
-			end)
+			end, { desc = "Open REPL" })
 			vim.keymap.set("n", "<Leader>dl", function()
 				dap.run_last()
-			end) --
+			end, { desc = "Run Last" }) --
 
 			dap.listeners.before.attach.dapui_config = function()
 				ui.open()

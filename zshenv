@@ -16,7 +16,8 @@ export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="$PATH:/opt/nvim-linux64/bin"
 export FPATH="$HOME/installs/eza/completions/zsh:$FPATH"
 
-export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
+# export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
+export DISPLAY=:0.0
 
 export GDK_SCALE=0.5
 
