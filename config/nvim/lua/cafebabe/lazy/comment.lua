@@ -1,6 +1,6 @@
 return {
-	"echasnovski/mini.comment",
-	version = false,
-	options = { ignore_blank_lines = true },
-	config = true,
+	"numToStr/Comment.nvim",
+	opts = {
+		ignore = "^$",
+	},
 }

@@ -21,11 +21,6 @@ local function SetupTelescope()
 	vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
 	vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
 
-	-- git commands
-	vim.keymap.set("n", "<leader>gS", builtin.git_status, { desc = "[G]it [S]tatus Telescope" })
-	vim.keymap.set("n", "<leader>gb", builtin.git_branches, { desc = "[G]it B[r]anch" })
-	vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "[G]it [C]omits" })
-
 	vim.keymap.set("n", "<leader>sb", function()
 		require("telescope").extensions.file_browser.file_browser()
 	end, { desc = "[S]earch [F]iles" })
@@ -45,6 +40,13 @@ local function SetupTelescope()
 	vim.keymap.set("n", "<leader>sG", function()
 		builtin.grep_string({ search = vim.fn.input("Grep > ") })
 	end, { desc = "[S]earch by [G]rep in CWD" })
+
+	vim.keymap.set("n", "<leader>cp", builtin.colorscheme, { desc = "[C]olorscheme [P]ick" })
+
+	-- git commands
+	vim.keymap.set("n", "<leader>gS", builtin.git_status, { desc = "[G]it [S]tatus Telescope" })
+	vim.keymap.set("n", "<leader>gb", builtin.git_branches, { desc = "[G]it B[r]anch" })
+	vim.keymap.set("n", "<leader>gc", builtin.git_commits, { desc = "[G]it [C]omits" })
 end
 
 return {
@@ -55,6 +57,11 @@ return {
 		require("telescope").setup({
 			file_ignore_patterns = { "node_modules", "build", "venv" },
 			pickers = {
+				pickers = {
+					colorscheme = {
+						enable_preview = true,
+					},
+				},
 				find_files = {
 					find_command = { "fdfind", "--strip-cwd-prefix", "--type", "f" },
 					mappings = {
