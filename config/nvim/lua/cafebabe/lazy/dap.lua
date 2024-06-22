@@ -38,6 +38,7 @@ return {
 					preLaunchTask = "debug",
 					env = {
 						ELASTIC_HOST = "localhost",
+						USE_NEW_EXIT = true,
 					},
 					exitAfterTaskReturns = false,
 					debugAutoInterpretAllModules = false,
@@ -52,7 +53,7 @@ return {
 					program = function()
 						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
 					end,
-					args = { "${workspaceFolder}/test/factorial.pl0" },
+					-- args = { "${workspaceFolder}/test/factorial.pl0" },
 					cwd = "${workspaceFolder}",
 					stopAtBeginningOfMainSubprogram = false,
 				},
