@@ -159,6 +159,15 @@ local function cafebabe_lsp_on_attach(client, bufnr)
 		})
 	end
 
+	if client.name == "clangd" then
+		vim.keymap.set(
+			"n",
+			"<leader><Tab>",
+			":ClangdSwitchSourceHeader<CR>",
+			{ desc = "Switch Source Header", noremap = true, silent = true, buffer = bufnr }
+		)
+	end
+
 	require("lsp_signature").on_attach({
 		handler_opts = {
 			border = "rounded", -- double, rounded, single, shadow, none, or a table of borders
