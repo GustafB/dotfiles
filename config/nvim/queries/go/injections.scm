@@ -9,7 +9,7 @@
   (argument_list
     (interpreted_string_literal) @injection.content))
   (#any-of? @_field "Exec" "GetContext" "ExecContext" "SelectContext" "In"
-				            "RebindNamed" "Rebind" "QueryRowxContext" "NamedExec" "MustExec" "Get" "Queryx")
+				            "RebindNamed" "Rebind" "QueryRowxContext" "NamedExec" "MustExec" "Get" "Query" "QueryOne" "GetETL" "db")
   (#offset! @injection.content 0 1 0 -1)
   (#set! injection.language "sql"))
 
