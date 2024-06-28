@@ -3,6 +3,7 @@ return {
 	dependencies = {
 		"nvim-tree/nvim-web-devicons",
 		"nvim-lua/plenary.nvim",
+		{ "juansalvatore/git-dashboard-nvim", dependencies = { "nvim-lua/plenary.nvim" } },
 	},
 	config = function()
 		-- Import alpha and dashboard
@@ -12,49 +13,73 @@ return {
 		-- Define custom icons
 		local icons = {
 			ui = {
-				file = "",
-				open_folder = "",
+				file = "",
+				files = "",
+				open_folder = "",
 				config = "",
-				close = "",
+				close = "󰈆",
 			},
 		}
 
+		local function is_whitespace_only(str)
+			return str:match("^%s*$") ~= nil
+		end
+
+		local function pad(n)
+			return { type = "padding", val = n }
+		end
+
 		local function center_header(header)
-			local width = vim.api.nvim_win_get_width(0) -- Get the width of the current window
-			local padding = math.floor((width - #header[1]) / 2) -- Calculate padding based on the first line length
-			for i, line in ipairs(header) do
-				header[i] = string.rep(" ", padding) .. line
+			local lines = {}
+			for line in string.gmatch(header, "[^\n]+") do
+				table.insert(lines, line)
 			end
-			return header
+
+			local width = vim.api.nvim_win_get_width(0) -- Get the width of the current window
+			local padding = math.floor((width - #lines[1]) / 2) -- Calculate padding based on the first line length
+			for i, line in ipairs(lines) do
+				lines[i] = string.rep(" ", padding) .. line
+			end
+			return lines
 		end
 
 		-- Define custom header with ASCII art or any custom message
-		local custom_header = center_header({
-			"  ___ ___         .__  .__             ________                __          _____",
-			" /   |   \\   ____ |  | |  |   ____    /  _____/ __ __  _______/  |______ _/ ____\\",
-			"/    ~    \\_/ __ \\|  | |  |  /  _ \\  /   \\  ___|  |  \\/  ___/\\   __\\__  \\\\   __\\",
-			"\\    Y    /\\  ___/|  |_|  |_(  <_> ) \\    \\_\\  \\  |  /\\___ \\  |  |  / __ \\|  |",
-			" \\___|_  /  \\___  >____/____/\\____/   \\______  /____//____  > |__| (____  /__|",
-			"       \\/       \\/                           \\/           \\/            \\/       ",
-			" ____ ____ ____ ____ ____ ____ _________ ____ ____ ____ ____ ____ ____ ",
-			"||G |||U |||S |||T |||A |||F |||       |||H |||J |||K |||L |||; ||| |||",
-			"||__|||__|||__|||__|||__|||__|||_______|||__|||__|||__|||__|||__|||__||",
-			"|/__\\|/__\\|/__\\|/__\\|/__\\|/__\\|/_______\\|/__\\|/__\\|/__\\|/__\\|/__\\|/__\\|",
-		})
+		local ascii_header = [[
+ ________  ___  ___  ________  _________  ________  ________ 
+|\   ____\|\  \|\  \|\   ____\|\___   ___\\   __  \|\  _____\
+\ \  \___|\ \  \\\  \ \  \___|\|___ \  \_\ \  \|\  \ \  \__/ 
+ \ \  \  __\ \  \\\  \ \_____  \   \ \  \ \ \   __  \ \   __\
+  \ \  \|\  \ \  \\\  \|____|\  \   \ \  \ \ \  \ \  \ \  \_|
+   \ \_______\ \_______\____\_\  \   \ \__\ \ \__\ \__\ \__\ 
+    \|_______|\|_______|\_________\   \|__|  \|__|\|__|\|__| 
+                       \|_________|                          
+		]]
 
-		-- Define the buttons for the dashboard
+		-- append git dashboard to header
+		local git_dashboard = require("git-dashboard-nvim").setup({})
+		for _, line in ipairs(git_dashboard) do
+			if not is_whitespace_only(line) then
+				ascii_header = ascii_header .. "\n" .. string.rep(" ", 4) .. line
+			end
+		end
+
+		local custom_header = center_header(ascii_header)
+		local header = { type = "text", val = custom_header }
+
 		local buttons = {
 			dashboard.button("e", icons.ui.file .. "  New file", "<cmd>new<CR>"),
-			dashboard.button("o", icons.ui.file .. "  Recent Files", "<cmd>Telescope oldfiles<cr>"),
-			dashboard.button("f", icons.ui.open_folder .. "  Explorer", "<cmd>Explore<cr>"),
+			dashboard.button("o", icons.ui.files .. "  Recent Files", "<cmd>Telescope oldfiles<cr>"),
+			dashboard.button("f", icons.ui.open_folder .. "  Explorer", "<cmd>Oil<cr>"),
 			dashboard.button(
 				"c",
 				icons.ui.config .. "  Neovim config",
-				"<cmd>e ~/home/cafebabe/install/dotfiles/config/nvim<cr>"
+				"<cmd>Oil /home/cafebabe/install/dotfiles/config/nvim<cr>"
 			),
 			dashboard.button("l", "󰒲  Lazy", "<cmd>Lazy<cr>"),
 			dashboard.button("q", icons.ui.close .. "  Quit NVIM", ":qa<CR>"),
 		}
+
+		local buttons = { type = "group", val = buttons }
 
 		-- Custom footer showing number of plugins loaded
 		local footer = {
@@ -73,13 +98,13 @@ return {
 		-- Setting up the alpha layout
 		alpha.setup({
 			layout = {
-				{ type = "padding", val = 8 },
-				{ type = "text", val = custom_header },
-				{ type = "padding", val = 2 },
-				{ type = "group", val = buttons },
-				{ type = "padding", val = 1 },
+				pad(4),
+				header,
+				pad(2),
+				buttons,
+				pad(2),
 				bottom_section,
-				{ type = "padding", val = 1 },
+				pad(2),
 				footer,
 			},
 		})
