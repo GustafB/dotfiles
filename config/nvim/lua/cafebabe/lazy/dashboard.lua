@@ -18,10 +18,11 @@ return {
 				open_folder = "",
 				config = "",
 				close = "󰈆",
+				git = "",
 			},
 		}
 
-		local function is_whitespace_only(str)
+		local function whitespace_only(str)
 			return str:match("^%s*$") ~= nil
 		end
 
@@ -43,6 +44,27 @@ return {
 			return lines
 		end
 
+		local function format_git_header()
+			local git_dashboard_raw = require("git-dashboard-nvim").setup({})
+			local git_dashboard = {}
+			for _, line in ipairs(git_dashboard_raw) do
+				if not whitespace_only(line) then
+					table.insert(git_dashboard, line)
+				end
+			end
+
+			local git_repo = git_dashboard[1]
+			local git_branch = git_dashboard[#git_dashboard]
+
+			local git_branch_section = {
+				type = "text",
+				val = " " .. git_repo .. ":" .. string.sub(git_branch, 5, #git_branch),
+				opts = { position = "center" },
+			}
+
+			return git_branch_section, { unpack(git_dashboard, 2, #git_dashboard - 1) }
+		end
+
 		-- Define custom header with ASCII art or any custom message
 		local ascii_header = [[
  ________  ___  ___  ________  _________  ________  ________ 
@@ -55,31 +77,31 @@ return {
                        \|_________|                          
 		]]
 
-		-- append git dashboard to header
-		local git_dashboard = require("git-dashboard-nvim").setup({})
-		for _, line in ipairs(git_dashboard) do
-			if not is_whitespace_only(line) then
-				ascii_header = ascii_header .. "\n" .. string.rep(" ", 4) .. line
-			end
+		local git_branch_section, commit_history = format_git_header()
+
+		for _, line in ipairs(commit_history) do
+			ascii_header = ascii_header .. "\n" .. string.rep(" ", 3) .. line
 		end
 
 		local custom_header = center_header(ascii_header)
 		local header = { type = "text", val = custom_header }
 
 		local buttons = {
-			dashboard.button("e", icons.ui.file .. "  New file", "<cmd>new<CR>"),
-			dashboard.button("o", icons.ui.files .. "  Recent Files", "<cmd>Telescope oldfiles<cr>"),
-			dashboard.button("f", icons.ui.open_folder .. "  Explorer", "<cmd>Oil<cr>"),
-			dashboard.button(
-				"c",
-				icons.ui.config .. "  Neovim config",
-				"<cmd>Oil /home/cafebabe/install/dotfiles/config/nvim<cr>"
-			),
-			dashboard.button("l", "󰒲  Lazy", "<cmd>Lazy<cr>"),
-			dashboard.button("q", icons.ui.close .. "  Quit NVIM", ":qa<CR>"),
+			type = "group",
+			val = {
+				dashboard.button("e", icons.ui.file .. "  New file", "<cmd>new<CR>"),
+				dashboard.button("o", icons.ui.files .. "  Recent Files", "<cmd>Telescope oldfiles<cr>"),
+				dashboard.button("f", icons.ui.open_folder .. "  Explorer", "<cmd>Oil<cr>"),
+				dashboard.button(
+					"c",
+					icons.ui.config .. "  Neovim config",
+					"<cmd>Oil /home/cafebabe/install/dotfiles/config/nvim<cr>"
+				),
+				dashboard.button("g", icons.ui.git .. "  Open Git", "<cmd>Neogit<CR>"),
+				dashboard.button("l", "󰒲  Lazy", "<cmd>Lazy<cr>"),
+				dashboard.button("q", icons.ui.close .. "  Quit NVIM", ":qa<CR>"),
+			},
 		}
-
-		local buttons = { type = "group", val = buttons }
 
 		-- Custom footer showing number of plugins loaded
 		local footer = {
@@ -100,6 +122,8 @@ return {
 			layout = {
 				pad(4),
 				header,
+				pad(1),
+				git_branch_section,
 				pad(2),
 				buttons,
 				pad(2),

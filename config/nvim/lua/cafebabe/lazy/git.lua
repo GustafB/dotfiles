@@ -43,7 +43,7 @@ return {
 			"nvim-telescope/telescope.nvim",
 		},
 		config = true,
-		lazy = true,
+		lazy = false,
 		keys = {
 			{ "<leader>gs", "<cmd>Neogit<cr>", "[G]it [S]tatus" },
 		},
