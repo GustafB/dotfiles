@@ -56,6 +56,14 @@ return {
 			local git_repo = git_dashboard[1]
 			local git_branch = git_dashboard[#git_dashboard]
 
+			if git_repo == nil and git_branch == nil then
+				return {
+					type = "text",
+					val = "",
+					opts = { position = "center" },
+				}, {}
+			end
+
 			local git_branch_section = {
 				type = "text",
 				val = " " .. git_repo .. ":" .. string.sub(git_branch, 5, #git_branch),
