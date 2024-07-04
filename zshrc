@@ -4,12 +4,9 @@ export TERM="xterm-256color"
 # =============================================================================
 #                                   Functions
 # =============================================================================
-powerlevel9k_random_color(){
-	local code
-	#for code ({000..255}) echo -n "$%F{$code}"
-	#code=$[${RANDOM}%11+10]    # random between 10-20
-	code=$[${RANDOM}%211+20]    # random between 20-230
-	printf "%03d" $code
+timezsh() {
+  shell=${1-$SHELL}
+  for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
 }
 
 si()
@@ -19,6 +16,15 @@ si()
     choice=$(tailscale status --json | jq -r '.Peer[] | .HostName' | fzf --preview 'tailscale status --json | jq -r \".Peer[] | select(.HostName == \"{}\") | .\"')
     echo "$pem $user@$choice"
     ssh -i $pem $user@$choice
+}
+
+dev() {
+    user="gustaf"
+    pem="/home/cafebabe/.ssh/$user.pem"
+    choice=$(tailscale status --json | jq -r '.Peer[] | .HostName' | fzf --preview "tailscale status --json | jq -r '.Peer[] | select(.HostName == \"{}\") | .'")
+    echo "$choice"
+    echo "$pem" "$user@$choice.saporo.net"
+    ssh -i "$pem" "$user@$choice.saporo.net"
 }
 
 # Greps process list for some string
@@ -254,26 +260,7 @@ mg() {
 # start app
 alias eg="setsid emacs &"
 
-fpath+=($HOME/.zsh/pure)
-autoload -U promptinit; promptinit
-prompt pure
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/home/cafebabe/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/home/cafebabe/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/home/cafebabe/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/home/cafebabe/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
-
-  export PATH="${PATH}:/home/cafebabe/.cargo/bin"
+export PATH="${PATH}:/home/cafebabe/.cargo/bin"
 
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
@@ -291,11 +278,11 @@ autoload -Uz _zinit
 
 # Load a few important annexes, without Turbo
 # (this is currently required for annexes)
-zinit light-mode for \
-    zdharma-continuum/zinit-annex-as-monitor \
-    zdharma-continuum/zinit-annex-bin-gem-node \
-    zdharma-continuum/zinit-annex-patch-dl \
-    zdharma-continuum/zinit-annex-rust
+# zinit light-mode for \
+#     zdharma-continuum/zinit-annex-as-monitor \
+#     zdharma-continuum/zinit-annex-bin-gem-node \
+#     zdharma-continuum/zinit-annex-patch-dl \
+#     zdharma-continuum/zinit-annex-rust
 
 ### End of Zinit's installer chunk
 # zsh-fzf-history-search
@@ -328,11 +315,8 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
-dev() {
-    user="gustaf"
-    pem="/home/cafebabe/.ssh/$user.pem"
-    choice=$(tailscale status --json | jq -r '.Peer[] | .HostName' | fzf --preview "tailscale status --json | jq -r '.Peer[] | select(.HostName == \"{}\") | .'")
-    echo "$choice"
-    echo "$pem" "$user@$choice.saporo.net"
-    ssh -i "$pem" "$user@$choice.saporo.net"
-}
+fpath+=($HOME/.zsh/pure)
+autoload -U promptinit; promptinit
+prompt pure
+
+
