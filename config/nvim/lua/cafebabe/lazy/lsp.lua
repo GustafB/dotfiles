@@ -216,6 +216,7 @@ return {
 			"gofumpt",
 			"svelte",
 			"cypher_ls",
+			"quick_lint_js",
 		}
 		local cmp = require("cmp")
 		local cmp_lsp = require("cmp_nvim_lsp")

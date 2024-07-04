@@ -109,6 +109,10 @@ return {
 				dap.run_last()
 			end, { desc = "Run Last" }) --
 
+			vim.keymap.set("n", "<Leader>du", function()
+				ui.open()
+			end, { desc = "Run Last" }) --
+
 			dap.listeners.before.attach.dapui_config = function()
 				ui.open()
 			end
