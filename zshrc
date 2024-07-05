@@ -1,4 +1,15 @@
 #!/bin/zsh
+zmodload zsh/zprof
+
+export ZPLUG_LOG_LOAD_SUCCESS=false
+export ZPLUG_LOG_LOAD_FAILURE=false
+
+# autoload -Uz compinit
+# if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+# 	compinit;
+# else
+# 	compinit -C;
+# fi;
 
 export TERM="xterm-256color"
 # =============================================================================
@@ -6,7 +17,7 @@ export TERM="xterm-256color"
 # =============================================================================
 timezsh() {
   shell=${1-$SHELL}
-  for i in $(seq 1 10); do /usr/bin/time $shell -i -c exit; done
+  for i in $(seq 1 10); do /usr/bin/time -f "%e" $shell -i -c exit; done
 }
 
 si()
@@ -241,8 +252,12 @@ alias egrep="myegrep $@"
 alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'
 alias klast="kill %1"
 alias dk="kill -9 $(docker ps -q)"
-
 alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
+
+# Tmux
+bindkey -s "^F" "tmux-sessionizer\n"
+bindkey  -s "^S" "tmux-windowizer\n"
+
 
 # sql
 dsql() {
@@ -284,35 +299,41 @@ autoload -Uz _zinit
 #     zdharma-continuum/zinit-annex-patch-dl \
 #     zdharma-continuum/zinit-annex-rust
 
-### End of Zinit's installer chunk
-# zsh-fzf-history-search
+# ## End of Zinit's installer chunk
+# # zsh-fzf-history-search
 zinit ice lucid wait'0'
 zinit light joshskidmore/zsh-fzf-history-search
-plugins=(… zsh-fzf-history-search docker)
+
+export NVM_LAZY_LOAD=true
+export NVM_COMPLETION=true
+
+plugins=(… zsh-nvm zsh-fzf-history-search docker git npm docker-compose)
 
 # # check if zplug is installed
 if [[ ! -d ~/.zplug ]]; then
 curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
 else
-    source ~/.zplug/init.zsh
+    # source ~/.zplug/init.zsh
 fi
 
-# # Self-manage
-zplug "zplug/zplug", hook-build:"zplug --self-manage"
+# # # Self-manage
+# zplug "zplug/zplug", hook-build:"zplug --self-manage"
 
-zplug check || zplug install
-zplug clean --force
+# zplug check || zplug install
+# zplug clean --force
+
+# zstyle ":zplug:tag" lazy yes
 
 # Initialize plugins
-zplug "woefe/wbase.zsh"
-zplug "zsh-users/zsh-completions"
-zplug "zsh-users/zsh-autosuggestions"
-zplug "so-fancy/diff-so-fancy", as:command, use:bin/git-dsf
-zplug load
+# zplug "woefe/wbase.zsh" lazy:true
+# zplug "zsh-users/zsh-completions" lazy:true
+# zplug "zsh-users/zsh-autosuggestions" lazy:true
+# zplug "so-fancy/diff-so-fancy", as:command, use:bin/git-dsf lazy:true
+# zplug load
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 
 fpath+=($HOME/.zsh/pure)
