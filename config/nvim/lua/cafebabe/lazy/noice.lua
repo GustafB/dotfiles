@@ -12,9 +12,10 @@ return {
 					["vim.lsp.util.convert_input_to_markdown_lines"] = true,
 					["vim.lsp.util.stylize_markdown"] = true,
 					["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+					[vim.lsp.handlers["textDocument/hover"]] = false,
+					[vim.lsp.handlers["textDocument/signatureHelp"]] = false,
 				},
 			},
-			-- you can enable a preset for easier configuration
 			presets = {
 				bottom_search = true, -- use a classic bottom cmdline for search
 				command_palette = true, -- position the cmdline and popupmenu together

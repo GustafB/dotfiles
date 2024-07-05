@@ -67,7 +67,7 @@ return {
 				}
 			end
 
-			local gdb_ls_debugger = "/usr/local/bin/gdb"
+			local gdb_ls_debugger = "/usr/bin/gdb"
 			if gdb_ls_debugger ~= "" then
 				dap.adapters.gdb = {
 					type = "executable",
