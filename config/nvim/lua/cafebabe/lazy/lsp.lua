@@ -111,8 +111,9 @@ local function cafebabe_lsp_map_kbds(bufnr)
 
 	-- Rename the variable under your cursor
 	--  Most Language Servers support renaming across files, etc.
-	map("<leader>ln", vim.lsp.buf.rename, "Re[n]ame")
-
+	vim.keymap.set("n", "<leader>ln", function()
+		return ":IncRename " .. vim.fn.expand("<cword>")
+	end, { expr = true })
 	-- Execute a code action, usually your cursor needs to be on top of an error
 	-- or a suggestion from your LSP for this to activate.
 	map("<leader>la", vim.lsp.buf.code_action, "Code [A]ction")
@@ -190,166 +191,174 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 return {
-	"neovim/nvim-lspconfig",
-	dependencies = {
-		"williamboman/mason.nvim",
-		"williamboman/mason-lspconfig.nvim",
-		"hrsh7th/cmp-nvim-lsp",
-		"hrsh7th/cmp-buffer",
-		"hrsh7th/cmp-path",
-		"hrsh7th/cmp-cmdline",
-		"hrsh7th/nvim-cmp",
-		"L3MON4D3/LuaSnip",
-		"saadparwaiz1/cmp_luasnip",
-		"j-hui/fidget.nvim",
+	{
+		"neovim/nvim-lspconfig",
+		dependencies = {
+			"williamboman/mason.nvim",
+			"williamboman/mason-lspconfig.nvim",
+			"hrsh7th/cmp-nvim-lsp",
+			"hrsh7th/cmp-buffer",
+			"hrsh7th/cmp-path",
+			"hrsh7th/cmp-cmdline",
+			"hrsh7th/nvim-cmp",
+			"L3MON4D3/LuaSnip",
+			"saadparwaiz1/cmp_luasnip",
+			"j-hui/fidget.nvim",
+		},
+
+		config = function()
+			local servers = {
+				"lua_ls",
+				"rust_analyzer",
+				"tsserver",
+				"clangd",
+				"gopls",
+				"pyright",
+				"html",
+				"gofumpt",
+				"svelte",
+				"cypher_ls",
+				"quick_lint_js",
+			}
+			local cmp = require("cmp")
+			local cmp_lsp = require("cmp_nvim_lsp")
+			local capabilities = vim.tbl_deep_extend(
+				"force",
+				{},
+				vim.lsp.protocol.make_client_capabilities(),
+				cmp_lsp.default_capabilities()
+			)
+			require("fidget").setup({})
+			require("mason").setup()
+			require("mason-lspconfig").setup({
+				ensure_isntalled = vim.tbl_keys(servers or {}),
+				handlers = {
+					function(server_name) -- default handler (optional)
+						require("lspconfig")[server_name].setup({
+							capabilities = capabilities,
+						})
+					end,
+
+					["lua_ls"] = function()
+						local lspconfig = require("lspconfig")
+						lspconfig.lua_ls.setup({
+							capabilities = capabilities,
+							settings = {
+								Lua = {
+									diagnostics = {
+										globals = { "vim", "it", "describe", "before_each", "after_each" },
+									},
+								},
+							},
+						})
+					end,
+
+					["clangd"] = function()
+						local lspconfig = require("lspconfig")
+						lspconfig.clangd.setup({
+							cmd = { "clangd", "--background-index", "--clang-tidy" },
+							filetypes = { "c", "cpp", "objc", "objcpp", "hpp", "h" },
+							capabilities = capabilities,
+							single_file_support = true,
+						})
+					end,
+
+					["gopls"] = function()
+						local lspconfig = require("lspconfig")
+						lspconfig.gopls.setup({
+							capabilities = capabilities,
+							cmd = { "gopls" },
+							filetypes = { "go", "gomod", "gowork", "gotmpl" },
+							settings = {
+								gopls = {
+									completeUnimported = true,
+									usePlaceholders = true,
+									analyses = {
+										unusedparams = true,
+										nilness = true,
+										unusedwrite = true,
+										useany = true,
+									},
+									gofumpt = true,
+									staticcheck = true,
+									hints = {
+										assignVariableTypes = true,
+										compositeLiteralFields = true,
+										compositeLiteralTypes = true,
+										constantValues = true,
+										functionTypeParameters = true,
+										parameterNames = true,
+										rangeVariableTypes = true,
+									},
+								},
+							},
+						})
+					end,
+					["cypher_ls"] = function()
+						local lspconfig = require("lspconfig")
+						lspconfig.cypher_ls.setup({
+							capabilities = capabilities,
+						})
+					end,
+				},
+			})
+
+			local cmp_select = { behavior = cmp.SelectBehavior.Select }
+
+			cmp.setup({
+				snippet = {
+					expand = function(args)
+						require("luasnip").lsp_expand(args.body) -- For `luasnip` users.
+					end,
+				},
+				mapping = cmp.mapping.preset.insert({
+					["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
+					["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
+					["<C-y>"] = cmp.mapping.confirm({ select = true }),
+					["<C-Space>"] = cmp.mapping.complete(),
+					["<Tab>"] = cmp.mapping(function(fallback)
+						local status_ok, luasnip = pcall(require, "luasnip")
+						if status_ok and luasnip.expand_or_jumpable() then
+							luasnip.expand_or_jump()
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+					["<S-Tab>"] = cmp.mapping(function(fallback)
+						local status_ok, luasnip = pcall(require, "luasnip")
+						if status_ok and luasnip.jumpable(-1) then
+							luasnip.jump(-1)
+						else
+							fallback()
+						end
+					end, { "i", "s" }),
+				}),
+				sources = cmp.config.sources({
+					{ name = "nvim_lsp" },
+					{ name = "luasnip" },
+					{ name = "buffer" },
+				}, {
+					{ name = "buffer" },
+				}),
+			})
+
+			vim.diagnostic.config({
+				-- update_in_insert = true,
+				float = {
+					focusable = false,
+					style = "minimal",
+					border = "rounded",
+					source = true,
+					header = "",
+					prefix = "",
+				},
+			})
+		end,
 	},
-
-	config = function()
-		local servers = {
-			"lua_ls",
-			"rust_analyzer",
-			"tsserver",
-			"clangd",
-			"gopls",
-			"pyright",
-			"html",
-			"gofumpt",
-			"svelte",
-			"cypher_ls",
-			"quick_lint_js",
-		}
-		local cmp = require("cmp")
-		local cmp_lsp = require("cmp_nvim_lsp")
-		local capabilities = vim.tbl_deep_extend(
-			"force",
-			{},
-			vim.lsp.protocol.make_client_capabilities(),
-			cmp_lsp.default_capabilities()
-		)
-		require("fidget").setup({})
-		require("mason").setup()
-		require("mason-lspconfig").setup({
-			ensure_isntalled = vim.tbl_keys(servers or {}),
-			handlers = {
-				function(server_name) -- default handler (optional)
-					require("lspconfig")[server_name].setup({
-						capabilities = capabilities,
-					})
-				end,
-
-				["lua_ls"] = function()
-					local lspconfig = require("lspconfig")
-					lspconfig.lua_ls.setup({
-						capabilities = capabilities,
-						settings = {
-							Lua = {
-								diagnostics = {
-									globals = { "vim", "it", "describe", "before_each", "after_each" },
-								},
-							},
-						},
-					})
-				end,
-
-				["clangd"] = function()
-					local lspconfig = require("lspconfig")
-					lspconfig.clangd.setup({
-						cmd = { "clangd", "--background-index", "--clang-tidy" },
-						filetypes = { "c", "cpp", "objc", "objcpp", "hpp", "h" },
-						capabilities = capabilities,
-						single_file_support = true,
-					})
-				end,
-
-				["gopls"] = function()
-					local lspconfig = require("lspconfig")
-					lspconfig.gopls.setup({
-						capabilities = capabilities,
-						cmd = { "gopls" },
-						filetypes = { "go", "gomod", "gowork", "gotmpl" },
-						settings = {
-							gopls = {
-								completeUnimported = true,
-								usePlaceholders = true,
-								analyses = {
-									unusedparams = true,
-									nilness = true,
-									unusedwrite = true,
-									useany = true,
-								},
-								gofumpt = true,
-								staticcheck = true,
-								hints = {
-									assignVariableTypes = true,
-									compositeLiteralFields = true,
-									compositeLiteralTypes = true,
-									constantValues = true,
-									functionTypeParameters = true,
-									parameterNames = true,
-									rangeVariableTypes = true,
-								},
-							},
-						},
-					})
-				end,
-				["cypher_ls"] = function()
-					local lspconfig = require("lspconfig")
-					lspconfig.cypher_ls.setup({
-						capabilities = capabilities,
-					})
-				end,
-			},
-		})
-
-		local cmp_select = { behavior = cmp.SelectBehavior.Select }
-
-		cmp.setup({
-			snippet = {
-				expand = function(args)
-					require("luasnip").lsp_expand(args.body) -- For `luasnip` users.
-				end,
-			},
-			mapping = cmp.mapping.preset.insert({
-				["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
-				["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
-				["<C-y>"] = cmp.mapping.confirm({ select = true }),
-				["<C-Space>"] = cmp.mapping.complete(),
-				["<Tab>"] = cmp.mapping(function(fallback)
-					local status_ok, luasnip = pcall(require, "luasnip")
-					if status_ok and luasnip.expand_or_jumpable() then
-						luasnip.expand_or_jump()
-					else
-						fallback()
-					end
-				end, { "i", "s" }),
-				["<S-Tab>"] = cmp.mapping(function(fallback)
-					local status_ok, luasnip = pcall(require, "luasnip")
-					if status_ok and luasnip.jumpable(-1) then
-						luasnip.jump(-1)
-					else
-						fallback()
-					end
-				end, { "i", "s" }),
-			}),
-			sources = cmp.config.sources({
-				{ name = "nvim_lsp" },
-				{ name = "luasnip" },
-				{ name = "buffer" },
-			}, {
-				{ name = "buffer" },
-			}),
-		})
-
-		vim.diagnostic.config({
-			-- update_in_insert = true,
-			float = {
-				focusable = false,
-				style = "minimal",
-				border = "rounded",
-				source = "always",
-				header = "",
-				prefix = "",
-			},
-		})
-	end,
+	{
+		"smjonas/inc-rename.nvim",
+		config = function()
+			require("inc_rename").setup({})
+		end,
+	},
 }

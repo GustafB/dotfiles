@@ -9,7 +9,7 @@ return {
 		},
 		config = function()
 			local dap = require("dap")
-			local ui = require("dapui")
+			local dapui = require("dapui")
 
 			vim.fn.sign_define("DapBreakpoint", { text = "🟥", texthl = "", linehl = "", numhl = "" })
 			vim.fn.sign_define("DapStopped", { text = "▶️", texthl = "", linehl = "", numhl = "" })
@@ -79,7 +79,7 @@ return {
 			--
 			-- Eval var under cursor
 			vim.keymap.set("n", "<space>?", function()
-				ui.eval(nil, { enter = true })
+				dapui.eval(nil, { enter = true })
 			end)
 
 			vim.keymap.set("n", "<leader>dc", function()
@@ -110,32 +110,32 @@ return {
 			end, { desc = "Run Last" }) --
 
 			vim.keymap.set("n", "<Leader>du", function()
-				ui.open()
+				dapui.open()
 			end, { desc = "Run Last" }) --
 
 			dap.listeners.before.attach.dapui_config = function()
-				ui.open()
+				dapui.open()
 			end
 			dap.listeners.before.launch.dapui_config = function()
-				ui.open()
+				dapui.open()
 			end
 			dap.listeners.before.event_terminated.dapui_config = function()
-				ui.close()
+				dapui.close()
 			end
 			dap.listeners.before.event_exited.dapui_config = function()
-				ui.close()
+				dapui.close()
 			end
 		end,
 	},
-   {
-    "jay-babu/mason-nvim-dap.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "williamboman/mason.nvim",
-      "mfussenegger/nvim-dap",
-    },
-    opts = {
-      handlers = {}
-    },
-  },
+	{
+		"jay-babu/mason-nvim-dap.nvim",
+		event = "VeryLazy",
+		dependencies = {
+			"williamboman/mason.nvim",
+			"mfussenegger/nvim-dap",
+		},
+		opts = {
+			handlers = {},
+		},
+	},
 }
