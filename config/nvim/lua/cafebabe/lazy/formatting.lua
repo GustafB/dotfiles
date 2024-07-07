@@ -5,7 +5,6 @@ return {
 			formatters_by_ft = {
 				bash = { "shfmt" },
 				sh = { "shfmt" },
-				fish = { "fish_indent" },
 				go = { "goimports", "gofumpt", "goimports-reviser" },
 				javascript = { { "prettierd", "prettier" } },
 				typescript = { { "prettierd", "prettier" } },
@@ -43,5 +42,37 @@ return {
 		config = function()
 			require("guess-indent").setup({})
 		end,
+	},
+	{
+		"johmsalas/text-case.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim" },
+		config = function()
+			require("textcase").setup({})
+			require("telescope").load_extension("textcase")
+		end,
+		keys = {
+			"ga", -- Default invocation prefix
+			{ "ga.", "<cmd>TextCaseOpenTelescope<CR>", mode = { "n", "x" }, desc = "Telescope" },
+		},
+		cmd = {
+			"Subs",
+			"TextCaseOpenTelescope",
+			"TextCaseOpenTelescopeQuickChange",
+			"TextCaseOpenTelescopeLSPChange",
+			"TextCaseStartReplacingCommand",
+		},
+		enabled_methods = {
+			"to_upper_case",
+			"to_lower_case",
+			"to_snake_case",
+			"to_constant_case",
+			"to_phrase_case",
+			"to_camel_case",
+			"to_title_case",
+			"to_path_case",
+			"to_upper_phrase_case",
+			"to_lower_phrase_case",
+		},
+		lazy = false,
 	},
 }

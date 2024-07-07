@@ -209,7 +209,6 @@ return {
 		config = function()
 			local servers = {
 				"lua_ls",
-				"rust_analyzer",
 				"tsserver",
 				"clangd",
 				"gopls",

@@ -55,7 +55,7 @@ return {
 	config = function()
 		SetupTelescope()
 		require("telescope").setup({
-			file_ignore_patterns = { "node_modules", "build", "venv" },
+			file_ignore_patterns = { "node_modules", "build", "venv", "keylines*" },
 			pickers = {
 				pickers = {
 					colorscheme = {

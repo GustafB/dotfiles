@@ -3,9 +3,11 @@ vim.g.have_nerd_font = true
 vim.opt.guicursor = "n-v-i-c:block-Cursor"
 -- [[ Setting options ]]
 -- See `:help vim.opt`
-vim.opt.tabstop = 2
+vim.opt.tabstop = 4
 -- Set the number of spaces to use for each step of (auto)indent.
-vim.opt.shiftwidth = 2
+vim.opt.shiftwidth = 4
+vim.opt.softtabstop = 4
+vim.opt.expandtab = true
 -- Convert tabs to spaces.
 vim.opt.expandtab = true
 -- Make line numbers default
@@ -82,3 +84,6 @@ vim.opt.suffixesadd:append({ ".java", ".rs" }) -- search for suffexes using gf
 
 -- turn off smartindent
 -- vim.opt.smartindent = false
+
+-- disable swap file
+vim.opt.swapfile = false
