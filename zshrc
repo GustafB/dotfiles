@@ -257,7 +257,7 @@ alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
 # Tmux
 bindkey -s "^F" "tmux-sessionizer\n"
 bindkey  -s "^S" "tmux-windowizer\n"
-
+bindkey \^K kill-line
 
 # sql
 dsql() {

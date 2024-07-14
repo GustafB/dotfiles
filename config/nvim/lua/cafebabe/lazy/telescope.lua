@@ -50,58 +50,64 @@ local function SetupTelescope()
 end
 
 return {
-	"nvim-telescope/telescope-file-browser.nvim",
-	dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
-	config = function()
-		SetupTelescope()
-		require("telescope").setup({
-			file_ignore_patterns = { "node_modules", "build", "venv", "keylines*" },
-			pickers = {
+	{
+		"nvim-telescope/telescope-file-browser.nvim",
+		dependencies = { "nvim-telescope/telescope.nvim", "nvim-lua/plenary.nvim" },
+		config = function()
+			SetupTelescope()
+			require("telescope").setup({
+				file_ignore_patterns = { "node_modules", "build", "venv", "keylines*" },
 				pickers = {
-					colorscheme = {
-						enable_preview = true,
+					pickers = {
+						colorscheme = {
+							enable_preview = true,
+						},
 					},
-				},
-				find_files = {
-					find_command = { "fdfind", "--strip-cwd-prefix", "--type", "f" },
-					mappings = {
-						n = {
-							["cd"] = function(prompt_bufnr)
-								local selection = require("telescope.actions.state").get_selected_entry()
-								local dir = vim.fn.fnamemodify(selection.path, ":p:h")
-								print(dir)
-								require("telescope.actions").close(prompt_bufnr)
-								-- Depending on what you want put `cd`, `lcd`, `tcd`
-								vim.cmd(string.format("silent lcd %s", dir))
-							end,
+					find_files = {
+						find_command = { "fdfind", "--strip-cwd-prefix", "--type", "f" },
+						mappings = {
+							n = {
+								["cd"] = function(prompt_bufnr)
+									local selection = require("telescope.actions.state").get_selected_entry()
+									local dir = vim.fn.fnamemodify(selection.path, ":p:h")
+									print(dir)
+									require("telescope.actions").close(prompt_bufnr)
+									-- Depending on what you want put `cd`, `lcd`, `tcd`
+									vim.cmd(string.format("silent lcd %s", dir))
+								end,
+							},
 						},
 					},
 				},
-			},
-			vimgrep_arguments = {
-				"rg",
-				"--color=never",
-				"--no-heading",
-				"--with-filename",
-				"--line-number",
-				"--column",
-				"--smart-case",
-				"--trim",
-			},
-			extensions = {
-				["file_browser"] = {
-					hijack_netrw = true,
+				vimgrep_arguments = {
+					"rg",
+					"--color=never",
+					"--no-heading",
+					"--with-filename",
+					"--line-number",
+					"--column",
+					"--smart-case",
+					"--trim",
 				},
-				["fzf"] = {
-					fuzzy = true, -- false will only do exact matching
-					override_generic_sorter = true, -- override the generic sorter
-					override_file_sorter = true, -- override the file sorter
-					case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+				extensions = {
+					["file_browser"] = {
+						hijack_netrw = true,
+					},
+					["fzf"] = {
+						fuzzy = true, -- false will only do exact matching
+						override_generic_sorter = true, -- override the generic sorter
+						override_file_sorter = true, -- override the file sorter
+						case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+					},
+					["ui-select"] = {
+						require("telescope.themes").get_dropdown(),
+					},
 				},
-				["ui-select"] = {
-					require("telescope.themes").get_dropdown(),
-				},
-			},
-		})
-	end,
+			})
+		end,
+	},
+	{
+		"nvim-telescope/telescope-fzf-native.nvim",
+		build = "cmake -S. -Bbuild -DCMAKE_BUILD_TYPE=Release && cmake --build build --config Release",
+	},
 }

@@ -214,7 +214,6 @@ return {
 				"gopls",
 				"pyright",
 				"html",
-				"gofumpt",
 				"svelte",
 				"cypher_ls",
 				"quick_lint_js",
@@ -230,7 +229,7 @@ return {
 			require("fidget").setup({})
 			require("mason").setup()
 			require("mason-lspconfig").setup({
-				ensure_isntalled = vim.tbl_keys(servers or {}),
+				ensure_installed = servers,
 				handlers = {
 					function(server_name) -- default handler (optional)
 						require("lspconfig")[server_name].setup({
@@ -255,7 +254,14 @@ return {
 					["clangd"] = function()
 						local lspconfig = require("lspconfig")
 						lspconfig.clangd.setup({
-							cmd = { "clangd", "--background-index", "--clang-tidy" },
+							cmd = {
+								"clangd",
+								"--background-index",
+								"--clang-tidy",
+								"--completion-style=detailed",
+								"--fallback-style=none",
+								"--function-arg-placeholders",
+							},
 							filetypes = { "c", "cpp", "objc", "objcpp", "hpp", "h" },
 							capabilities = capabilities,
 							single_file_support = true,
