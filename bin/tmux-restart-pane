@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# set -x
+
+# PANE_UNIQUE_ID=$1
+PANE_UNIQUE_ID=${TMUX_PANE}
+
+get_running_process() {
+    PANE_PID=$1
+    ps -o pid,args -g $PANE_PID | sed -n '3p'
+}
+
+# Function to get the current directory of the pane
+get_pane_directory() {
+    PANE_ID=$1
+    tmux display-message -p -t $PANE_ID "#{pane_current_path}"
+}
+PANE=$(tmux display -pt "${TMUX_PANE}" '#{session_name}:#{window_index}.#{pane_index} #{pane_pid}')
+PANE_ID=$(echo $PANE | awk '{print $1}')
+PANE_PID=$(echo "$PANE" | cut -d' ' -f2)
+PROCESS=$(get_running_process $PANE_PID)
+COMMAND=$(echo "$PROCESS" | cut -d' ' -f2-)
+
+echo "PANE_UNIQUE_ID=$PANE_UNIQUE_ID"
+echo "PANE=$PANE"
+echo "PID=$PANE_PID"
+echo "PROCESS=$PROCESS"
+echo "COMMAND=$COMMAND"
+
+if [ -n "$COMMAND" ]; then
+    # Get the current directory of the pane
+    PANE_DIR=$(get_pane_directory $PANE_ID)
+
+    # Attempt to gracefully stop the process
+    tmux send-keys -t $PANE_ID C-c
+
+    sleep 2
+
+    echo "Process did not stop with C-c, killing forcefully"
+
+    # Respawn the pane with the command in the same directory
+    tmux respawn-pane -k -t "$PANE_ID" -c "$PANE_DIR"
+    tmux send-keys -t "$PANE_ID" "$COMMAND" C-m
+else
+    echo "No command found in the selected pane."
+fi

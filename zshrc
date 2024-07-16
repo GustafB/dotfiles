@@ -255,8 +255,21 @@ alias dk="kill -9 $(docker ps -q)"
 alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
 
 # Tmux
-bindkey -s "^F" "tmux-sessionizer\n"
-bindkey  -s "^S" "tmux-windowizer\n"
+tmux-sessionizer-widget() {
+    source $HOME/bin/tmux-sessionizer
+    zle reset-prompt
+}
+
+tmux-windowizer-widget() {
+    source $HOME/bin/mux-windowizer
+    zle reset-prompt
+}
+
+zle -N tmux-sessionizer-widget
+zle -N tmux-windowizer-widget
+
+bindkey "^F" tmux-sessionizer-widget
+bindkey "^S" tmux-windowizer-widget
 bindkey \^K kill-line
 
 # sql
@@ -303,6 +316,8 @@ autoload -Uz _zinit
 # # zsh-fzf-history-search
 zinit ice lucid wait'0'
 zinit light joshskidmore/zsh-fzf-history-search
+zinit ice lucid as"program" pick"bin/git-dsf"
+zinit load so-fancy/diff-so-fancy
 
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
@@ -341,3 +356,5 @@ autoload -U promptinit; promptinit
 prompt pure
 
 
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
