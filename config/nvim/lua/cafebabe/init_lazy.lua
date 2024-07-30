@@ -16,7 +16,22 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 	spec = {
-		{ import = "cafebabe.lazy" },
+		{ import = "cafebabe.plugins" },
 	},
-	checker = { enabled = true },
+	install = { colorscheme = { "tokyonight", "habamax" } },
+	checker = { enabled = true }, -- automatically check for plugin updates
+	performance = {
+		rtp = {
+			disabled_plugins = {
+				"gzip",
+				-- "matchit",
+				-- "matchparen",
+				-- "netrwPlugin",
+				"tarPlugin",
+				"tohtml",
+				"tutor",
+				"zipPlugin",
+			},
+		},
+	},
 })

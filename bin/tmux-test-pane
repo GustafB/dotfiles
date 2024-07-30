@@ -1,0 +1,48 @@
+#!/bin/bash
+
+set -e
+
+get_running_process() {
+    PANE_PID=$1
+    ps -o pid,args -g $PANE_PID | sed -n '3p'
+}
+
+get_pane_directory() {
+    PANE_ID=$1
+    tmux display-message -p -t $PANE_ID "#{pane_current_path}"
+}
+
+PANES=$(tmux list-panes -a -F "#{session_name}:#{window_index}.#{pane_index} #{pane_pid}" | while read -r line; do
+    PANE_ID=$(echo $line | awk '{print $1}')
+    PANE_PID=$(echo $line | awk '{print $2}')
+    PROCESS=$(get_running_process $PANE_PID)
+    echo "$PANE_ID $PROCESS"
+done)
+
+SELECTED=$(echo -e "$PANES" | fzf)
+echo "$SELECTED"
+PANE_ID=$(echo "$SELECTED" | awk '{print $1}')
+echo "$PANE_ID"
+PANE_PID=$(echo "$SELECTED" | cut -d' ' -f2)
+echo "$PANE_PID"
+COMMAND=$(echo "$SELECTED" | cut -d' ' -f3-)
+echo "$COMMAND"
+
+if [ -n "$COMMAND" ]; then
+    # attempt to gracefully stop the process
+    tmux send-keys -t $PANE_ID C-c
+
+    sleep 2
+
+    echo "Process did not stop with C-c, killing forcefully"
+
+    # respawn-pane automatically kills any currently running
+    # processes
+    PANE_DIR=$(get_pane_directory "$PANE_ID")
+    tmux respawn-pane -k -t "$PANE_ID" -c "$PANE_DIR"
+    tmux send-keys -t "$PANE_ID" "$COMMAND" C-m
+
+    echo "Pane has been respawned and is running '$COMMAND'"
+else
+    echo "No command found in the selected pane."
+fi
