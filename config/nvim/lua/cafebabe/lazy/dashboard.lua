@@ -17,8 +17,8 @@ return {
 				files = "",
 				open_folder = "",
 				config = "",
-				close = "󰈆",
 				git = "",
+				close = "",
 			},
 		}
 
@@ -118,7 +118,6 @@ return {
 			opts = { position = "center", hl = "Comment" },
 		}
 
-		-- Custom section with a personal greeting
 		local bottom_section = {
 			type = "text",
 			val = "Hi Gustaf, It's " .. os.date(" %H:%M ") .. "How are you doing today?",
@@ -126,6 +125,7 @@ return {
 		}
 
 		-- Setting up the alpha layout
+		print(vim.inspect(require("git-dashboard-nvim").setup({})))
 		alpha.setup({
 			layout = {
 				pad(4),
@@ -139,6 +139,7 @@ return {
 				pad(2),
 				footer,
 			},
+			position = "center",
 		})
 	end,
 }
