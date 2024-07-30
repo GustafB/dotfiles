@@ -261,7 +261,7 @@ tmux-sessionizer-widget() {
 }
 
 tmux-windowizer-widget() {
-    source $HOME/bin/mux-windowizer
+    $HOME/bin/tmux-windowizer
     zle reset-prompt
 }
 
@@ -269,7 +269,7 @@ zle -N tmux-sessionizer-widget
 zle -N tmux-windowizer-widget
 
 bindkey "^F" tmux-sessionizer-widget
-bindkey "^S" tmux-windowizer-widget
+bindkey "^W" tmux-windowizer-widget
 bindkey \^K kill-line
 
 # sql
