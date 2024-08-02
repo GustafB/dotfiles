@@ -125,7 +125,6 @@ return {
 		}
 
 		-- Setting up the alpha layout
-		print(vim.inspect(require("git-dashboard-nvim").setup({})))
 		alpha.setup({
 			layout = {
 				pad(4),
