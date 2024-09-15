@@ -12,6 +12,13 @@ export ZPLUG_LOG_LOAD_FAILURE=false
 # fi;
 
 export TERM="xterm-256color"
+
+# set -o vi
+
+if [[ -z $TMUX ]]; then
+    tmuxinator start poke
+fi
+
 # =============================================================================
 #                                   Functions
 # =============================================================================
@@ -76,8 +83,8 @@ export FZF_DEFAULT_OPTS='--height 40% --reverse --border --inline-info --color=d
 
 export ENHANCD_FILTER="fzf:peco:percol"
 export ENHANCD_COMMAND='c'
-export EDITOR="emacs -nw"
-export VISUAL="emacs -nw"
+# export EDITOR="nvim"
+# export VISUAL="nvim"
 
 if [ -n "$INSIDE_EMACS" ]; then
   chpwd() { print -P "\033AnSiTc %d" }
@@ -255,9 +262,38 @@ alias dk="kill -9 $(docker ps -q)"
 alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
 
 # Tmux
-bindkey -s "^F" "tmux-sessionizer\n"
-bindkey  -s "^S" "tmux-windowizer\n"
+# Allows us to save the current command and return to it 
+# if we accidentally hit a tmux keybind
+tmux_sessionizer_widget() {
+    # Preserve the current buffer
+    local saved_buffer="$BUFFER"
+    local saved_cursor="$CURSOR"
+    
+    # Clear the prompt
+    zle clear-screen
+    
+    # Run tmux_sessionizer function
+    tmux_sessionizer
+    
+    # Restore the prompt
+    zle reset-prompt
+    
+    # Restore the buffer
+    BUFFER="$saved_buffer"
+    CURSOR="$saved_cursor"
+}
 
+tmux_sessionizer() {
+    local selected=$(find ~/saporo ~/install/dotfiles ~/code ~/tmp ~/notes -mindepth 1 -maxdepth 1 -type d | fzf)
+    if [[ -n $selected ]]; then
+        ~/bin/tmux-sessionizer "$selected"
+    fi
+}
+
+zle -N tmux_sessionizer_widget
+
+bindkey '^G' tmux_sessionizer_widget
+bindkey -s "^H" "list-tmux-sessions"
 
 # sql
 dsql() {

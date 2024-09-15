@@ -32,3 +32,4 @@ export ZPLUG_HOME=$HOME/.zplug
 if [[ -f "$HOME/.saporo_env" ]]; then
   . "$HOME/.saporo_env"
 fi
+

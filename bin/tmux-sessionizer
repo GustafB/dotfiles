@@ -1,15 +1,6 @@
 #!/usr/bin/zsh
 
-if [[ $# -eq 1 ]]; then
-    selected=$1
-else
-    selected=$(find ~/saporo ~/install/dotfiles ~/code ~/tmp ~/notes -mindepth 1 -maxdepth 1 -type d | fzf)
-fi
-
-if [[ -z $selected ]]; then
-    exit 0
-fi
-
+selected=$1
 selected_name=$(basename "$selected" | tr . _)
 tmux_running=$(pgrep tmux)
 
