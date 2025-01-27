@@ -1,3 +1,4 @@
+-- return {}
 return {
   "vimwiki/vimwiki",
   event = "BufEnter *.md",
