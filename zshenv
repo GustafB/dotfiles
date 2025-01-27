@@ -14,7 +14,10 @@ export PATH="/snap/bin:$PATH"
 export PATH="/home/cafebabe/.cargo/bin/navi:$PATH"
 export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="$PATH:/opt/nvim-linux64/bin"
+export PATH="$PATH:/mnt/c/windows"
+export PATH="$PATH:/mnt/c/windows/system32/openssh"
 export FPATH="$HOME/installs/eza/completions/zsh:$FPATH"
+
 
 # export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
 export DISPLAY=:0.0
@@ -25,11 +28,18 @@ export GDK_DPI_SCALE=2
 
 export PYENV_ROOT="$HOME/.pyenv"
 
-export ZPLUG_HOME=$HOME/.zplug
+export ZPLUG_HOME="$HOME/.zplug"
+
+export XDG_RUNTIME_DIR="/run/user/$(id -u)/xdg_runtime_dir"
 
 . "$HOME/.cargo/env"
 
 if [[ -f "$HOME/.saporo_env" ]]; then
   . "$HOME/.saporo_env"
 fi
+
+export GOTCH_LIBTORCH="/usr/local/lib/libtorch"
+export LIBRARY_PATH="$LIBRARY_PATH:$GOTCH_LIBTORCH/lib"
+export CPATH="$CPATH:$GOTCH_LIBTORCH/lib:$GOTCH_LIBTORCH/include:$GOTCH_LIBTORCH/include/torch/csrc/api/include"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$GOTCH_LIBTORCH/lib:/usr/lib64-nvidia:/usr/local/cuda-${CUDA_VERSION}/lib64"
 

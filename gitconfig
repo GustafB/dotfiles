@@ -1,42 +1,50 @@
 [filter "lfs"]
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-[user]
-	email = gustaf@saporo.io
-  name = Gustaf Brostedt
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
 [core]
-  pager = delta
-  autocrlf = false
-  safecrlf = false
-	editor = vim
+    pager = delta
+    autocrlf = false
+    safecrlf = false
+    editor = vim
     excludesfile = /home/cafebabe/.gitignore_global
-	pager = diff-so-fancy | less --tabs=4 -RFX
+    pager = diff-so-fancy | less --tabs=4 -RFX
+	sshCommand = ssh.exe
 [alias]
-  co = checkout
-  ci = commit
-  st = status
-  br = branch
-  hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
-  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-  type = cat-file -t
-  dump = cat-file -p
-  pom = push origin master
-  pod = push origin dev
-  gpr = pull --rebase
-  gprud = pull --rebase upstream dev
-  ac = add . && commit
-  u = upstream
-  dbr = branch -d
-	root = rev-parse --show-toplevel
+    co = checkout
+    ci = commit
+    st = status
+    br = branch
+    hist = log --pretty=format:'%h %ad | %s%d [%an]' --graph --date=short
+    lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    type = cat-file -t
+    dump = cat-file -p
+    pom = push origin master
+    pod = push origin dev
+    gpr = pull --rebase
+    gprud = pull --rebase upstream dev
+    ac = add . && commit
+    u = upstream
+    dbr = branch -d
+    root = rev-parse --show-toplevel
 [credential]
-	helper = store
+    helper = store
 [delta]
-	naviate = true
+    naviate = true
 [merge]
-	conflictstyle = diff3
+    conflictstyle = diff3
 [diff]
-	colorMoved = default
+    colorMoved = default
 [github]
-	user = gustafb
+    user = gustafb
+[user]
+  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEBqWi2Bxg6SQGP4OyfDwZsBLiOUUZGEzfnagxt3rh8i
+    name = Gustaf Brostedt
+    email = "gustaf.brostedt@gmail.com"
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  program = "/mnt/c/Users/gusta/AppData/Local/1Password/app/8/op-ssh-sign.exe"
+[commit]
+  gpgsign = true
