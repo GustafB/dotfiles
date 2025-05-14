@@ -261,6 +261,14 @@ alias klast="kill %1"
 alias dk="kill -9 $(docker ps -q)"
 alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
 
+# Neovim
+alias v=nvim
+alias vi=nvim
+alias vim=nvim
+
+# Other
+alias act='source ./.venv/bin/activate'
+
 # Tmux
 # Allows us to save the current command and return to it 
 # if we accidentally hit a tmux keybind
@@ -352,25 +360,6 @@ else
     # source ~/.zplug/init.zsh
 fi
 
-# # # Self-manage
-# zplug "zplug/zplug", hook-build:"zplug --self-manage"
-
-# zplug check || zplug install
-# zplug clean --force
-
-# zstyle ":zplug:tag" lazy yes
-
-# Initialize plugins
-# zplug "woefe/wbase.zsh" lazy:true
-# zplug "zsh-users/zsh-completions" lazy:true
-# zplug "zsh-users/zsh-autosuggestions" lazy:true
-# zplug "so-fancy/diff-so-fancy", as:command, use:bin/git-dsf lazy:true
-# zplug load
-
-# export NVM_DIR="$HOME/.nvm"
-# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
 
 fpath+=($HOME/.zsh/pure)
 autoload -U promptinit; promptinit
@@ -379,19 +368,3 @@ prompt pure
 
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-#
-# # >>> conda initialize >>>
-# # !! Contents within this block are managed by 'conda init' !!
-# __conda_setup="$('/home/cafebabe/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-# if [ $? -eq 0 ]; then
-#     eval "$__conda_setup"
-# else
-#     if [ -f "/home/cafebabe/anaconda3/etc/profile.d/conda.sh" ]; then
-#         . "/home/cafebabe/anaconda3/etc/profile.d/conda.sh"
-#     else
-#         export PATH="/home/cafebabe/anaconda3/bin:$PATH"
-#     fi
-# fi
-# unset __conda_setup
-# # <<< conda initialize <<<
-
