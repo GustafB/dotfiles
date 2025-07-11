@@ -15,9 +15,9 @@ export TERM="xterm-256color"
 
 # set -o vi
 
-if [[ -z $TMUX ]]; then
-    tmuxinator start poke
-fi
+# if [[ -z $TMUX ]]; then
+#     tmuxinator start poke
+# fi
 
 # =============================================================================
 #                                   Functions
@@ -258,7 +258,7 @@ alias egrep="myegrep $@"
 # Housekeeping
 alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'
 alias klast="kill %1"
-alias dk="kill -9 $(docker ps -q)"
+# alias dk="kill -9 $(docker ps -q)"
 alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
 
 # Neovim
@@ -351,7 +351,7 @@ zinit light joshskidmore/zsh-fzf-history-search
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
 
-plugins=(… zsh-nvm zsh-fzf-history-search docker git npm docker-compose)
+#plugins=(… zsh-nvm zsh-fzf-history-search docker git npm docker-compose)
 
 # # check if zplug is installed
 if [[ ! -d ~/.zplug ]]; then
@@ -361,10 +361,6 @@ else
 fi
 
 
-fpath+=($HOME/.zsh/pure)
-autoload -U promptinit; promptinit
-prompt pure
-
-
+eval "$(starship init zsh)"
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

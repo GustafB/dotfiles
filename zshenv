@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export NVM_DIR="$HOME/.nvm"
-. "${NVM_DIR}/nvm.sh"
+#export NVM_DIR="$HOME/.nvm"
+#. "${NVM_DIR}/nvm.sh"
 
 export PATH="/usr/local/sbin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
@@ -32,7 +32,7 @@ export ZPLUG_HOME="$HOME/.zplug"
 
 export XDG_RUNTIME_DIR="/run/user/$(id -u)/xdg_runtime_dir"
 
-. "$HOME/.cargo/env"
+# . "$HOME/.cargo/env"
 
 if [[ -f "$HOME/.saporo_env" ]]; then
   . "$HOME/.saporo_env"
@@ -42,8 +42,8 @@ if [ ! -d "/run/user/1000/xdg_runtime_dir" ]; then
     mkdir "/run/user/1000/xdg_runtime_dir"
 fi
 
-export GOTCH_LIBTORCH="/usr/local/lib/libtorch"
-export LIBRARY_PATH="$LIBRARY_PATH:$GOTCH_LIBTORCH/lib"
-export CPATH="$CPATH:$GOTCH_LIBTORCH/lib:$GOTCH_LIBTORCH/include:$GOTCH_LIBTORCH/include/torch/csrc/api/include"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$GOTCH_LIBTORCH/lib:/usr/lib64-nvidia:/usr/local/cuda-${CUDA_VERSION}/lib64"
+#export GOTCH_LIBTORCH="/usr/local/lib/libtorch"
+#export LIBRARY_PATH="$LIBRARY_PATH:$GOTCH_LIBTORCH/lib"
+#export CPATH="$CPATH:$GOTCH_LIBTORCH/lib:$GOTCH_LIBTORCH/include:$GOTCH_LIBTORCH/include/torch/csrc/api/include"
+#LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$GOTCH_LIBTORCH/lib:/usr/lib64-nvidia:/usr/local/cuda-${CUDA_VERSION}/lib64"
 

@@ -48,7 +48,6 @@ setup_file_link "${CODE_HOME}/zshenv" "${HOME}/.zshenv"
 setup_file_link "${CODE_HOME}/inputrc" "${HOME}/.inputrc"
 setup_file_link "${CODE_HOME}/gitconfig" "${HOME}/.gitconfig"
 setup_file_link "${CODE_HOME}/gitignore_global" "${HOME}/.gitignore_global"
-setup_dir_link "${CODE_HOME}/dotemacs.d" "${HOME}/.emacs.d"
 setup_dir_link "${CODE_HOME}/bin" "${HOME}/bin"
 setup_dir_link "${CODE_HOME}/config" "${HOME}/.config"
 
@@ -67,26 +66,6 @@ run_script() {
         echo "$script_name failed to execute."
     fi
 }
-
-if [ "$(uname)" == "Linux" ]; then
-    run_script "${CODE_HOME}/install/dev-tools.sh"
-    run_script "${CODE_HOME}/install/python.sh"
-    run_script "${CODE_HOME}/install/clang17.sh"
-    run_script "${CODE_HOME}/install/clangd.sh"
-    run_script "${CODE_HOME}/install/cmake.sh"
-    run_script "${CODE_HOME}/install/golang.sh"
-    run_script "${CODE_HOME}/install/rust.sh"
-    run_script "${CODE_HOME}/install/zsh.sh"
-    run_script "${CODE_HOME}/install/ohmyzsh.sh"
-    run_script "${CODE_HOME}/install/pure.sh"
-    run_script "${CODE_HOME}/install/gtk-3.sh"
-    run_script "${CODE_HOME}/install/ranger.sh"
-    run_script "${CODE_HOME}/install/nvm.sh"
-    run_script "${CODE_HOME}/install/lua.sh"
-    run_script "${CODE_HOME}/install/nvim.sh"
-fi
-
-sudo chsh -s $(which zsh)
 
 echo "Installation completed at $(date)" >> "$LOG_FILE"
 
