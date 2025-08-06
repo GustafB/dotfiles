@@ -222,16 +222,16 @@ zshaddhistory() { whence ${${(z)1}[1]} >| /dev/null || return 1 }
 # Git commands
 alias glog='git log --oneline'
 alias grv='git remote -v'
-alias gpcb='git push origin $(git rev-parse --abbrev-ref HEAD)'
 alias gog="git log  --abbrev-commit --name-status --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'"
 alias gml="git log --stat --color --decorate --all --oneline"
+alias ggr="git log --graph --full-history --all --pretty=format:\"%h%x09%d%x20%s\""
 alias gdw="git diff --word-diff=color"
 alias gds="git diff --word-diff=color --staged"
 alias gs="git status"
-alias gau="git add -u"
-alias gaa="git add ."
+alias gu="git add -u"
+alias ga="git add"
 alias gc="git commit"
-alias ggr="git log --graph --full-history --all --pretty=format:\"%h%x09%d%x20%s\""
+alias gp='git push origin $(git rev-parse --abbrev-ref HEAD)'
 
 # Navigation
 alias ..='cd ..'
