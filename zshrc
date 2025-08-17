@@ -36,14 +36,14 @@ si()
     ssh -i $pem $user@$choice
 }
 
-dev() {
-    user="gustaf"
-    pem="/home/cafebabe/.ssh/$user.pem"
-    choice=$(tailscale status --json | jq -r '.Peer[] | .HostName' | fzf --preview "tailscale status --json | jq -r '.Peer[] | select(.HostName == \"{}\") | .'")
-    echo "$choice"
-    echo "$pem" "$user@$choice.saporo.net"
-    ssh -i "$pem" "$user@$choice.saporo.net"
-}
+# dev() {
+#     user="gustaf"
+#     pem="/home/cafebabe/.ssh/$user.pem"
+#     choice=$(tailscale status --json | jq -r '.Peer[] | .HostName' | fzf --preview "tailscale status --json | jq -r '.Peer[] | select(.HostName == \"{}\") | .'")
+#     echo "$choice"
+#     echo "$pem" "$user@$choice.saporo.net"
+#     ssh -i "$pem" "$user@$choice.saporo.net"
+# }
 
 # Greps process list for some string
 pps()
@@ -230,7 +230,7 @@ alias gds="git diff --word-diff=color --staged"
 alias gs="git status"
 alias gu="git add -u"
 alias ga="git add"
-alias gc="git commit"
+alias gc="git commit -m"
 alias gp='git push origin $(git rev-parse --abbrev-ref HEAD)'
 
 # Navigation
