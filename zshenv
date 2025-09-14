@@ -38,8 +38,15 @@ if [[ -f "$HOME/.saporo_env" ]]; then
   . "$HOME/.saporo_env"
 fi
 
-if [ ! -d "/run/user/1000/xdg_runtime_dir" ]; then 
-    mkdir "/run/user/1000/xdg_runtime_dir"
+if [[ ! $OSTYPE = darwin* ]]; then
+    if [ ! -d "/run/user/1000/xdg_runtime_dir" ]; then 
+        mkdir "/run/user/1000/xdg_runtime_dir"
+    fi
+fi
+
+if [[ $OSTYPE = darwin* ]]; then
+    eval "$(homebrew/bin/brew shellenv)"
+    export PATH="/Users/cafebabe/.local/nvim/nvim-macos-arm64/bin:$PATH"
 fi
 
 #export GOTCH_LIBTORCH="/usr/local/lib/libtorch"

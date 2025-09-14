@@ -182,7 +182,7 @@ alias egrep='() { $(whence -p egrep) --color=auto $@ }'
 # Custom helper aliases
 alias ccat='highlight -O ansi'
 alias rm='rm -v'
-alias cat='batcat $@'
+alias cat='bat $@'
 
 # Directory management
 alias ls="eza --icons --group-directories-first"
