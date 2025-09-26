@@ -34,8 +34,8 @@ export XDG_RUNTIME_DIR="/run/user/$(id -u)/xdg_runtime_dir"
 
 # . "$HOME/.cargo/env"
 
-if [[ -f "$HOME/.saporo_env" ]]; then
-  . "$HOME/.saporo_env"
+if [[ -f "$HOME/priv/.saporo_env" ]]; then
+  . "$HOME/priv/.saporo_env"
 fi
 
 if [ ! -d "/run/user/1000/xdg_runtime_dir" ]; then 
