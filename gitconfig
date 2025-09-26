@@ -10,7 +10,7 @@
     editor = vim
     excludesfile = /home/cafebabe/.gitignore_global
     pager = diff-so-fancy | less --tabs=4 -RFX
-	sshCommand = ssh.exe
+	sshCommand = ssh
 [alias]
     co = checkout
     ci = commit
@@ -39,12 +39,12 @@
 [github]
     user = gustafb
 [user]
-  signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEBqWi2Bxg6SQGP4OyfDwZsBLiOUUZGEzfnagxt3rh8i
+    signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEBqWi2Bxg6SQGP4OyfDwZsBLiOUUZGEzfnagxt3rh8i
     name = Gustaf Brostedt
     email = "gustaf.brostedt@gmail.com"
 [gpg]
   format = ssh
-[gpg "ssh"]
-  program = "/mnt/c/Users/gusta/AppData/Local/1Password/app/8/op-ssh-sign.exe"
 [commit]
   gpgsign = true
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign

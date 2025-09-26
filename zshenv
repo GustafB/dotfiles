@@ -34,8 +34,8 @@ export XDG_RUNTIME_DIR="/run/user/$(id -u)/xdg_runtime_dir"
 
 # . "$HOME/.cargo/env"
 
-if [[ -f "$HOME/.saporo_env" ]]; then
-  . "$HOME/.saporo_env"
+if [[ -f "$HOME/priv/.saporo_env" ]]; then
+  . "$HOME/priv/.saporo_env"
 fi
 
 if [[ ! $OSTYPE = darwin* ]]; then
@@ -45,8 +45,11 @@ if [[ ! $OSTYPE = darwin* ]]; then
 fi
 
 if [[ $OSTYPE = darwin* ]]; then
-    eval "$(homebrew/bin/brew shellenv)"
-    export PATH="/Users/cafebabe/.local/nvim/nvim-macos-arm64/bin:$PATH"
+    eval "$($HOME/homebrew/bin/brew shellenv)"
+    export PATH="$HOME/.local/nvim/nvim-macos-arm64/bin:$PATH"
+    export NVM_DIR="$HOME/.nvm"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 fi
 
 #export GOTCH_LIBTORCH="/usr/local/lib/libtorch"

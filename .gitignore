@@ -36,3 +36,4 @@ dotemacs.d/tutorial/
 emacs_everywhere.dict
 the-one-theme/
 /dotemacs.d/literate_init.el
+install/*
