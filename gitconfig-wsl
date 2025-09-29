@@ -1,9 +1,13 @@
+[core]
+  sshCommand = ssh.exe
+
 [gpg]
   format = ssh
 
 [gpg "ssh"]
-  program = "/mnt/c/Users/gusta/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
+  program = "/mnt/c/Users/gusta/AppData/Local/1Password/app/8/op-ssh-sign.exe"
 
 [commit]
   gpgsign = true
+
 

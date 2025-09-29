@@ -3,14 +3,14 @@
     clean = git-lfs clean -- %f
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
+
 [core]
     pager = delta
     autocrlf = false
     safecrlf = false
     editor = vim
     excludesfile = /home/cafebabe/.gitignore_global
-    pager = diff-so-fancy | less --tabs=4 -RFX
-	sshCommand = ssh
+
 [alias]
     co = checkout
     ci = commit
@@ -28,23 +28,26 @@
     u = upstream
     dbr = branch -d
     root = rev-parse --show-toplevel
+
 [credential]
     helper = store
-[delta]
-    naviate = true
+
 [merge]
     conflictstyle = diff3
+
 [diff]
     colorMoved = default
+
 [github]
     user = gustafb
+
 [user]
     signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEBqWi2Bxg6SQGP4OyfDwZsBLiOUUZGEzfnagxt3rh8i
     name = Gustaf Brostedt
     email = "gustaf.brostedt@gmail.com"
 
-[includeIf "gitdir:/Users"]
+[includeIf "gitdir:/Users/"]
   path = ~/.gitconfig-macos
 
-[includeIf "gitdir:/home"]
+[includeIf "gitdir:/home/"]
   path = ~/.gitconfig-wsl
