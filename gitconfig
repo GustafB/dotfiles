@@ -42,11 +42,9 @@
     signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEBqWi2Bxg6SQGP4OyfDwZsBLiOUUZGEzfnagxt3rh8i
     name = Gustaf Brostedt
     email = "gustaf.brostedt@gmail.com"
-[gpg]
-  format = ssh
-[commit]
-  gpgsign = true
+
 [includeIf "gitdir:/Users"]
   path = ~/.gitconfig-macos
+
 [includeIf "gitdir:/home"]
   path = ~/.gitconfig-wsl
