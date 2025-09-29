@@ -1,10 +1,9 @@
 [gpg]
   format = ssh
 
-[commit]
-  gpgsign = true
-
 [gpg "ssh"]
   program = "/mnt/c/Users/gusta/AppData/Local/1Password/app/8/op-ssh-sign-wsl"
 
+[commit]
+  gpgsign = true
 
