@@ -46,5 +46,7 @@
   format = ssh
 [commit]
   gpgsign = true
-[gpg "ssh"]
-	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+[includeIf "gitdir:/Users"]
+  path = ~/.gitconfig-macos
+[includeIf "gitdir:/home"]
+  path = ~/.gitconfig-wsl
