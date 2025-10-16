@@ -1,319 +1,196 @@
 #!/bin/zsh
 
-export ZPLUG_LOG_LOAD_SUCCESS=false
-export ZPLUG_LOG_LOAD_FAILURE=false
+# ============================== Core options ==============================
+setopt BANG_HIST EXTENDED_HISTORY INC_APPEND_HISTORY SHARE_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_DUPS HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS HIST_IGNORE_SPACE HIST_SAVE_NO_DUPS
+setopt HIST_REDUCE_BLANKS HIST_VERIFY HIST_BEEP
+setopt PUSHD_IGNORE_DUPS PUSHD_MINUS AUTO_CD EXTENDED_GLOB
 
-export TERM="xterm-256color"
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=1000000
+export SAVEHIST=$HISTSIZE
 
-# =============================================================================
-#                                   Functions
-# =============================================================================
-timezsh() {
-  shell=${1-$SHELL}
-  for i in $(seq 1 10); do /usr/bin/time -f "%e" $shell -i -c exit; done
-}
-
-# Greps process list for some string
-pps()
-{
-    ps aux | grep --color=auto "$@" | grep -v 'grep';
-}
-
-gfd() {
-  preview="git diff $@ --color=always -- {-1}"
-  git diff $@ --name-only | fzf -m --ansi --preview $preview
-}
-
-# Returns the current git branch
-parse_git_branch()
-{
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
-
-mygrep()
-{
-    $(which -p grep) --color=auto "$@"
-}
-
-myegrep()
-{
-    $(which -p egrep) --color=auto "$@"
-}
-
-
-# =============================================================================
-#                                   Variables
-# =============================================================================
-export LANG="en_US.UTF-8"
-export LC_ALL="en_US.UTF-8"
-
-export FZF_DEFAULT_OPTS='--height 40% --reverse --border --inline-info --color=dark,bg+:235,hl+:10,pointer:5'
-
-export ENHANCD_FILTER="fzf:peco:percol"
-export ENHANCD_COMMAND='c'
-
-if [ -n "$INSIDE_EMACS" ]; then
-  chpwd() { print -P "\033AnSiTc %d" }
-  print -P "\033AnSiTu %n"
-  print -P "\033AnSiTc %d"
-fi
-
-# =============================================================================
-#                                   Options
-# =============================================================================
-
-# improved less option
-export LESS="-CQaix4"
-
-# Key timeout and character sequences
 KEYTIMEOUT=1
 WORDCHARS='*?_-[]~=./&;!#$%^(){}<>'
 
-# History
-export HISTFILE="/home/cafebabe/.zsh_history"
-export HISTSIZE=1000000
-export SAVEHIST=$HISTSIZE
-export HISTIGNORE="pwd:ls:cd"
-alias hist="history 1"
-setopt BANG_HIST                 # Treat the '!' character specially during expansion.
-setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
-setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
-setopt SHARE_HISTORY             # Share history between all sessions.
-setopt HIST_EXPIRE_DUPS_FIRST    # Expire duplicate entries first when trimming history.
-setopt HIST_IGNORE_DUPS          # Don't record an entry that was just recorded again.
-setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
-setopt HIST_FIND_NO_DUPS         # Do not display a line previously found.
-setopt HIST_IGNORE_SPACE         # Don't record an entry starting with a space.
-setopt HIST_SAVE_NO_DUPS         # Don't write duplicate entries in the history file.
-setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording entry.
-setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
-setopt HIST_BEEP                 # Beep when accessing nonexistent history.
+export LESS="-CQaix4"
 
-bindkey "^R" history-incremental-search-backward
+# ============================== Completion ================================
+autoload -Uz compinit
+compinit -C                             # cached; skips security checks after first run
 
-# Changing directories
-#setopt auto_pushd
-setopt pushd_ignore_dups        # Dont push copies of the same dir on stack.
-setopt pushd_minus              # Reference stack entries with "-".
-setopt autocd                   # Allow changing directories without `cd`
+# completion quality & UI
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'r:|[._-]=* r:|=*'
+zstyle ':completion:*' menu select
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
-setopt extended_glob
-CASE_SENSITIVE="true"
+# git: prefer branches, then remotes, then tags
+zstyle ':completion:*:*:git-(checkout|switch|merge|rebase|cherry-pick|reset):*' tag-order 'heads' 'remote-heads' 'tags'
 
-# =============================================================================
-#                                   Aliases
-# =============================================================================
+# =============================== Prompt ===================================
+eval "$(starship init zsh)"
 
-# Directory coloring
-if [[ $OSTYPE = (darwin|freebsd)* ]]; then
-	export CLICOLOR="YES" # Equivalent to passing -G to ls.
-	export LSCOLORS="exgxdHdHcxaHaHhBhDeaec"
+# ================================ FZF =====================================
+export FZF_DEFAULT_OPTS='--height 40% --reverse --border --inline-info --color=dark,bg+:235,hl+:10,pointer:5'
+[ -f "$HOME/.fzf.zsh" ] && source "$HOME/.fzf.zsh"
 
-	[ -d "/opt/local/bin" ] && export PATH="/opt/local/bin:$PATH"
-
-	# Prefer GNU version, since it respects dircolors.
-	if (( $+commands[gls] )); then
-		alias ls='() { $(whence -p gls) -Ctr --file-type --color=auto $@ }'
-	else
-		alias ls='() { $(whence -p ls) -CFtr $@ }'
-	fi
-else
-	alias ls='() { $(whence -p ls) -Ctr --file-type --color=auto $@ }'
-fi
-
-# Set editor preference to nvim if available.
-if (( $+commands[nvim] )); then
-	alias vim='() { $(whence -p nvim) $@ }'
-else
-	alias vim='() { $(whence -p vim) $@ }'
-fi
-
-# Generic command adaptations
-alias grep='() { $(whence -p grep) --color=auto $@ }'
-alias egrep='() { $(whence -p egrep) --color=auto $@ }'
-
-# Custom helper aliases
-alias ccat='highlight -O ansi'
-alias rm='rm -v'
-
-if command -v batcat >/dev/null 2>&1; then
-    alias cat='batcat'
-    alias cap='batcat --plain'
-elif command -v bat >/dev/null 2>&1; then
-    alias cat='bat --plain'
-else
-    alias cat='cat'
-fi
-
-# Directory management
-alias ls="eza --icons --group-directories-first"
-alias ll="eza --icons --group-directories-first -l"
-alias la='ls -a'
-alias lal='ls -al'
-alias d='dirs -v'
-alias 1='pu'
-alias 2='pu -2'
-alias 3='pu -3'
-alias 4='pu -4'
-alias 5='pu -5'
-alias 6='pu -6'
-alias 7='pu -7'
-alias 8='pu -8'
-alias 9='pu -9'
-alias pu='() { pushd $1 &> /dev/null; dirs -v; }'
-alias po='() { popd &> /dev/null; dirs -v; }'
-
-# Housekeeping
-alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'
-
-zshaddhistory() { whence ${${(z)1}[1]} >| /dev/null || return 1 }
-
-[ -d "$HOME/bin" ] && export PATH="$HOME/bin:$PATH"
-
-# Source defined functions.
-[[ -f ~/.zsh_functions ]] && source ~/.zsh_functions
-
-# Source local customizations.
-[[ -f ~/.zsh_rclocal ]] && source ~/.zsh_rclocal
-
-# Source exports and aliases.
-[[ -f ~/.zsh_exports ]] && source ~/.zsh_exports
-[[ -f ~/.zsh_aliases ]] && source ~/.zsh_aliases
-
-# Git commands
-alias glog='git log --oneline'
-alias grv='git remote -v'
-alias gog="git log  --abbrev-commit --name-status --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'"
-alias gml="git log --stat --color --decorate --all --oneline"
-alias ggr="git log --graph --full-history --all --pretty=format:\"%h%x09%d%x20%s\""
-alias gdw="git diff --word-diff=color"
-alias gds="git diff --word-diff=color --staged"
-alias gs="git status"
-alias gu="git add -u"
-alias ga="git add"
-alias gc="git commit -m"
-alias gp='git push origin $(git rev-parse --abbrev-ref HEAD)'
-
-# Navigation
-alias ..='cd ..'
-alias ..2='cd ../..'
-alias ..3='cd ../../..'
-alias ..4='cd ../../../..'
-alias ..5='cd ../../../../..'
-alias ..6='cd ../../../../../..'
-alias ..7='cd ../../../../../../..'
-alias win='explorer.exe .'
-
-# Generic command adaptions
-alias ll="ls -lh"
-alias lal="ls -lha"
-alias la="ls -a"
-alias rm="rm -iv"
-alias c="clear"
-alias cl="clear; ll"
-alias cla="clear; lal"
-alias grepdir="find . -type f -print0 | xargs -0 grep -nHi --color=auto"
-alias grep="mygrep $@"
-alias egrep="myegrep $@"
-
-# Housekeeping
-alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'
-alias klast="kill %1"
-# alias dk="kill -9 $(docker ps -q)"
-alias ccat="source-highlight --out-format=esc256 -o STDOUT -i"
-
-# Neovim
-alias v=nvim
-alias vi=nvim
-alias vim=nvim
-
-# Other
-alias act='source ./.venv/bin/activate'
-
-# Tmux
-# Allows us to save the current command and return to it 
-# if we accidentally hit a tmux keybind
-tmux_sessionizer_widget() {
-    # Preserve the current buffer
-    local saved_buffer="$BUFFER"
-    local saved_cursor="$CURSOR"
-    
-    # Clear the prompt
-    zle clear-screen
-    
-    # Run tmux_sessionizer function
-    tmux_sessionizer
-    
-    # Restore the prompt
-    zle reset-prompt
-    
-    # Restore the buffer
-    BUFFER="$saved_buffer"
-    CURSOR="$saved_cursor"
-}
-
-tmux_sessionizer() {
-    local selected=$(find ~/saporo ~/install/dotfiles ~/code ~/tmp ~/notes -mindepth 1 -maxdepth 1 -type d | fzf)
-    if [[ -n $selected ]]; then
-        ~/bin/tmux-sessionizer "$selected"
-    fi
-}
-
-zle -N tmux_sessionizer_widget
-
-bindkey '^G' tmux_sessionizer_widget
-bindkey -s "^H" "list-tmux-sessions"
-
-# sql
-dsql() {
-    docker exec $(docker ps -q -f "name=psql") psql -U postgres main -c "${1}"
-}
-
-isql() {
-    docker exec -it $(docker ps -q -f "name=psql") psql -U postgres main
-}
-
-mg() {
-    docker exec -it $(docker ps -q -f "name=mg") mgconsole
-}
-
-### Added by Zinit's installer
+# =============================== Plugins ==================================
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
-    print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
-    command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
-    command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" && \
-        print -P "%F{33} %F{34}Installation successful.%f%b" || \
-        print -P "%F{160} The clone has failed.%f%b"
+  print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} zinit…%f"
+  command mkdir -p "$HOME/.local/share/zinit" && command chmod g-rwX "$HOME/.local/share/zinit"
+  command git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git" \
+    && print -P "%F{34}Installation successful.%f" \
+    || print -P "%F{160}The clone has failed.%f"
 fi
-
-
 source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
+autoload -Uz _zinit; (( ${+_comps} )) && _comps[zinit]=_zinit
 
-
-# ## End of Zinit's installer chunk
-# # zsh-fzf-history-search
 zinit ice lucid wait'0'
 zinit light joshskidmore/zsh-fzf-history-search
 
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
+zinit ice lucid wait"1"
+zinit light lukechilds/zsh-nvm
 
-plugins=(… zsh-nvm zsh-fzf-history-search docker git npm docker-compose)
+# ============================== Environment ===============================
+export DISPLAY=:0.0
+export GDK_SCALE=0.5
+export GDK_DPI_SCALE=2
 
-# # check if zplug is installed
-if [[ ! -d ~/.zplug ]]; then
-curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
-else
-    # source ~/.zplug/init.zsh
+if [[ $OSTYPE != darwin* ]]; then
+  export XDG_RUNTIME_DIR="/run/user/$(id -u)/xdg_runtime_dir"
+  [[ -d "$XDG_RUNTIME_DIR" ]] || mkdir -p "$XDG_RUNTIME_DIR"
 fi
 
+if [[ $OSTYPE = darwin* ]]; then
+  [[ -x "$HOME/homebrew/bin/brew" ]] && eval "$($HOME/homebrew/bin/brew shellenv)"
+  export PATH="$HOME/.local/nvim/nvim-macos-arm64/bin:$PATH"
+fi
 
-eval "$(starship init zsh)"
+[ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[[ -f "$HOME/priv/.saporo_env" ]] && . "$HOME/priv/.saporo_env"
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# ============================== Functions =================================
+timezsh() {
+  local shell=${1-$SHELL}
+  for i in $(seq 1 10); do /usr/bin/time -f "%e" "$shell" -i -c exit; done
+}
+
+# Grep processes (avoid matching grep itself)
+pps() {
+  ps aux | grep --color=auto -i "[${1[1]}]${1[2,-1]}"
+}
+
+# Git diff picker (space-safe)
+gfd() {
+  local preview='git diff --color=always -- {-1}'
+  git diff --name-only -z "$@" | tr -d '\n' | tr '\0' '\n' | fzf -m --ansi --preview "$preview"
+}
+
+# Current git branch in prompt (if you use it)
+parse_git_branch() {
+  git branch 2>/dev/null | sed -n 's/^\* \(.*\)$/ (\1)/p'
+}
+
+# Docker helpers
+dsql() { docker exec "$(docker ps -q -f "name=psql")" psql -U postgres main -c "${1}"; }
+isql() { docker exec -it "$(docker ps -q -f "name=psql")" psql -U postgres main; }
+mg()   { docker exec -it "$(docker ps -q -f "name=mg")" mgconsole; }
+
+# Tmux sessionizer (preserve prompt buffer)
+tmux_sessionizer() {
+  local selected
+  selected=$(find ~/saporo ~/install/dotfiles ~/code ~/tmp ~/notes -mindepth 1 -maxdepth 1 -type d | fzf)
+  [[ -n $selected ]] && ~/bin/tmux-sessionizer "$selected"
+}
+tmux_sessionizer_widget() {
+  local saved_buffer="$BUFFER" saved_cursor="$CURSOR"
+  zle clear-screen
+  tmux_sessionizer
+  zle reset-prompt
+  BUFFER="$saved_buffer"
+  CURSOR="$saved_cursor"
+}
+zle -N tmux_sessionizer_widget
+bindkey '^G' tmux_sessionizer_widget
+
+# zshaddhistory: skip commands that aren't found in PATH (keeps output clean)
+zshaddhistory() { whence ${${(z)1}[1]} >| /dev/null || return 1 }
+
+# ================================ Aliases =================================
+# Pager/cat
+if command -v batcat >/dev/null 2>&1; then
+  alias cat='batcat'
+  alias cap='batcat --plain'
+elif command -v bat >/dev/null 2>&1; then
+  alias cat='bat --plain'
+fi
+
+# eza (single source of truth)
+alias ls="eza --icons --group-directories-first"
+alias ll="eza --icons --group-directories-first -l"
+alias la='ls -a'
+alias lal='ls -al'
+
+# Editors
+alias v='nvim'
+alias vi='nvim'
+alias vim='nvim'
+
+# Grep family (simple, consistent)
+alias grep='grep --color=auto'
+alias egrep='grep -E --color=auto'
+alias fgrep='grep -F --color=auto'
+
+# Safer rm
+alias rm='rm -iv'
+
+# Misc
+alias c='clear'
+alias cl='clear; ll'
+alias cla='clear; lal'
+alias d='dirs -v'
+alias ..='cd ..'; alias ..2='cd ../..'; alias ..3='cd ../../..'
+alias ..4='cd ../../../..'; alias ..5='cd ../../../../..'
+alias ..6='cd ../../../../../..'; alias ..7='cd ../../../../../../..'
+alias win='explorer.exe .'
+alias act='source ./.venv/bin/activate'
+alias glog='git log --oneline'
+alias grv='git remote -v'
+alias gog="git log  --abbrev-commit --name-status --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'"
+alias gml="git log --stat --color --decorate --all --oneline"
+alias ggr="git log --graph --full-history --all --pretty=format:\"%h%x09%d%x20%s\""
+alias gdw='git diff --word-diff=color'
+alias gds='git diff --word-diff=color --staged'
+alias gs='git status'
+alias gu='git add -u'
+alias ga='git add'
+alias gc='git commit -m'
+alias gp='git push origin $(git rev-parse --abbrev-ref HEAD)'
+
+# Git convenience + completions for aliases
+alias gco='git checkout'
+alias gsw='git switch'
+compdef gco=git-checkout
+compdef gsw=git-switch
+
+# Housekeeping
+alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'
+
+# ============================= Local includes =============================
+[ -d "$HOME/bin" ] && path=($HOME/bin $path)
+[[ -f "$HOME/.zsh_functions" ]] && source "$HOME/.zsh_functions"
+[[ -f "$HOME/.zsh_rclocal"   ]] && source "$HOME/.zsh_rclocal"
+[[ -f "$HOME/.zsh_exports"   ]] && source "$HOME/.zsh_exports"
+[[ -f "$HOME/.zsh_aliases"   ]] && source "$HOME/.zsh_aliases"
+
+# Emacs shell integration (if applicable)
+if [[ -n "$INSIDE_EMACS" ]]; then
+  chpwd() { print -P "\033AnSiTc %d" }
+  print -P "\033AnSiTu %n"
+  print -P "\033AnSiTc %d"
+fi
+
