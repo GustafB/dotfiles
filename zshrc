@@ -71,7 +71,7 @@ fi
 
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
-[[ -f "$HOME/priv/.saporo_env" ]] && . "$HOME/priv/.saporo_env"
+[[ -f "$HOME/priv/saporo_env" ]] && . "$HOME/priv/saporo_env"
 
 # ============================== Functions =================================
 timezsh() {
@@ -174,8 +174,6 @@ alias gp='git push origin $(git rev-parse --abbrev-ref HEAD)'
 # Git convenience + completions for aliases
 alias gco='git checkout'
 alias gsw='git switch'
-compdef gco=git-checkout
-compdef gsw=git-switch
 
 # Housekeeping
 alias cdir='find . \( -name "*.o" -or -name "*.so" \) -exec rm {} \;'

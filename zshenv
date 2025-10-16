@@ -21,7 +21,8 @@ path=(
 
 fpath=($HOME/installs/eza/completions/zsh $fpath)
 
-export PATH=${path:|:}
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"
 export TERM="xterm-256color"
+export PATH   # (no value) just marks it exported; PATH is already synced from $path
+
