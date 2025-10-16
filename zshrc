@@ -1,5 +1,4 @@
 #!/bin/zsh
-zmodload zsh/zprof
 
 export ZPLUG_LOG_LOAD_SUCCESS=false
 export ZPLUG_LOG_LOAD_FAILURE=false
@@ -35,15 +34,6 @@ si()
     echo "$pem $user@$choice"
     ssh -i $pem $user@$choice
 }
-
-# dev() {
-#     user="gustaf"
-#     pem="/home/cafebabe/.ssh/$user.pem"
-#     choice=$(tailscale status --json | jq -r '.Peer[] | .HostName' | fzf --preview "tailscale status --json | jq -r '.Peer[] | select(.HostName == \"{}\") | .'")
-#     echo "$choice"
-#     echo "$pem" "$user@$choice.saporo.net"
-#     ssh -i "$pem" "$user@$choice.saporo.net"
-# }
 
 # Greps process list for some string
 pps()

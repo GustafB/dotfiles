@@ -11,7 +11,7 @@ export PATH="/usr/local/opt/ruby/bin:$PATH"
 export PATH="/usr/local/go/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 export PATH="/snap/bin:$PATH"
-export PATH="/home/cafebabe/.cargo/bin/navi:$PATH"
+export PATH="$HOME/.cargo/bin:$PATH"
 export PATH="$PYENV_ROOT/bin:$PATH"
 export PATH="$PATH:/mnt/c/windows"
 export PATH="$PATH:/mnt/c/windows/system32/openssh"
@@ -32,8 +32,7 @@ export ZPLUG_HOME="$HOME/.zplug"
 
 export XDG_RUNTIME_DIR="/run/user/$(id -u)/xdg_runtime_dir"
 
-# . "$HOME/.cargo/env"
-
+# 
 if [[ -f "$HOME/priv/.saporo_env" ]]; then
   . "$HOME/priv/.saporo_env"
 fi
@@ -57,3 +56,4 @@ fi
 #export CPATH="$CPATH:$GOTCH_LIBTORCH/lib:$GOTCH_LIBTORCH/include:$GOTCH_LIBTORCH/include/torch/csrc/api/include"
 #LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$GOTCH_LIBTORCH/lib:/usr/lib64-nvidia:/usr/local/cuda-${CUDA_VERSION}/lib64"
 
+. "$HOME/.cargo/env"

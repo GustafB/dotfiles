@@ -73,3 +73,6 @@ privatekey
 .conda
 .gnupg
 .git
+
+**/.claude
+**/.claude/
