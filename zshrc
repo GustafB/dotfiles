@@ -3,20 +3,7 @@
 export ZPLUG_LOG_LOAD_SUCCESS=false
 export ZPLUG_LOG_LOAD_FAILURE=false
 
-# autoload -Uz compinit
-# if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-# 	compinit;
-# else
-# 	compinit -C;
-# fi;
-
 export TERM="xterm-256color"
-
-# set -o vi
-
-# if [[ -z $TMUX ]]; then
-#     tmuxinator start poke
-# fi
 
 # =============================================================================
 #                                   Functions
@@ -24,15 +11,6 @@ export TERM="xterm-256color"
 timezsh() {
   shell=${1-$SHELL}
   for i in $(seq 1 10); do /usr/bin/time -f "%e" $shell -i -c exit; done
-}
-
-si()
-{
-    user="gustaf"
-    pem="/home/cafebabe/.ssh/gustaf_dev.pem"
-    choice=$(tailscale status --json | jq -r '.Peer[] | .HostName' | fzf --preview 'tailscale status --json | jq -r \".Peer[] | select(.HostName == \"{}\") | .\"')
-    echo "$pem $user@$choice"
-    ssh -i $pem $user@$choice
 }
 
 # Greps process list for some string
@@ -73,8 +51,6 @@ export FZF_DEFAULT_OPTS='--height 40% --reverse --border --inline-info --color=d
 
 export ENHANCD_FILTER="fzf:peco:percol"
 export ENHANCD_COMMAND='c'
-# export EDITOR="nvim"
-# export VISUAL="nvim"
 
 if [ -n "$INSIDE_EMACS" ]; then
   chpwd() { print -P "\033AnSiTc %d" }
@@ -87,14 +63,7 @@ fi
 # =============================================================================
 
 # improved less option
-#export LESS="--tabs=4 --no-init --LONG-PROMPT --ignore-case --quit-if-one-screen --RAW-CONTROL-CHARS"
 export LESS="-CQaix4"
-
-# Watching other users
-#WATCHFMT="%n %a %l from %m at %t."
-watch=(notme)         # Report login/logout events for everybody except ourself.
-LOGCHECK=60           # Time (seconds) between checks for login/logout activity.
-REPORTTIME=5          # Display usage statistics for commands running > 5 sec.
 
 # Key timeout and character sequences
 KEYTIMEOUT=1
@@ -120,8 +89,6 @@ setopt HIST_REDUCE_BLANKS        # Remove superfluous blanks before recording en
 setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
 setopt HIST_BEEP                 # Beep when accessing nonexistent history.
 
-
-
 bindkey "^R" history-incremental-search-backward
 
 # Changing directories
@@ -136,10 +103,6 @@ CASE_SENSITIVE="true"
 # =============================================================================
 #                                   Aliases
 # =============================================================================
-
-# In the definitions below, you will see use of function definitions instead of
-# aliases for some cases. We use this method to avoid expansion of the alias in
-# combination with the globalias plugin.
 
 # Directory coloring
 if [[ $OSTYPE = (darwin|freebsd)* ]]; then
@@ -314,11 +277,6 @@ mg() {
     docker exec -it $(docker ps -q -f "name=mg") mgconsole
 }
 
-# start app
-alias eg="setsid emacs &"
-
-export PATH="${PATH}:/home/cafebabe/.cargo/bin"
-
 ### Added by Zinit's installer
 if [[ ! -f $HOME/.local/share/zinit/zinit.git/zinit.zsh ]]; then
     print -P "%F{33} %F{220}Installing %F{33}ZDHARMA-CONTINUUM%F{220} Initiative Plugin Manager (%F{33}zdharma-continuum/zinit%F{220})…%f"
@@ -333,13 +291,6 @@ source "$HOME/.local/share/zinit/zinit.git/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
-# Load a few important annexes, without Turbo
-# (this is currently required for annexes)
-# zinit light-mode for \
-#     zdharma-continuum/zinit-annex-as-monitor \
-#     zdharma-continuum/zinit-annex-bin-gem-node \
-#     zdharma-continuum/zinit-annex-patch-dl \
-#     zdharma-continuum/zinit-annex-rust
 
 # ## End of Zinit's installer chunk
 # # zsh-fzf-history-search
@@ -349,7 +300,7 @@ zinit light joshskidmore/zsh-fzf-history-search
 export NVM_LAZY_LOAD=true
 export NVM_COMPLETION=true
 
-#plugins=(… zsh-nvm zsh-fzf-history-search docker git npm docker-compose)
+plugins=(… zsh-nvm zsh-fzf-history-search docker git npm docker-compose)
 
 # # check if zplug is installed
 if [[ ! -d ~/.zplug ]]; then

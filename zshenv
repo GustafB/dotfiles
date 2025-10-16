@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#export NVM_DIR="$HOME/.nvm"
-#. "${NVM_DIR}/nvm.sh"
-
 export PATH="/usr/local/sbin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="/usr/bin:$PATH"
@@ -19,20 +16,12 @@ export PATH=$PATH:~/install/zig-linux-x86_64-0.15.0-dev.56+d0911786c
 export FPATH="$HOME/installs/eza/completions/zsh:$FPATH"
 export PATH="$PATH:/opt/nvim-linux-x86_64/bin"
 
-# export DISPLAY=$(cat /etc/resolv.conf | grep nameserver | awk '{print $2; exit;}'):0
 export DISPLAY=:0.0
-
 export GDK_SCALE=0.5
-
 export GDK_DPI_SCALE=2
-
-export PYENV_ROOT="$HOME/.pyenv"
-
 export ZPLUG_HOME="$HOME/.zplug"
-
 export XDG_RUNTIME_DIR="/run/user/$(id -u)/xdg_runtime_dir"
 
-# 
 if [[ -f "$HOME/priv/.saporo_env" ]]; then
   . "$HOME/priv/.saporo_env"
 fi
@@ -50,10 +39,5 @@ if [[ $OSTYPE = darwin* ]]; then
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 fi
-
-#export GOTCH_LIBTORCH="/usr/local/lib/libtorch"
-#export LIBRARY_PATH="$LIBRARY_PATH:$GOTCH_LIBTORCH/lib"
-#export CPATH="$CPATH:$GOTCH_LIBTORCH/lib:$GOTCH_LIBTORCH/include:$GOTCH_LIBTORCH/include/torch/csrc/api/include"
-#LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$GOTCH_LIBTORCH/lib:/usr/lib64-nvidia:/usr/local/cuda-${CUDA_VERSION}/lib64"
 
 . "$HOME/.cargo/env"
