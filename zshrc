@@ -98,7 +98,7 @@ parse_git_branch() {
 # Docker helpers
 dsql() { docker exec "$(docker ps -q -f "name=psql")" psql -U postgres main -c "${1}"; }
 isql() { docker exec -it "$(docker ps -q -f "name=psql")" psql -U postgres main; }
-mg()   { docker exec -it "$(docker ps -q -f "name=mg")" mgconsole; }
+mg()   { docker exec -it "$(docker ps -q -f "name=mg")" mgconsole --term-colors=true; }
 
 # Tmux sessionizer (preserve prompt buffer)
 tmux_sessionizer() {
@@ -141,9 +141,9 @@ alias vi='nvim'
 alias vim='nvim'
 
 # Grep family (simple, consistent)
-alias grep='grep --color=auto'
-alias egrep='grep -E --color=auto'
-alias fgrep='grep -F --color=auto'
+alias grep='rg --color=auto'
+alias egrep='rg -E --color=auto'
+alias fgrep='rg -F --color=auto'
 
 # Safer rm
 alias rm='rm -iv'
