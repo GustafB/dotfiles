@@ -32,6 +32,9 @@
 [credential]
     helper = store
 
+[pull]
+	rebase = true
+
 [merge]
     conflictstyle = diff3
 
@@ -51,3 +54,4 @@
 
 [includeIf "gitdir:/home/"]
   path = ~/.gitconfig-wsl
+
