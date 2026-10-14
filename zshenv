@@ -20,6 +20,8 @@ path=(
 [[ -n $PYENV_ROOT ]] && path=($PYENV_ROOT/bin $path)
 
 fpath=($HOME/installs/eza/completions/zsh $fpath)
+# needed before compinit in zshrc; `brew shellenv` adds it too late
+[[ -d /opt/homebrew/share/zsh/site-functions ]] && fpath=(/opt/homebrew/share/zsh/site-functions $fpath)
 
 export LANG="en_US.UTF-8"
 export LC_ALL="en_US.UTF-8"

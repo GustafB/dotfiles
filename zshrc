@@ -28,8 +28,6 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 # git: prefer branches, then remotes, then tags
 zstyle ':completion:*:*:git-(checkout|switch|merge|rebase|cherry-pick|reset):*' tag-order 'heads' 'remote-heads' 'tags'
 
-# =============================== Prompt ===================================
-eval "$(starship init zsh)"
 
 # ================================ FZF =====================================
 export FZF_DEFAULT_OPTS='--height 40% --reverse --border --inline-info --color=dark,bg+:235,hl+:10,pointer:5'
@@ -65,9 +63,18 @@ if [[ $OSTYPE != darwin* ]]; then
 fi
 
 if [[ $OSTYPE = darwin* ]]; then
-  [[ -x "$HOME/homebrew/bin/brew" ]] && eval "$($HOME/homebrew/bin/brew shellenv)"
+  [[ -x /opt/homebrew/bin/brew ]] && eval "$(/opt/homebrew/bin/brew shellenv)"
   export PATH="$HOME/.local/nvim/nvim-macos-arm64/bin:$PATH"
 fi
+
+# =============================== Prompt ===================================
+eval "$(starship init zsh)"
+
+# A new tmux pane can still report its pre-tiling width at the first prompt, so
+# PROMPT_SP's line wraps and leaves a stray %; a fresh shell has no output to mark
+unsetopt PROMPT_SP
+_first_prompt_sp() { setopt PROMPT_SP; precmd_functions=(${precmd_functions:#_first_prompt_sp}) }
+precmd_functions+=(_first_prompt_sp)
 
 [ -f "$HOME/.cargo/env" ] && . "$HOME/.cargo/env"
 
@@ -98,7 +105,17 @@ parse_git_branch() {
 # Docker helpers
 dsql() { docker exec "$(docker ps -q -f "name=psql")" psql -U postgres main -c "${1}"; }
 isql() { docker exec -it "$(docker ps -q -f "name=psql")" psql -U postgres main; }
-mg()   { docker exec -it "$(docker ps -q -f "name=mg")" mgconsole --term-colors=true; }
+mg() {
+  local id=$(docker ps -q -f "name=mg")
+  if (( $# )); then
+    # mgconsole silently ignores a statement without a trailing ; (extra ones are harmless)
+    print -r -- "$*;" | docker exec -i "$id" mgconsole ${MG_FORMAT:+--output-format=$MG_FORMAT}
+  elif [[ ! -t 0 ]]; then
+    docker exec -i "$id" mgconsole ${MG_FORMAT:+--output-format=$MG_FORMAT}
+  else
+    docker exec -it "$id" mgconsole --term-colors=true
+  fi
+}
 
 # Tmux sessionizer (preserve prompt buffer)
 tmux_sessionizer() {
